@@ -1,0 +1,104 @@
+body {
+
+    background: #363339; 
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4 {
+    font-family: Georgia;
+    font-weight: 300;
+    color: #ffffff;
+}
+
+a {
+    color: #ceb9e3;
+    text-decoration: none;
+}
+p {
+
+
+
+    color: #ffffffd1;  /* Changes color of all <p> (paragraph) elements to a medium gray */
+}
+a:hover {
+    text-decoration: underline;
+}
+
+
+footer {
+    color: #ffffff;
+
+}
+
+li {
+    color: #f0f0f0;
+}
+
+
+
+input {
+    color: #ffffffc0;
+    border: 1px solid #ccc; /* Adds a border */
+    background: #363339;
+    padding: 10px;
+    width: 200px; /* You can adjust the width as per your preference */
+    transition: width 0.3s ease-in-out; /* Adds a transition effect when the width changes */
+
+}
+#pagename {
+    color: #ffffff;
+    font-family: Georgia;
+}
+
+button {
+    background: #363339; /* Same as body background */
+    color: #ffffffc0; /* Matching the anchor tag color */
+    border: 1px solid #ccc; /* Similar to the search input border */
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.3s ease; /* Smooth transition for hover effect */
+}
+
+button:hover {
+    background: #504a50d5; /* Slightly lighter shade for hover */
+    text-decoration: underline; /* Consistent with the anchor hover effect */
+}
+
+
+nav {
+    display: flex;
+    flex-direction: row;
+    align-items: left;
+    justify-content: left;
+    margin-top: 20px;
+    
+}
+
+#suggestionsList {
+    list-style-type: none; /* Removes bullet points */
+    padding: 10px; 
+    background: #363339; /* Background color for the dropdown */
+    position: absolute; /* Positions the dropdown relative to its parent */
+    width: 200px; /* Matches the width of the search input */
+    border: 1px solid #ccc; /* Adds a border */
+    display: none; /* Hides the list by default */
+}
+#suggestions {
+    border: 1px solid #ccc;
+    position: absolute;
+    width: 200px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+  }
+  #suggestions li {
+    padding: 5px;
+    cursor: pointer;
+  }
+  #suggestions li:hover {
+    background-color: #f0f0f0;
+    color: #363339
+  }

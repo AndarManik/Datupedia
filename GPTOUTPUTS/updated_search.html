@@ -1,0 +1,25 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Datupedia</title>
+</head>
+<body>
+  <h1>Welcome to Datupedia</h1>
+  <div id="status"></div>
+
+  <script>
+    // Initialize WebSocket connection to the server
+    const ws = new WebSocket('ws://localhost:3000');
+
+    // Get a reference to the status div where updates will be displayed
+    const statusDiv = document.getElementById('status');
+
+    // Listen for messages from the server
+    ws.addEventListener('message', (event) => {
+      // Update the status div with the message received from the server
+      statusDiv.innerHTML += `<p>${event.data}</p>`;
+    });
+  </script>
+</body>
+</html>

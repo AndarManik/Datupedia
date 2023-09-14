@@ -1,0 +1,30 @@
+{
+  "name": "datupedia",
+  "version": "1.0.0",
+  "description": "Backlink analyzer for wikipedia",
+  "main": "index.js",
+  "scripts": {
+    "test": "testd"
+  },
+  "keywords": [
+    "Wikipedia",
+    "data",
+    "extraction",
+    "text",
+    "analysis",
+    "clustering",
+    "OpenAI",
+    "embeddings"
+  ],
+  "author": "Andar Manik",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.4.0",
+    "bottleneck": "^2.19.5",
+    "express": "^4.18.2",
+    "express-rate-limit": "^6.11.0",
+    "mongodb": "^6.0.0",
+    "node-html-parser": "^6.1.6",
+    "ws": "^8.14.1"
+  }
+}

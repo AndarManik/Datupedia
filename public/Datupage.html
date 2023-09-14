@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      body {
+        background: #363339; 
+        font-family: Georgia, sans-serif;
+        margin: 20px;
+        line-height: 1.2;
+      }
+      h1, h2, h3, h4 {
+        font-family: Georgia;
+        font-weight: 300;
+        color: #ffffff;
+      }
+      /* ... (all the rest of your CSS here) ... */
+      p {
+        color: #f0f0f0;
+      }
+    </style>
+    <title>DatuPage - {{pagename}}</title>
+    <script>
+      // Initialize WebSocket connection
+      const ws = new WebSocket("ws://localhost:3000");
+
+      // Function to update the UI
+      const updateUI = (message) => {
+        const statusDiv = document.getElementById("status");
+        const dataDiv = document.getElementById("data");
+
+        if (message.startsWith("Fetching data for")) {
+          statusDiv.innerHTML = "Loading...";
+        } else if (message.startsWith("Data fetched:")) {
+          // Clear the loading text
+          statusDiv.innerHTML = "";
+
+          // Display the fetched data
+          const fetchedData = message.replace("Data fetched:", "");
+          dataDiv.innerHTML = fetchedData;
+        }
+      };
+
+      ws.addEventListener("message", (event) => {
+        updateUI(event.data);
+      });
+    </script>
+  </head>
+  <body>
+    <h1 id="pageTitle">DatuPage - {{pagename}}</h1>
+    <div id="status"></div>
+    <div id="data"></div>
+  </body>
+</html>
