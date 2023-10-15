@@ -1,0 +1,10 @@
+[X] Batch request WikipediaAPI
+[X] Batch request OpenAIAPI
+[ ] Loading bar
+[ ] Cluster data storage
+[X] Wikipage cluster navigation
+[ ] Fix formating bugs in the page display
+[ ] Fix mongoDB issues
+[X] Add a check to see if there is enough information to generate a Wikipage
+[ ] Add CSS features, a home button, a search button
+[ ] Port Forward hosting
