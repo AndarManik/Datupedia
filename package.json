@@ -4,7 +4,7 @@
   "description": "Backlink analyzer for wikipedia",
   "main": "index.js",
   "scripts": {
-    "test": "testd"
+    "start": "node server"
   },
   "keywords": [
     "Wikipedia",
