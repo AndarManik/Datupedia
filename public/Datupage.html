@@ -2,52 +2,190 @@
 <html>
   <head>
     <style>
-      body {
-        background: #363339; 
-        font-family: Georgia, sans-serif;
-        margin: 20px;
-        line-height: 1.2;
+      :root {
+        /* Set the width to be 80% of viewport width, but not exceeding 900px */
+        --gradient-width: min(81vw, 905px);
       }
-      h1, h2, h3, h4 {
+      body {
+        background: linear-gradient(
+          to right,
+          #363339 0%,
+
+          #4d4650 calc(50% - (var(--gradient-width) / 2)),
+          #4d4650 calc(50% + (var(--gradient-width) / 2)),
+
+          #363339 100%
+        );
+        font-family: Arial, Helvetica, sans-serif, sans-serif;
+        margin: 0;
+        line-height: 1.3;
+        color: #f0f0f0;
+      }
+      .container {
+        width: 80%;
+        max-width: 900px;
+        margin: 0 auto;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
         font-family: Georgia;
         font-weight: 300;
         color: #ffffff;
       }
-      /* ... (all the rest of your CSS here) ... */
       p {
         color: #f0f0f0;
+        font-weight: 50;
+      }
+      .article-section {
+        cursor: pointer; /* Changes the cursor to a hand when hovered over the div */
+        transition: background-color 0.3s ease; /* Smooth transition for background color change */
+      }
+      .article-section:hover {
+        background-color: #575757; /* Change background color when hovered over the div */
+      }
+      .article-section:active {
+        background-color: #787878; /* Change background color when div is clicked */
+      }
+      a {
+        color: #a4c5fb;
+        text-decoration: none;
       }
     </style>
-    <title>DatuPage - {{pagename}}</title>
+    <title>{{pagename}}</title>
     <script>
+      const userId = "{{userID}}"; // Assume you have some way to populate this value
+      const pageId = "{{pagename}}";
       // Initialize WebSocket connection
-      const ws = new WebSocket("ws://localhost:3000");
+      const ws = new WebSocket("wss://1prc4c82-3000.use.devtunnels.ms/");
 
-      // Function to update the UI
-      const updateUI = (message) => {
+      // Function to handle the server response
+      const handleServerResponse = (data) => {
         const statusDiv = document.getElementById("status");
         const dataDiv = document.getElementById("data");
+        if (data.status === "error") {
+          statusDiv.innerHTML = data.message;
+          return;
+        }
 
-        if (message.startsWith("Fetching data for")) {
-          statusDiv.innerHTML = "Loading...";
-        } else if (message.startsWith("Data fetched:")) {
-          // Clear the loading text
-          statusDiv.innerHTML = "";
+        if (data.status === "ping") {
+          ws.send(JSON.stringify({ type: "pong", userId }));
+          return;
+        }
 
-          // Display the fetched data
-          const fetchedData = message.replace("Data fetched:", "");
-          dataDiv.innerHTML = fetchedData;
+        switch (data.message) {
+          case "Loading state":
+            statusDiv.innerHTML = data.state;
+            ws.send(
+              JSON.stringify({
+                type: "Loading data stream",
+                userId,
+              })
+            );
+            break;
+          case "New DatuPage created":
+            ws.send(
+              JSON.stringify({
+                type: "GetClusterData",
+                position: [],
+                userId,
+              })
+            );
+            break;
+
+          case "Not large enough":
+            ws.send(
+              JSON.stringify({
+                type: "Get recommendation",
+                pageId,
+                userId,
+              })
+            );
+            break;
+          case "generating page":
+            statusDiv.innerHTML = "";
+            dataDiv.innerHTML = "";
+            ws.send(
+              JSON.stringify({
+                type: "Cluster data stream",
+                userId,
+              })
+            );
+            break;
+          case "Cluster data stream":
+            dataDiv.innerHTML = data.clusterData;
+            ws.send(
+              JSON.stringify({
+                type: "Cluster data stream",
+                userId,
+              })
+            );
+            break;
+          case "Cluster data finished":
+            if (data.clusterData !== "Cluster too small") {
+              dataDiv.innerHTML = data.clusterData;
+            }
+            break;
         }
       };
 
-      ws.addEventListener("message", (event) => {
-        updateUI(event.data);
+      const handleClientResponse = (position) => {
+        const dataDiv = document.getElementById("data");
+        ws.send(JSON.stringify({ type: "GetClusterData", position, userId }));
+      };
+
+      ws.addEventListener("open", () => {
+        const statusDiv = document.getElementById("status");
+        statusDiv.innerHTML = "Loading...";
+        ws.send(
+          JSON.stringify({
+            type: "InitializeDatuPage",
+            pageId,
+            userId,
+          })
+        );
       });
+
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleServerResponse(data);
+      });
+
+      window.addEventListener("unload", () => {
+        ws.close();
+      });
+
+      const redirectToSearch = () => {
+        window.location.href = "/";
+      };
+
+      const redirectToWiki = () => {
+        // Get the current URL
+        const currentUrl = window.location.href;
+
+        // Check if it matches the "/datu/" pattern
+        const datuPattern = /\/datu\/([^/]+)/;
+        const match = currentUrl.match(datuPattern);
+
+        if (match) {
+          // Replace "/datu/" with "/wiki/" and redirect
+          const newUrl = currentUrl.replace(datuPattern, "/wiki/$1");
+          window.location.href = newUrl;
+        }
+      };
     </script>
   </head>
   <body>
-    <h1 id="pageTitle">DatuPage - {{pagename}}</h1>
-    <div id="status"></div>
-    <div id="data"></div>
+    <div class="container">
+      <h1 class="article-section" onclick="redirectToSearch()">
+        Datupedia home
+      </h1>
+      <h3 class="article-section" onclick="redirectToWiki()">To WikiPage</h3>
+      <h1 id="pageTitle">{{pagename}}</h1>
+      <div id="status"></div>
+      <div id="data"></div>
+    </div>
   </body>
 </html>

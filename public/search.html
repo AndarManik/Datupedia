@@ -2,61 +2,70 @@
 
 <html lang="en">
   <head>
-    <link rel="stylesheet" type="text/css" href="styles.css">
-    
+    <link rel="stylesheet" type="text/css" href="styles.css" />
     <title>Datupedia</title>
     <script>
-      document.addEventListener('DOMContentLoaded', () => {
-        console.log('DOM fully loaded and parsed.');
-        const inputField = document.getElementById('pagename');
-        const suggestionList = document.getElementById('suggestions');
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("DOM fully loaded and parsed.");
+        const inputField = document.getElementById("pagename");
+        const suggestionList = document.getElementById("suggestions");
 
-        inputField.addEventListener('input', async () => {
+        inputField.addEventListener("input", async () => {
           const query = inputField.value;
           console.log(`Query inputted: ${query}`);
           if (query) {
             const response = await fetch(`/suggestions?query=${query}`);
-            console.log('Fetch initiated.');
-            
+            console.log("Fetch initiated.");
+
             const suggestions = await response.json();
             console.log(`Received suggestions: ${suggestions}`);
-            
-            suggestionList.innerHTML = '';
-            suggestions.forEach(suggestion => {
+
+            suggestionList.innerHTML = "";
+            suggestions.forEach((suggestion) => {
               console.log(`Appending suggestion: ${suggestion}`);
-              
-              const listItem = document.createElement('li');
+
+              const listItem = document.createElement("li");
               listItem.textContent = suggestion;
-              listItem.addEventListener('click', () => {
-                console.log(`Clicked on suggestion: ${suggestion}. Redirecting...`);
-                window.location.href = `/${suggestion}/home`;
+              listItem.addEventListener("click", () => {
+                console.log(
+                  `Clicked on suggestion: ${suggestion}. Redirecting...`
+                );
+                window.location.href = `/datu/${encodeURIComponent(
+                  suggestion
+                )}`;
               });
               suggestionList.appendChild(listItem);
             });
-            suggestionList.style.display = suggestions.length > 0 ? 'block' : 'none';
+            suggestionList.style.display =
+              suggestions.length > 0 ? "block" : "none";
           } else {
-            console.log('Query empty. Hiding suggestions.');
-            suggestionList.style.display = 'none';
+            console.log("Query empty. Hiding suggestions.");
+            suggestionList.style.display = "none";
           }
         });
       });
     </script>
   </head>
   <body>
-    <header>
-      <h1>Search Datupedia</h1>
-    </header>
-    <div id="status"></div>
-    <input type="text" id="pagename" name="pagename" placeholder="Wikipedia Page Name" required autocomplete="off">
-    <ul id="suggestions"></ul>
-    <script>
-      const ws = new WebSocket('ws://localhost:3000');
-      const statusDiv = document.getElementById('status');
-  
-      ws.addEventListener('message', (event) => {
-        statusDiv.innerHTML += `<p>${event.data}</p>`;
-      });
-    </script>
+    <div class="container">
+      <header>
+        <h1>Datupedia</h1>
+      </header>
+      <p>Type in a Wikipedia page of interest. Our system will gather all the 
+        paragraphs containing that link and transform it into an interactive article. 
+        If a section piques your interest click on the header to read more.
+      </p>
+
+      <div id="status"></div>
+      <input
+        type="text"
+        id="pagename"
+        name="pagename"
+        placeholder="Wikipedia Page Name"
+        required
+        autocomplete="off"
+      />
+      <ul id="suggestions"></ul>
+    </div>
   </body>
-  
 </html>

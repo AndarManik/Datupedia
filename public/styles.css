@@ -1,104 +1,129 @@
+:root {
+  /* Set the width to be 80% of viewport width, but not exceeding 900px */
+  --gradient-width: min(80vw, 900px);
+}
 body {
+  background: linear-gradient(
+    to right,
+    #363339 0%,
+    #4d4650 calc(50% - (var(--gradient-width) / 2)),
+    #4d4650 calc(50% + (var(--gradient-width) / 2)),
+    #363339 100%
+  );
 
-    background: #363339; 
-    font-family: Arial, sans-serif;
-    margin: 20px;
-    line-height: 1.6;
+  font-family: Arial;
+  margin: 0;
+  line-height: 1.3;
+  color: #f0f0f0;
 }
 
-h1, h2, h3, h4 {
-    font-family: Georgia;
-    font-weight: 300;
-    color: #ffffff;
+h1,
+h2,
+h3,
+h4 {
+  font-family: Georgia;
+  font-weight: 300;
+  color: #ffffff;
 }
 
 a {
-    color: #ceb9e3;
-    text-decoration: none;
+  color: #ceb9e3;
+  text-decoration: none;
 }
 p {
-
-
-
-    color: #ffffffd1;  /* Changes color of all <p> (paragraph) elements to a medium gray */
+  color: #ffffffd1; /* Changes color of all <p> (paragraph) elements to a medium gray */
 }
 a:hover {
-    text-decoration: underline;
+  text-decoration: underline;
 }
 
-
 footer {
-    color: #ffffff;
-
+  color: #ffffff;
 }
 
 li {
-    color: #f0f0f0;
+  color: #f0f0f0;
 }
-
-
 
 input {
-    color: #ffffffc0;
-    border: 1px solid #ccc; /* Adds a border */
-    background: #363339;
-    padding: 10px;
-    width: 200px; /* You can adjust the width as per your preference */
-    transition: width 0.3s ease-in-out; /* Adds a transition effect when the width changes */
-
+  color: #ffffffc0;
+  border: 2px solid #ccc; /* Adds a border */
+  background: #363339;
+  padding: 12px;
+  width: 175px;
+  transition: width 0.3s ease-in-out; /* Adds a transition effect when the width changes */
 }
 #pagename {
-    color: #ffffff;
-    font-family: Georgia;
+  color: #ffffff;
+  font-family: Georgia;
 }
 
 button {
-    background: #363339; /* Same as body background */
-    color: #ffffffc0; /* Matching the anchor tag color */
-    border: 1px solid #ccc; /* Similar to the search input border */
-    padding: 10px;
-    cursor: pointer;
-    transition: background 0.3s ease; /* Smooth transition for hover effect */
+  background: #363339; /* Same as body background */
+  color: #ffffffc0; /* Matching the anchor tag color */
+  border: 1px solid #ccc; /* Similar to the search input border */
+  padding: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease; /* Smooth transition for hover effect */
 }
 
 button:hover {
-    background: #504a50d5; /* Slightly lighter shade for hover */
-    text-decoration: underline; /* Consistent with the anchor hover effect */
+  background: #504a50d5; /* Slightly lighter shade for hover */
+  text-decoration: underline; /* Consistent with the anchor hover effect */
 }
 
-
 nav {
-    display: flex;
-    flex-direction: row;
-    align-items: left;
-    justify-content: left;
-    margin-top: 20px;
-    
+  display: flex;
+  flex-direction: row;
+  align-items: left;
+  justify-content: left;
+  margin-top: 20px;
 }
 
 #suggestionsList {
-    list-style-type: none; /* Removes bullet points */
-    padding: 10px; 
-    background: #363339; /* Background color for the dropdown */
-    position: absolute; /* Positions the dropdown relative to its parent */
-    width: 200px; /* Matches the width of the search input */
-    border: 1px solid #ccc; /* Adds a border */
-    display: none; /* Hides the list by default */
+  list-style-type: none; /* Removes bullet points */
+  padding: 10px;
+  background: #363339; /* Background color for the dropdown */
+  position: absolute; /* Positions the dropdown relative to its parent */
+  width: 200px; /* Matches the width of the search input */
+  border: 1px solid #ccc; /* Adds a border */
+  display: none; /* Hides the list by default */
 }
 #suggestions {
-    border: 1px solid #ccc;
-    position: absolute;
-    width: 200px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: none;
-  }
-  #suggestions li {
-    padding: 5px;
-    cursor: pointer;
-  }
-  #suggestions li:hover {
-    background-color: #f0f0f0;
-    color: #363339
-  }
+  border: 1px solid #ccc;
+  position: absolute;
+  width: 200px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: none;
+}
+#suggestions li {
+  padding: 5px;
+  cursor: pointer;
+  line-height: 1.6;
+}
+#suggestions li:hover {
+  background-color: #f0f0f0;
+  color: #363339;
+}
+/* Step 3: Add the styles */
+.content-wrapper {
+  display: flex;
+  align-items: flex-start; /* Align items to the top */
+  gap: 20px; /* Add a gap between flex items */
+}
+
+/* You might want to style or adjust the width of the elements inside for a better look */
+header,
+#status,
+#pagename,
+#suggestions {
+  flex: 1; /* Make these take equal width */
+}
+
+.container {
+  width: 80%;
+  max-width: 900px;
+  margin: 0 auto;
+}
