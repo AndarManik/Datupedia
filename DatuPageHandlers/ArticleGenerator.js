@@ -120,6 +120,15 @@ class ArticleGenerator {
   getWikiText() {
     return this.wikiText;
   }
+
+  async resetArticle() {
+    const db = getDb();
+    const collection = db.collection("datuCluster");
+
+    const uniqueId = this.pageName + this.position.join("-");
+
+    await collection.updateOne({ _id: uniqueId }, { $set: {hasArticle: false} });
+  }
 }
 
 module.exports = ArticleGenerator;

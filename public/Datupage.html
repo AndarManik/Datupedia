@@ -13,7 +13,6 @@
 
           #4d4650 calc(50% - (var(--gradient-width) / 2)),
           #4d4650 calc(50% + (var(--gradient-width) / 2)),
-
           #363339 100%
         );
         font-family: Arial, Helvetica, sans-serif, sans-serif;
@@ -33,7 +32,6 @@
       h4 {
         font-family: Georgia;
         font-weight: 300;
-        color: #ffffff;
       }
       p {
         color: #f0f0f0;
@@ -44,14 +42,41 @@
         transition: background-color 0.3s ease; /* Smooth transition for background color change */
       }
       .article-section:hover {
-        background-color: #575757; /* Change background color when hovered over the div */
+        color: #4d4650;
+        background-color: #f0f0f0; /* Change background color when hovered over the div */
       }
       .article-section:active {
-        background-color: #787878; /* Change background color when div is clicked */
+        background-color: #ffffff; /* Change background color when div is clicked */
       }
       a {
         color: #a4c5fb;
         text-decoration: none;
+      }
+      .button-container {
+        display: flex; /* Use flexbox */
+        width: 100%; /* Take full width of the parent container */
+        border: 1px solid #ccc; /* Optional: border around the container for visual purposes */
+        margin-top: 10px;           /* Add 10px of space at the top */
+      }
+
+      .button-container button {
+        flex: 1; /* This will make each button take up an equal portion of the container's width */
+        background: #4d4650; /* Same as body background */
+        border: 1px solid #ccc; /* Similar to the search input border */
+        color: #f0f0f0; /* Matching the anchor tag color */
+        padding: 10px 20px; /* Padding for visual comfort */
+        border-right: 1px solid #ccc; /* Optional: add a border to the right of each button for separation */
+        cursor: pointer; /* Make the button show a hand cursor on hover */
+        transition: background 0.3s ease; /* Smooth transition for hover effect */
+      }
+      .button-container button:hover {
+        background: #f0f0f0; /* Slightly lighter shade for hover */
+        color: #4d4650;
+        text-decoration: underline; /* Consistent with the anchor hover effect */
+      }
+
+      .button-container button:last-child {
+        border-right: none; /* Remove the right border for the last button */
       }
     </style>
     <title>{{pagename}}</title>
@@ -175,14 +200,20 @@
           window.location.href = newUrl;
         }
       };
+
+      const regeneratePage = () => {
+        ws.send(JSON.stringify({ type: "RegenerateArticle", userId }));
+      };
     </script>
   </head>
   <body>
     <div class="container">
-      <h1 class="article-section" onclick="redirectToSearch()">
-        Datupedia home
-      </h1>
-      <h3 class="article-section" onclick="redirectToWiki()">To WikiPage</h3>
+      <div class="button-container">
+        <button onclick="redirectToSearch()">Datupedia Home</button>
+        <button onclick="redirectToWiki()">Wikipedia Page</button>
+        <button onclick="regeneratePage()">Regenerate Article</button>
+      </div>
+
       <h1 id="pageTitle">{{pagename}}</h1>
       <div id="status"></div>
       <div id="data"></div>

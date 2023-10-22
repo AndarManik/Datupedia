@@ -80,6 +80,10 @@ class DatuPage {
     }
     return false;
   }
+
+  async resetArticle(){
+    await this.article.resetArticle();
+  }
 }
 
 module.exports = DatuPage;
