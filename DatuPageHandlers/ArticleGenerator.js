@@ -86,7 +86,8 @@ class ArticleGenerator {
       this.wikiText.match(/==[^=]+==[^=]+/g).forEach(async (text, index) => {
         if (index < this.childCount) {
             const uniqueId = this.pageName + [...this.position, index].join("-");
-            await collection.updateOne({ _id: uniqueId }, { $set: {superText: text} });
+            const childSuperText = this.superText + text.trim(); 
+            await collection.updateOne({ _id: uniqueId }, { $set: {superText: childSuperText} });
         }
       });
       console.log("childSaveSucc");
