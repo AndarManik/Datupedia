@@ -11,14 +11,14 @@ class DatuPage {
   }
 
   async fetchData() {
-    await this.inlinks.fetchData();
-    console.log("fetchFinishd");
-    console.log("clusterStart");
-    if (!(await this.checkIfDone())) {
+    if (!(await this.isAnalysisDone())) {
+      await this.inlinks.fetchData();
+    }
+
+    if (!(await this.isClusterDone())) {
       this.rootCluster = new InlinkCluster(this.pageName, 6, this.inlinks.data);
     }
     this.fetchDone = true;
-    console.log("clusterfinished");
   }
 
   async generatePage() {
@@ -67,7 +67,7 @@ class DatuPage {
     return this.fetchDone;
   }
 
-  async checkIfDone() {
+  async isClusterDone() {
     const db = getDb();
     const collection = db.collection("datuCluster");
 
@@ -81,7 +81,19 @@ class DatuPage {
     return false;
   }
 
-  async resetArticle(){
+  async isAnalysisDone() {
+    const db = getDb();
+    if (
+      await db
+        .collection("datuPages")
+        .findOne({ pageName: this.pageName, chunkNumber: 0 })
+    ) {
+      return true;
+    }
+    return false;
+  }
+
+  async resetArticle() {
     await this.article.resetArticle();
   }
 }
