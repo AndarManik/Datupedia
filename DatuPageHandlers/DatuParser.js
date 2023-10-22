@@ -6,8 +6,8 @@ async function datuParse(superText, wikiText, position) {
   return addOnclickToH2(
     replacePreWithP(
       removeEditSpans(
-        (await wikipediaAPI.parseWikitext(superText)) +
-          (await wikipediaAPI.parseWikitext(wikiText))
+        (await wikipediaAPI.parseWikitext(wikiText)) +
+          (await wikipediaAPI.parseWikitext(superText.replaceAll("==", "===")))
       )
     ),
     position
@@ -21,29 +21,15 @@ function addOnclickToH2(htmlString, position) {
   const h2Elements = document.querySelectorAll(".mw-parser-output h2");
 
   h2Elements.forEach((h2, index) => {
-    if (index !== 0 && position.length !== 0) {
-      const div = document.createElement("div");
-      div.className = "article-section";
-      div.setAttribute(
-        "onclick",
-        `handleClientResponse([${position.concat(index - 1)}])`
-      );
+    const div = document.createElement("div");
+    div.className = "article-section";
+    div.setAttribute(
+      "onclick",
+      `handleClientResponse([${position.concat(index)}])`
+    );
 
-      h2.parentNode.insertBefore(div, h2);
-      div.appendChild(h2);
-    } else {
-      if (position.length === 0) {
-        const div = document.createElement("div");
-        div.className = "article-section";
-        div.setAttribute(
-          "onclick",
-          `handleClientResponse([${position.concat(index)}])`
-        );
-
-        h2.parentNode.insertBefore(div, h2);
-        div.appendChild(h2);
-      }
-    }
+    h2.parentNode.insertBefore(div, h2);
+    div.appendChild(h2);
   });
   if (position.length !== 0) {
     const mwParserOutput = document.querySelector(".mw-parser-output");
@@ -78,11 +64,16 @@ function removeEditSpans(htmlString) {
   const document = dom.window.document;
 
   // Get all the 'edit' spans
-  const editSpans = document.querySelectorAll('h2 .mw-editsection');
+  const editSpans = document.querySelectorAll("h2 .mw-editsection");
 
   // Remove each 'edit' span
-  editSpans.forEach(span => {
-      span.parentNode.removeChild(span);
+  editSpans.forEach((span) => {
+    span.parentNode.removeChild(span);
+  });
+
+  const editSpansh3 = document.querySelectorAll("h3 .mw-editsection");
+  editSpansh3.forEach((span) => {
+    span.parentNode.removeChild(span);
   });
 
   // Return the modified HTML string
