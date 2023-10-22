@@ -6,12 +6,26 @@ async function datuParse(superText, wikiText, position) {
   return addOnclickToH2(
     replacePreWithP(
       removeEditSpans(
-        (await wikipediaAPI.parseWikitext(wikiText)) +
-          (await wikipediaAPI.parseWikitext(superText.replaceAll("==", "===")))
+        (await wikipediaAPI.parseWikitext(extractLastSuperText(superText))) +
+          (await wikipediaAPI.parseWikitext(wikiText))
       )
     ),
     position
   );
+}
+
+function extractLastSuperText(str) {
+  // Regular expression pattern to match the last '==text==moretext' sequence
+  const pattern = /==([^=]+)==([^=]+)$/;
+
+  const match = str.match(pattern);
+
+  if (match) {
+    // Return the entire matched string
+    return match[0];
+  } else {
+    return "";
+  }
 }
 
 function addOnclickToH2(htmlString, position) {
