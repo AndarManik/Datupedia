@@ -6,7 +6,7 @@ async function datuParse(superText, wikiText, position) {
   return addOnclickToH2(
     replacePreWithP(
       removeEditSpans(
-        (await wikipediaAPI.parseWikitext(extractLastSuperText(superText.replaceAll("==","===")))) +
+        (await wikipediaAPI.parseWikitext(extractLastSuperText(superText).replaceAll("==","==="))) +
           (await wikipediaAPI.parseWikitext(wikiText))
       )
     ),
