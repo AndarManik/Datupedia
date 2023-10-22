@@ -13,6 +13,8 @@ class DatuPage {
   async fetchData() {
     if (!(await this.isAnalysisDone())) {
       await this.inlinks.fetchData();
+    } else {
+      this.isLarge = true;
     }
 
     if (!(await this.isClusterDone())) {
@@ -28,7 +30,7 @@ class DatuPage {
   }
 
   isLargeEnough() {
-    return this.inlinks.isLargeEnough();
+    return this.isLarge || this.inlinks.isLargeEnough() ;
   }
 
   async has(position) {
