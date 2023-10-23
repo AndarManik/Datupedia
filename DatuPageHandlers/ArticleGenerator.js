@@ -41,7 +41,7 @@ class ArticleGenerator {
     let prompt = this.prompt;
 
     if (this.superText.length !== 0) {
-      prompt += `The article you are task to write will be a sub article for this article section provided: ${this.superText}`;
+      prompt += `The article should extend this provided article: ${this.superText}`;
     }
 
     prompt += "END OF PROVIDED TEXT";
