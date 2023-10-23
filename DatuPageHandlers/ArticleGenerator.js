@@ -26,9 +26,9 @@ class ArticleGenerator {
     3. Stick to the information in each text cluster without adding outside data.
     4. Include at least four wiki-style links in each section. These links refer to the titles in the provided text.Use the format [[link]].
     5. Each section needs a unique, relevant title, formatted as ==header==.
-    6. Ensure each section has a consistent theme.
-    7. Maintain a neutral, informative tone, avoiding calls to action.
-    8. Instead of just listing links or ideas, provide in-depth analysis.  
+    6. Ensure each section has a consistent theme. Maintain a neutral, informative tone, avoiding calls to action.
+    7. Each article section should be of equal importance to any other section.
+    8. Provide in-depth analysis. Avoid listing.
     Example Format:
     
     ==Article Header==
