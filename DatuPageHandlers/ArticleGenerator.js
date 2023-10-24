@@ -26,7 +26,6 @@ class ArticleGenerator {
     Article Guidelines:
 
     1. Your article should have three sections, one for each cluster in the provided text.
-    2. 
     2. The purpose of the article is to outline the differences between the clusters.
     3. Ensure each section has its own consistent theme.
     4. Maintain a neutral, informative tone, avoiding calls to action.
