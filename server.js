@@ -213,12 +213,12 @@ function clusterDataStream(ws, user) {
 
 async function getRecommendation(ws, parsedMessage, user) {
   const pageName = parsedMessage.pageId;
-  const recommendation = await wikipediaAPI.getMoreLike(pageName);
+  const recommendation = removeEditSpans(await wikipediaAPI.getContent(pageName)).replace(/\/wiki\//g, '/datu/');
   console.log(recommendation);
   ws.send(
     JSON.stringify({
       status: "success",
-      message: "Cluster data finished",
+      message: "Recommendations",
       clusterData: recommendation,
     })
   );

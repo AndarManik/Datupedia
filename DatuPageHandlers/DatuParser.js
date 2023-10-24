@@ -11,7 +11,7 @@ async function datuParse(superText, wikiText, position) {
       )
     ),
     position
-  );
+  ).replace(/\/wiki\//g, '/datu/');
 }
 
 function extractLastSuperText(str) {
