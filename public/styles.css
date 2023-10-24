@@ -23,9 +23,8 @@ h3,
 h4 {
   font-family: Georgia;
   font-weight: 300;
-  color: #ffffff;
+  text-align: center;
 }
-
 a {
   color: #ceb9e3;
   text-decoration: none;
@@ -48,7 +47,7 @@ li {
 input {
   box-sizing: border-box; /* This line ensures padding and border are inside the width */
   color: #ffffffc0;
-  border: 2px solid #ccc; 
+  border: 2px solid #ccc;
   background: #4d4650;
   padding: 12px;
   width: 100%;
@@ -129,47 +128,44 @@ header,
   max-width: 700px;
   margin: 0 auto;
 }
-@media only screen and (max-width: 768px) {
-  :root {
-    --gradient-width: 90%;
-  }
-  body {
-      font-size: 18px;
-  }
-
-  h1, h2, h3, h4 {
-      font-size: 1.5em; /* Adjust based on your design */
-  }
-
-  nav {
-      flex-direction: column;
-      align-items: flex-start;
-  }
-
-  .content-wrapper {
-      flex-direction: column; /* Stack flex items vertically */
-  }
-
-  header, #status, #pagename, #suggestions {
-      margin-bottom: 20px; /* Add some vertical spacing between stacked elements */
-  }
-
-  .container {
-      width: 90%; /* Use a larger portion of the screen */
-  }
-
-}
-
 /* For very small screens, typically phones */
 @media only screen and (max-width: 480px) {
   :root {
-    --gradient-width: 95%;
-  }
-  nav {
-      margin-top: 10px; /* Reduce some spacings for smaller screens */
+    --gradient-width: 90%;
   }
 
   .container {
-      width: 95%; /* Use even more of the screen's width */
+    width: 90%; /* Use even more of the screen's width */
+  }
+  body {
+    font-size: 18px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-size: 1.5em; /* Adjust based on your design */
+  }
+
+  nav {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 10px; /* Reduce some spacings for smaller screens */
+  }
+
+  .content-wrapper {
+    flex-direction: column; /* Stack flex items vertically */
+  }
+
+  header,
+  #status,
+  #pagename,
+  #suggestions {
+    margin-bottom: 20px; /* Add some vertical spacing between stacked elements */
+  }
+
+  .container {
+    width: 90%; /* Use a larger portion of the screen */
   }
 }

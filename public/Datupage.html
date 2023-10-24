@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <style>
       :root {
         /* Set the width to be 80% of viewport width, but not exceeding 900px */
@@ -80,23 +82,31 @@
         text-decoration: underline; /* Consistent with the anchor hover effect */
       }
 
-      .button-container button:last-child {
-        border-right: none; /* Remove the right border for the last button */
-      }
+      
 
-      @media only screen and (max-width: 768px) {
+      @media only screen and (max-width: 480px) {
         :root {
           --gradient-width: 90%;
         }
-        p {
-          font-size: 28;
+
+        .container {
+          width: 90%; /* Use even more of the screen's width */
+        }
+        body {
+          font-size: 18px;
         }
 
-        
+        h1,
+        h2,
+        h3,
+        h4 {
+          font-size: 1.5em; /* Adjust based on your design */
+        }
 
         nav {
           flex-direction: column;
           align-items: flex-start;
+          margin-top: 10px; /* Reduce some spacings for smaller screens */
         }
 
         .content-wrapper {
@@ -105,155 +115,44 @@
 
         header,
         #status,
-        #pagename{
+        #pagename,
+        #suggestions {
           margin-bottom: 20px; /* Add some vertical spacing between stacked elements */
         }
 
         .container {
           width: 90%; /* Use a larger portion of the screen */
         }
-      }
-
-      /* For very small screens, typically phones */
-      @media only screen and (max-width: 480px) {
-        :root {
-          --gradient-width: 95%;
-        }
-        nav {
-          margin-top: 10px; /* Reduce some spacings for smaller screens */
+        /* Mobile Styles */
+        /* Mobile Styles */
+        .button-container {
+          display: flex; /* Keep them side by side */
+          width: 100%;
+          border: 1px solid #ccc;
+          margin-top: 10px;
         }
 
-        .container {
-          width: 95%; /* Use even more of the screen's width */
+        .button-container button {
+          flex: 1; /* This will keep each button taking up an equal portion of the container's width */
+          background: #4d4650;
+          border: 1px solid #ccc;
+          color: #f0f0f0;
+          padding: 15px 10px; /* Increase vertical padding for a larger touch target and reduce horizontal padding to fit content */
+          border-right: 1px solid #ccc; /* Keep the separation between buttons */
+          cursor: pointer;
+          transition: background 0.3s ease;
+          font-size: 16px; /* Reduced font size to fit better and to allow for more padding */
         }
+
+        .button-container button:hover {
+          background: #f0f0f0;
+          color: #4d4650;
+          text-decoration: underline;
+        }
+
+
       }
     </style>
-    <title>{{pagename}}</title>
-    <script>
-      const userId = "{{userID}}"; // Assume you have some way to populate this value
-      const pageId = "{{pagename}}";
-      // Initialize WebSocket connection
-      const ws = new WebSocket("wss://datupedia.onrender.com/");
-
-      // Function to handle the server response
-      const handleServerResponse = (data) => {
-        const statusDiv = document.getElementById("status");
-        const dataDiv = document.getElementById("data");
-        if (data.status === "error") {
-          statusDiv.innerHTML = data.message;
-          return;
-        }
-
-        if (data.status === "ping") {
-          ws.send(JSON.stringify({ type: "pong", userId }));
-          return;
-        }
-
-        switch (data.message) {
-          case "Loading state":
-            statusDiv.innerHTML = data.state;
-            ws.send(
-              JSON.stringify({
-                type: "Loading data stream",
-                userId,
-              })
-            );
-            break;
-          case "New DatuPage created":
-            ws.send(
-              JSON.stringify({
-                type: "GetClusterData",
-                position: [],
-                userId,
-              })
-            );
-            break;
-
-          case "Not large enough":
-            ws.send(
-              JSON.stringify({
-                type: "Get recommendation",
-                pageId,
-                userId,
-              })
-            );
-            break;
-          case "generating page":
-            statusDiv.innerHTML = "";
-            dataDiv.innerHTML = "";
-            ws.send(
-              JSON.stringify({
-                type: "Cluster data stream",
-                userId,
-              })
-            );
-            break;
-          case "Cluster data stream":
-            dataDiv.innerHTML = data.clusterData;
-            ws.send(
-              JSON.stringify({
-                type: "Cluster data stream",
-                userId,
-              })
-            );
-            break;
-          case "Cluster data finished":
-            if (data.clusterData !== "Cluster too small") {
-              dataDiv.innerHTML = data.clusterData;
-            }
-            break;
-        }
-      };
-
-      const handleClientResponse = (position) => {
-        const dataDiv = document.getElementById("data");
-        ws.send(JSON.stringify({ type: "GetClusterData", position, userId }));
-      };
-
-      ws.addEventListener("open", () => {
-        const statusDiv = document.getElementById("status");
-        statusDiv.innerHTML = "Loading...";
-        ws.send(
-          JSON.stringify({
-            type: "InitializeDatuPage",
-            pageId,
-            userId,
-          })
-        );
-      });
-
-      ws.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        handleServerResponse(data);
-      });
-
-      window.addEventListener("unload", () => {
-        ws.close();
-      });
-
-      const redirectToSearch = () => {
-        window.location.href = "/";
-      };
-
-      const redirectToWiki = () => {
-        // Get the current URL
-        const currentUrl = window.location.href;
-
-        // Check if it matches the "/datu/" pattern
-        const datuPattern = /\/datu\/([^/]+)/;
-        const match = currentUrl.match(datuPattern);
-
-        if (match) {
-          // Replace "/datu/" with "/wiki/" and redirect
-          const newUrl = currentUrl.replace(datuPattern, "/wiki/$1");
-          window.location.href = newUrl;
-        }
-      };
-
-      const regeneratePage = () => {
-        ws.send(JSON.stringify({ type: "RegenerateArticle", userId }));
-      };
-    </script>
   </head>
   <body>
     <div class="container">

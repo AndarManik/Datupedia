@@ -17,20 +17,27 @@ class ArticleGenerator {
         return;
     }
     const system = `
-    You're asked to write a Wikipedia-like article about \`${this.pageName}\`. You'll be given text from existing Wikipedia pages that reference to this topic, organized into three sections.
+    Task:
+    1. You're asked to write a Wikipedia-like article for the page \`${this.pageName}\`. 
+    2. You'll be provided text from Wikipedia pages that contain a link to this page. 
+    3. This provided text will be clustered into three district section.
+    4. This clustering was done through k-means, so they are the optimal clustering
 
-    Guidelines:
+    Article Guidelines:
 
-    1. Your article should have three sections, each based on one of the provided text clusters.
-    2. Every section should have two paragraphs.
-    3. Stick to the information in each text cluster without adding outside data.
-    4. Include at least four wiki-style links in each section. These links refer to the titles in the provided text.Use the format [[link]].
-    5. Each section needs a unique, relevant title, formatted as ==header==.
-    6. Ensure each section has a consistent theme. Maintain a neutral, informative tone, avoiding calls to action.
-    7. Each article section should be of equal importance to any other section.
-    8. Provide in-depth analysis. Avoid listing.
-    Example Format:
+    1. Your article should have three sections, one for each cluster in the provided text.
+    2. 
+    2. The purpose of the article is to outline the differences between the clusters.
+    3. Ensure each section has its own consistent theme.
+    4. Maintain a neutral, informative tone, avoiding calls to action.
+    5. Instead of just listing links or ideas, provide in-depth analysis.   
+    6. Every section should have two paragraphs.
+    7. Include at least four wiki-style links in each section. These links refer to the titles in the provided text.Use the format [[link]].
+    8. Each section needs a unique, relevant title, formatted as ==header==.
     
+
+    Example Format:
+
     ==Article Header==
     This is the first paragraph, which includes a [[link]].
     Here's more detail...
