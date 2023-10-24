@@ -94,4 +94,4 @@ function removeEditSpans(htmlString) {
   return dom.serialize();
 }
 
-module.exports = { datuParse };
+module.exports = { datuParse, removeEditSpans };

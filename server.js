@@ -13,6 +13,7 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const wikipediaAPI = new WikipediaAPI();
 const { v4: uuidv4 } = require("uuid");
+const {removeEditSpans} = require("./DatuPageHandlers/DatuParser");
 const users = [];
 
 // Middleware
