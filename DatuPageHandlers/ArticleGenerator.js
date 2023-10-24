@@ -27,13 +27,13 @@ class ArticleGenerator {
 
     1. Your article should have three sections, one for each cluster in the provided text.
     2. The purpose of the article is to outline the differences between the clusters.
-    3. Ensure each section has its own consistent theme.
+    3. Ensure each section has its own consistent theme. 
     4. Maintain a neutral, informative tone, avoiding calls to action.
     5. Instead of just listing links or ideas, provide in-depth analysis.   
     6. Every section should have two paragraphs.
     7. Include at least four wiki-style links in each section. These links refer to the titles in the provided text.Use the format [[link]].
     8. Each section needs a unique, relevant title, formatted as ==header==.
-    
+    9. These sections should not mention the existence of the provided text.
 
     Example Format:
 
