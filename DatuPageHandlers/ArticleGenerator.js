@@ -16,7 +16,7 @@ class ArticleGenerator {
     if (await this.fetchData(this.pageName, this.position)) {
       return;
     }
-    const system = `
+    let system = `
 Task:
 1. You're asked to write a hyperlinked article for the wikipedia page \`${this.pageName}\`. 
 2. You'll be provided text from Wikipedia pages that contain a link to this page. 
