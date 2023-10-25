@@ -11,15 +11,15 @@ class DatuPage {
   }
 
   async fetchData() {
-    //if (!(await this.isAnalysisDone())) {
+    if (!(await this.isAnalysisDone())) {
       await this.inlinks.fetchData();
-    //} else {
+    } else {
       this.isLarge = true;
-    //}
+    }
 
-    //if (!(await this.isClusterDone())) {
-    this.rootCluster = new InlinkCluster(this.pageName, 6, this.inlinks.data);
-    //}
+    if (!(await this.isClusterDone())) {
+      this.rootCluster = new InlinkCluster(this.pageName, 6, this.inlinks.data);
+    }
     this.fetchDone = true;
   }
 
