@@ -1,9 +1,8 @@
 require("dotenv").config();
 const express = require("express");
-
-const WikipediaAPI = require("./APIs/WikipediaAPI");
-const DatuPage = require("./DatuPageHandlers/DatuPage");
-const { connectToDb } = require("./APIs/MongoAPI");
+const WikipediaAPI = require("../APIs/WikipediaAPI");
+const DatuPage = require("../DatuPageHandlers/DatuPage");
+const { connectToDb } = require("../APIs/MongoAPI");
 const fs = require("fs");
 const path = require("path");
 const http = require("http");
@@ -13,13 +12,13 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const wikipediaAPI = new WikipediaAPI();
 const { v4: uuidv4 } = require("uuid");
-const {removeEditSpans} = require("./DatuPageHandlers/DatuParser");
+const {removeEditSpans} = require("../DatuPageHandlers/DatuParser");
 const users = [];
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, "../public")));
 // Rate Limiting
 
 // Database connection
@@ -37,7 +36,7 @@ connectToDb()
 
 app.get("/", (req, res) => {
   fs.readFile(
-    path.join(__dirname, "public/search.html"),
+    path.join(__dirname, "../public/search.html"),
     "utf8",
     (err, data) => {
       if (err) {
@@ -61,7 +60,7 @@ app.get("/datu/:pagename", async (req, res) => {
     const pagename = decodeURIComponent(
       req.params.pagename.replaceAll("_", " ")
     );
-    const filePath = path.join(__dirname, "public/Datupage.html");
+    const filePath = path.join(__dirname, "../public/Datupage.html");
     const fileContent = fs.readFileSync(filePath, "utf-8");
     let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
     renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
