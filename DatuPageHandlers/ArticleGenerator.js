@@ -18,31 +18,33 @@ class ArticleGenerator {
     }
     const system = `
     Task:
-    1. You're asked to write a Wikipedia-like article for the page \`${this.pageName}\`. 
+    1. You're asked to write a hyperlinked article for the wikipedia page \`${this.pageName}\`. 
     2. You'll be provided text from Wikipedia pages that contain a link to this page. 
     3. This provided text will be clustered into three district section.
     4. This clustering was done through k-means, so they are the optimal clustering
 
     Article Guidelines:
 
-    1. Your article should have three sections, one for each cluster in the provided text.
-    2. The purpose of the article is to outline the differences between the clusters.
+    1. The purpose of the article is to outline the differences between the clusters.
+    2. Your article should have three sections, one for each cluster in the provided text.
     3. Ensure each section has its own consistent theme. 
     4. Maintain a neutral, informative tone, avoiding calls to action.
-    5. Instead of just listing links or ideas, provide in-depth analysis.   
-    6. Every section should have two paragraphs.
-    7. Include at least four wiki-style links in each section. These links refer to the titles in the provided text.Use the format [[link]].
-    8. Each section needs a unique, relevant title, formatted as ==header==.
-    9. These sections should not mention the existence of the provided text.
-
+    5. Instead of listing, provide in-depth analysis.
+    6. If two sections are similar, consider focusing on what differentiates the two.   
+    7. Every section should have two paragraphs.
+    8. Include at least four wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
+    9. Each section needs a unique, relevant title, formatted as ==header==.
+    10. Avoid starting with "In this cluster", "In this section", or anything similar. Instead start with something related to \`${this.pageName}\`. 
+    
     Example Format:
 
-    ==Article Header==
+    ==Article header==
     This is the first paragraph, which includes a [[link]].
     Here's more detail...
 
     The next paragraph might use another link type, [[link|display text]].
     And even more detail...
+
     `;
     let prompt = this.prompt;
 
@@ -51,7 +53,7 @@ class ArticleGenerator {
     }
 
     prompt += "END OF PROVIDED TEXT";
-    console.log(prompt);
+    console.log(system + prompt);
     this.wikitextStoreStream(await openai.gpt4Stream(system, prompt));
   }
 

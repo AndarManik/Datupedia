@@ -45,7 +45,7 @@ class InlinkCluster {
   inlinkMeans(inlinks) {
     const embeddings = inlinks.map((inlink) => inlink.embedding);
 
-    const result = ml.kmeans(embeddings, NUMCLUSTERS);
+    const result = ml.kmeans(embeddings, NUMCLUSTERS, { distanceFunction: this.cosineDistance });
     const clusters = Array.from({ length: NUMCLUSTERS }, () => []);
     result.clusters.forEach((clusterIndex, i) => {
       clusters[clusterIndex].push(inlinks[i]);
@@ -56,7 +56,7 @@ class InlinkCluster {
     const output = clusters.map((cluster, i) => {
       const clusterCenter = result.centroids[i];
       cluster.forEach((inlink) => {
-        inlink.distance = this.euclideanDistance(
+        inlink.distance = this.cosineDistance(
           inlink.embedding,
           clusterCenter
         );
@@ -69,11 +69,17 @@ class InlinkCluster {
     return output;
   }
 
-  euclideanDistance(vecA, vecB) {
-    return Math.sqrt(
-      vecA.reduce((sum, val, i) => sum + Math.pow(val - vecB[i], 2), 0)
-    );
-  }
+  cosineDistance(a, b) {
+    const dotProduct = a.map((val, i) => val * b[i]).reduce((sum, val) => sum + val, 0);
+    
+    const magnitudeA = Math.sqrt(a.map(val => val * val).reduce((sum, val) => sum + val, 0));
+    const magnitudeB = Math.sqrt(b.map(val => val * val).reduce((sum, val) => sum + val, 0));
+    
+    const cosineSimilarity = dotProduct / (magnitudeA * magnitudeB);
+    
+    return 1 - cosineSimilarity;
+}
+
 
   getTraverse(position) {
     if (position.length === 0) {
@@ -103,14 +109,14 @@ class InlinkCluster {
       prompt += `CLUSTER: ${i + 1}\n`;
       if (child.children.length < 2) {
         child.topInlinks.forEach((inlink) => {
-          prompt += `TITLE: ${inlink.title}\n`;
+          prompt += `LINK: [[${inlink.title}]]\n`;
           prompt += `TEXT: ${inlink.paragraph}\n`;
         });
       } else {
         child.children.forEach((chichild) => {
           chichild.topInlinks.forEach((inlink, index) => {
             if (index < 3) {
-              prompt += `TITLE: ${inlink.title}\n`;
+              prompt += `LINK: [[${inlink.title}]]\n`;
               prompt += `TEXT: ${inlink.paragraph}\n`;
             }
           });
@@ -123,7 +129,7 @@ class InlinkCluster {
   leafPrompt(inlinks) {
     let prompt = "";
     inlinks.forEach((inlink) => {
-      prompt += `TITLE: ${inlink.title}\n`;
+      prompt += `LINK: [[${inlink.title}]]\n`;
       prompt += `TEXT: ${inlink.paragraph}\n`;
     });
     return prompt;

@@ -22,7 +22,6 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 // Rate Limiting
 
-
 // Database connection
 connectToDb()
   .then(() => {
@@ -66,6 +65,7 @@ app.get("/datu/:pagename", async (req, res) => {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
     renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
+    renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS)
     res.send(renderedHtml);
   } catch (err) {
     console.error(err);
@@ -117,7 +117,6 @@ wss.on("connection", (ws) => {
         await regenerateArticle(ws, user);
         break;
       case "pong":
-        // No operation needed for "pong" type.
         break;
     }
   });
