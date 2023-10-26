@@ -36,7 +36,7 @@ class InlinkAnalysis {
       const batch = inlinks.slice(i, i + InlinkAnalysis.MAX_REQUESTS);
       const results = await this._fetchParagraphsInBatch(batch);
       this.data.push(...results);
-      this._logProgress(i, batch, startTime, totalBatches, inlinks.length);
+      this._logProgress(startTime, Math.min(inlinks.length, 2000), this.data.length);
       await this._delay(InlinkAnalysis.DELAY_TIME);
     }
 
@@ -71,19 +71,18 @@ class InlinkAnalysis {
     });
   }
 
-  _logProgress(i, batch, startTime, totalBatches, totalInlinks) {
-    const batchesProcessed = i / InlinkAnalysis.MAX_REQUESTS + 1;
-    const currentTime = Date.now();
-    const timePerBatch = (currentTime - startTime) / batchesProcessed;
-    const estimatedTimeRemaining =
-      ((Math.max(totalBatches, Math.ceil(2000 / InlinkAnalysis.MAX_CHUNK_SIZE)) - batchesProcessed) * timePerBatch) / 1000; // in seconds
-    const progress = ((i + batch.length) / Math.max(totalInlinks,2000)) * 100; // in percentage
-    const runTime = (currentTime - startTime) / 1000;
-    this.state = `Loading:${progress.toFixed(
-      2
-    )}% ETA:${estimatedTimeRemaining.toFixed(2)} seconds Run Time: ${runTime.toFixed(2)} Found: ${
-      this.data.length
-    }`;
+  _logProgress(startTime, inlinksLength, dataLength) {
+    const progress = dataLength / inlinksLength * 100; //in percent
+    const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
+    const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
+
+    this.state = `
+    Loading:${progress.toFixed(2)}%
+    ETA:${eta.toFixed(2)} seconds 
+    Run Time: ${runTimeSeconds.toFixed(2)} 
+    Found: ${this.data.length}
+    `;
+
     console.log(this.state);
   }
 
