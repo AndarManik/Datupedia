@@ -76,7 +76,7 @@ class InlinkAnalysis {
     const currentTime = Date.now();
     const timePerBatch = (currentTime - startTime) / batchesProcessed;
     const estimatedTimeRemaining =
-      ((Math.max(totalBatches, Math.ceil(2000 / MAX_CHUNK_SIZE)) - batchesProcessed) * timePerBatch) / 1000; // in seconds
+      ((Math.max(totalBatches, Math.ceil(2000 / InlinkAnalysis.MAX_CHUNK_SIZE)) - batchesProcessed) * timePerBatch) / 1000; // in seconds
     const progress = ((i + batch.length) / Math.max(totalInlinks,2000)) * 100; // in percentage
     const runTime = (currentTime - startTime) / 1000;
     this.state = `Loading:${progress.toFixed(
