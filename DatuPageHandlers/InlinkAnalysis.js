@@ -32,7 +32,7 @@ class InlinkAnalysis {
       inlinks.length / InlinkAnalysis.MAX_REQUESTS
     );
 
-    for (let i = 0; i < inlinks.length; i += InlinkAnalysis.MAX_REQUESTS) {
+    for (let i = 0; i < inlinks.length && this.data.length < 2000; i += InlinkAnalysis.MAX_REQUESTS) {
       const batch = inlinks.slice(i, i + InlinkAnalysis.MAX_REQUESTS);
       const results = await this._fetchParagraphsInBatch(batch);
       this.data.push(...results);
@@ -77,10 +77,11 @@ class InlinkAnalysis {
     const timePerBatch = (currentTime - startTime) / batchesProcessed;
     const estimatedTimeRemaining =
       ((totalBatches - batchesProcessed) * timePerBatch) / 1000; // in seconds
-    const progress = ((i + batch.length) / totalInlinks) * 100; // in percentage
+    const progress = ((i + batch.length) / Math.max(totalInlinks,2000)) * 100; // in percentage
+    const runTime = (currentTime - startTime) / 1000;
     this.state = `Loading:${progress.toFixed(
       2
-    )}% ETA:${estimatedTimeRemaining.toFixed(2)} seconds Found ${
+    )}% ETA:${estimatedTimeRemaining.toFixed(2)} seconds Run Time: ${runTime.toFixed(2)} Found: ${
       this.data.length
     }`;
     console.log(this.state);
