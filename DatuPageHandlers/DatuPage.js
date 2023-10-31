@@ -10,17 +10,12 @@ class DatuPage {
     this.fetchDone = false;
   }
 
-  async fetchData() {
-    if (!(await this.isAnalysisDone())) {
+  async fetchData(datuPages) {
+    if (!(await this.isAnalysisDone()) || !(await this.isClusterDone())) {
       await this.inlinks.fetchData();
-    } else {
-      this.isLarge = true;
-    }
-
-    if (!(await this.isClusterDone())) {
       this.rootCluster = new InlinkCluster(this.pageName, 6, this.inlinks.data);
-    }
-    this.fetchDone = true;
+    } 
+    datuPages.delete(this.pageName);
   }
 
   async generatePage() {
@@ -29,8 +24,8 @@ class DatuPage {
     this.article.generatePage();
   }
 
-  isLargeEnough() {
-    return this.isLarge || this.inlinks.isLargeEnough() ;
+  static async isLargeEnough(pageName) {
+    return this.isLarge || await InlinkRetreival.isLargeEnough(pageName);
   }
 
   async has(position) {
@@ -74,10 +69,17 @@ class DatuPage {
     const collection = db.collection("datuCluster");
 
     // Use the position as the unique identifier
-    const uniqueId = this.pageName + [].join("-");
 
     // Insert or update the document in the database
-    if (await collection.findOne({ _id: uniqueId })) {
+    const data = await collection.findOne({ _id: this.pageName + "VERSION"});
+    if (data) {
+      if(!data.version) {
+        return false;
+      }
+      if(data.version !== 1.1) {
+        return false;
+      }
+
       return true;
     }
     return false;

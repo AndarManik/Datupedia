@@ -2,7 +2,7 @@ const ml = require("ml-kmeans");
 const { getDb } = require("../APIs/MongoAPI");
 const NUMCLUSTERS = 3;
 const NUMTOP = 8;
-
+const MAXCHILDRENPROMPT = 3
 class InlinkCluster {
   constructor(
     pageName,
@@ -38,12 +38,13 @@ class InlinkCluster {
       this.prompt = this.leafPrompt(inlinks);
     }
     if(this.position.length === 0) {
+      this.saveVersion();
       this.saveNodeAndChildren();
     }
   }
 
   inlinkMeans(inlinks) {
-    const embeddings = inlinks.map((inlink) => inlink.embedding);
+    const embeddings = this.centerVectors(inlinks.map((inlink) => inlink.embedding));
 
     const result = ml.kmeans(embeddings, NUMCLUSTERS, { distanceFunction: this.cosineDistance });
     const clusters = Array.from({ length: NUMCLUSTERS }, () => []);
@@ -68,6 +69,19 @@ class InlinkCluster {
 
     return output;
   }
+  centerVectors(vectors) {
+    if (vectors.length === 0) {
+        return [];
+    }
+    const dim = vectors[0].length;
+    const center = vectors.reduce((acc, vec) => {
+        return acc.map((val, idx) => val + vec[idx]);
+    }, Array(dim).fill(0)).map(val => val / vectors.length);
+    const centeredVectors = vectors.map(vec => {
+        return vec.map((val, idx) => val - center[idx]);
+    });
+    return centeredVectors;
+}
 
   cosineDistance(a, b) {
     const dotProduct = a.map((val, i) => val * b[i]).reduce((sum, val) => sum + val, 0);
@@ -115,7 +129,7 @@ class InlinkCluster {
       } else {
         child.children.forEach((chichild) => {
           chichild.topInlinks.forEach((inlink, index) => {
-            if (index < 3) {
+            if (index < MAXCHILDRENPROMPT) {
               prompt += `LINK: [[${inlink.title}]]\n`;
               prompt += `TEXT: ${inlink.paragraph}\n`;
             }
@@ -161,8 +175,13 @@ class InlinkCluster {
     }
     if(this.position.length === 0){
       console.log("clusterSaveFinished");
-
     }
+  }
+
+  async saveVersion() {
+    const db = getDb();
+    const collection = db.collection("datuCluster");
+    await collection.updateOne({ _id: this.pageName + "VERSION" }, { $set: {version: 1.1} }, { upsert: true });
   }
 }
 

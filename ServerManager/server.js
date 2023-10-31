@@ -12,8 +12,12 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 const wikipediaAPI = new WikipediaAPI();
 const { v4: uuidv4 } = require("uuid");
-const {removeEditSpans} = require("../DatuPageHandlers/DatuParser");
-const users = [];
+const { removeEditSpans } = require("../DatuPageHandlers/DatuParser");
+const ArticleGenerator = require("../DatuPageHandlers/ArticleGenerator");
+const { log } = require("console");
+const users = new Map();
+const datuPages = new Map();
+const generators = new Map();
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -64,7 +68,7 @@ app.get("/datu/:pagename", async (req, res) => {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
     renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
-    renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS)
+    renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS);
     res.send(renderedHtml);
   } catch (err) {
     console.error(err);
@@ -98,20 +102,20 @@ const interval = setInterval(() => {
 wss.on("connection", (ws) => {
   ws.on("message", async (message) => {
     const parsedMessage = JSON.parse(message);
-    user = users[parsedMessage.userId];
+    user = users.get(parsedMessage.userId);
 
     switch (parsedMessage.type) {
       case "InitializeDatuPage":
-        initializeDatuPage(ws, parsedMessage, user);
+        initializeDatuPage(ws, parsedMessage);
         break;
       case "Loading data stream":
-        loadingDataStream(ws, user);
+        await loadingDataStream(ws, user);
         break;
       case "GetClusterData":
         await getClusterData(ws, parsedMessage, user);
         break;
       case "Cluster data stream":
-        clusterDataStream(ws, user);
+        await clusterDataStream(ws, user);
         break;
       case "Get recommendation":
         await getRecommendation(ws, parsedMessage, user);
@@ -125,14 +129,18 @@ wss.on("connection", (ws) => {
   });
 });
 
-function initializeDatuPage(ws, parsedMessage, user) {
-  const datuPageInstance = new DatuPage(parsedMessage.pageId);
+function initializeDatuPage(ws, parsedMessage) {
   user = {
-    connection: ws,
-    datuPageInstance,
+    pageId: parsedMessage.pageId,
   };
-  users[parsedMessage.userId] = user;
-  datuPageInstance.fetchData();
+  users.set(parsedMessage.userId, user);
+
+  if (!datuPages.has(parsedMessage.pageId)) {
+    const datuPageInstance = new DatuPage(parsedMessage.pageId);
+    datuPageInstance.fetchData(datuPages);
+    datuPages.set(parsedMessage.pageId, datuPageInstance);
+  }
+
   ws.send(
     JSON.stringify({
       status: "success",
@@ -142,10 +150,18 @@ function initializeDatuPage(ws, parsedMessage, user) {
   );
 }
 
-function loadingDataStream(ws, user) {
-  const state = user.datuPageInstance.getState();
-  if (user.datuPageInstance.isFetchDone()) {
-    if (user.datuPageInstance.isLargeEnough()) {
+async function loadingDataStream(ws, user) {
+  if (datuPages.has(user.pageId)) {
+    const state = datuPages.get(user.pageId).getState();
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: "Loading state",
+        state,
+      })
+    );
+  } else {
+    if (await DatuPage.isLargeEnough(user.pageId)) {
       ws.send(
         JSON.stringify({
           status: "success",
@@ -163,39 +179,28 @@ function loadingDataStream(ws, user) {
       return;
     }
   }
+}
+
+async function getClusterData(ws, parsedMessage, user) {
+  const clusterId = user.pageId + parsedMessage.position;
+  user.clusterId = clusterId;
+  user.position = parsedMessage.position;
+  if (!generators.has(clusterId)) {
+    const generator = new ArticleGenerator(user.pageId, parsedMessage.position);
+    generator.generatePage(generators);
+    generators.set(clusterId, generator);
+  }
   ws.send(
     JSON.stringify({
       status: "success",
-      message: "Loading state",
-      state,
+      message: `generating page`,
     })
   );
 }
 
-async function getClusterData(ws, parsedMessage, user) {
-  if (user && user.datuPageInstance) {
-    if (!(await user.datuPageInstance.has(parsedMessage.position))) {
-      return;
-    }
-    if (user.datuPageInstance.isGenerating()) {
-      return;
-    }
-    user.datuPageInstance.position = parsedMessage.position;
-    await user.datuPageInstance.generatePage();
-
-    ws.send(
-      JSON.stringify({
-        status: "success",
-        message: `generating page`,
-      })
-    );
-  }
-}
-
-function clusterDataStream(ws, user) {
-  const wikitext = user.datuPageInstance.getWikiText();
-  if (user.datuPageInstance.isClusterFinished()) {
-    const parsedText = user.datuPageInstance.getProcessedWikiText();
+async function clusterDataStream(ws, user) {
+  if(!generators.has(user.clusterId)) {
+    const parsedText = await ArticleGenerator.getParsedText(user.pageId, user.position);
     ws.send(
       JSON.stringify({
         status: "success",
@@ -205,6 +210,9 @@ function clusterDataStream(ws, user) {
     );
     return;
   }
+
+  const generator = generators.get(user.clusterId);
+  const wikitext = generator.getWikiText();
   ws.send(
     JSON.stringify({
       status: "Processing",
@@ -216,7 +224,9 @@ function clusterDataStream(ws, user) {
 
 async function getRecommendation(ws, parsedMessage, user) {
   const pageName = parsedMessage.pageId;
-  const recommendation = removeEditSpans(await wikipediaAPI.getContent(pageName)).replace(/\/wiki\//g, '/datu/');
+  const recommendation = removeEditSpans(
+    await wikipediaAPI.getContent(pageName)
+  ).replace(/\/wiki\//g, "/datu/");
   console.log(recommendation);
   ws.send(
     JSON.stringify({

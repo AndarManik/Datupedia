@@ -21,22 +21,32 @@ class InlinkRetreival {
   }
 
   async fetchData() {
-    if (await this._loadFromDb()) {
-      console.log("fetch");
-      this.finished = true;
-      return;
-    }
+
+      if (await this._loadFromDb()) {
+        console.log("fetch");
+        this.finished = true;
+        return;
+      }
+
     const startTime = Date.now();
-    const inlinks = (await wikipediaAPI.getInlinks(this.pageName)).slice(0, 5000);
-    const totalBatches = Math.ceil(
-      inlinks.length / InlinkRetreival.MAX_REQUESTS
+    const inlinks = (await wikipediaAPI.getInlinks(this.pageName)).slice(
+      0,
+      5000
     );
 
-    for (let i = 0; i < inlinks.length && this.data.length < 2000; i += InlinkRetreival.MAX_REQUESTS) {
+    for (
+      let i = 0;
+      i < inlinks.length && this.data.length < 2000;
+      i += InlinkRetreival.MAX_REQUESTS
+    ) {
       const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
       const results = await this._fetchParagraphsInBatch(batch);
       this.data.push(...results);
-      this._logProgress(startTime, Math.min(inlinks.length, 2000), this.data.length);
+      this._logProgress(
+        startTime,
+        Math.min(inlinks.length, 2000),
+        (inlinks.length < 2000) ? i : this.data.length
+      );
       await this._delay(InlinkRetreival.DELAY_TIME);
     }
 
@@ -72,7 +82,7 @@ class InlinkRetreival {
   }
 
   _logProgress(startTime, inlinksLength, dataLength) {
-    const progress = dataLength / inlinksLength * 100; //in percent
+    const progress = (dataLength / inlinksLength) * 100; //in percent
     const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
 
@@ -96,6 +106,14 @@ class InlinkRetreival {
       const numChunks = Math.ceil(
         this.data.length / InlinkRetreival.MAX_CHUNK_SIZE
       );
+
+      await this.db
+        .collection("datuPages")
+        .updateOne(
+          { pageName: this.pageName, type: "length" },
+          { $set: { inlinkLength: this.data.length } },
+          { upsert: true }
+        );
 
       for (let i = 0; i < numChunks; i++) {
         const chunkData = this.data.slice(
@@ -172,8 +190,11 @@ class InlinkRetreival {
     }
   }
 
-  isLargeEnough(){
-    return this.data.length > 21;
+  static async isLargeEnough(pageName) {
+    const doc = await getDb()
+      .collection("datuPages")
+      .findOne({ pageName: pageName, type: "length" });
+    return doc.inlinkLength > 21;
   }
 }
 class Inlink {
