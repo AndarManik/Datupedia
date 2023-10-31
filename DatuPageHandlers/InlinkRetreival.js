@@ -7,7 +7,7 @@ const TextExtractor = require("./TextExtractor");
 const textExtractor = new TextExtractor();
 const { getDb } = require("../APIs/MongoAPI");
 
-class InlinkAnalysis {
+class InlinkRetreival {
   static MAX_REQUESTS = 100;
   static DELAY_TIME = 500;
   static MAX_CHUNK_SIZE = 250;
@@ -29,15 +29,15 @@ class InlinkAnalysis {
     const startTime = Date.now();
     const inlinks = (await wikipediaAPI.getInlinks(this.pageName)).slice(0, 5000);
     const totalBatches = Math.ceil(
-      inlinks.length / InlinkAnalysis.MAX_REQUESTS
+      inlinks.length / InlinkRetreival.MAX_REQUESTS
     );
 
-    for (let i = 0; i < inlinks.length && this.data.length < 2000; i += InlinkAnalysis.MAX_REQUESTS) {
-      const batch = inlinks.slice(i, i + InlinkAnalysis.MAX_REQUESTS);
+    for (let i = 0; i < inlinks.length && this.data.length < 2000; i += InlinkRetreival.MAX_REQUESTS) {
+      const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
       const results = await this._fetchParagraphsInBatch(batch);
       this.data.push(...results);
       this._logProgress(startTime, Math.min(inlinks.length, 2000), this.data.length);
-      await this._delay(InlinkAnalysis.DELAY_TIME);
+      await this._delay(InlinkRetreival.DELAY_TIME);
     }
 
     await this._saveToDb();
@@ -94,13 +94,13 @@ class InlinkAnalysis {
   async _saveToDb() {
     try {
       const numChunks = Math.ceil(
-        this.data.length / InlinkAnalysis.MAX_CHUNK_SIZE
+        this.data.length / InlinkRetreival.MAX_CHUNK_SIZE
       );
 
       for (let i = 0; i < numChunks; i++) {
         const chunkData = this.data.slice(
-          i * InlinkAnalysis.MAX_CHUNK_SIZE,
-          (i + 1) * InlinkAnalysis.MAX_CHUNK_SIZE
+          i * InlinkRetreival.MAX_CHUNK_SIZE,
+          (i + 1) * InlinkRetreival.MAX_CHUNK_SIZE
         );
 
         await this.db
@@ -183,4 +183,4 @@ class Inlink {
     this.embedding = embedding;
   }
 }
-module.exports = InlinkAnalysis;
+module.exports = InlinkRetreival;

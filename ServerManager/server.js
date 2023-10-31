@@ -77,8 +77,12 @@ app.get("/wiki/:pagename", async (req, res) => {
     const pagename = decodeURIComponent(
       req.params.pagename.replaceAll("_", " ")
     );
+    const filePath = path.join(__dirname, "../public/Wikipage.html");
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
     const page = await wikipediaAPI.getContent(pagename);
-    res.send(page);
+    renderedHtml = renderedHtml.replace(/{{content}}/g, page);
+    res.send(renderedHtml);
   } catch (err) {
     console.error(err);
     res.status(500).send("Internal Server Error");

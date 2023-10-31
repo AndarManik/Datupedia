@@ -167,131 +167,23 @@
     </style>
     <title>{{pagename}}</title>
     <script>
-      const userId = "{{userID}}"; // Assume you have some way to populate this value
-      const pageId = "{{pagename}}";
-      // Initialize WebSocket connection
-      const ws = new WebSocket("{{wss}}");
-
-      // Function to handle the server response
-      const handleServerResponse = (data) => {
-        const statusDiv = document.getElementById("status");
-        const dataDiv = document.getElementById("data");
-        if (data.status === "error") {
-          statusDiv.innerHTML = data.message;
-          return;
-        }
-
-        if (data.status === "ping") {
-          ws.send(JSON.stringify({ type: "pong", userId }));
-          return;
-        }
-
-        switch (data.message) {
-          case "Loading state":
-            statusDiv.innerHTML = data.state;
-            ws.send(
-              JSON.stringify({
-                type: "Loading data stream",
-                userId,
-              })
-            );
-            break;
-          case "New DatuPage created":
-            ws.send(
-              JSON.stringify({
-                type: "GetClusterData",
-                position: [],
-                userId,
-              })
-            );
-            break;
-
-          case "Not large enough":
-            ws.send(
-              JSON.stringify({
-                type: "Get recommendation",
-                pageId,
-                userId,
-              })
-            );
-            break;
-          case "generating page":
-            statusDiv.innerHTML = "";
-            dataDiv.innerHTML = "";
-            ws.send(
-              JSON.stringify({
-                type: "Cluster data stream",
-                userId,
-              })
-            );
-            break;
-          case "Cluster data stream":
-            dataDiv.innerHTML = data.clusterData;
-            ws.send(
-              JSON.stringify({
-                type: "Cluster data stream",
-                userId,
-              })
-            );
-            break;
-          case "Cluster data finished":
-            statusDiv.innerHTML = "";
-            dataDiv.innerHTML = data.clusterData;
-            break;
-          case "Recommendations":
-            statusDiv.innerHTML = "There weren't enough links to generate the article.";
-            dataDiv.innerHTML = data.clusterData;
-            break;
-        }
-      };
-
-      const handleClientResponse = (position) => {
-        const dataDiv = document.getElementById("data");
-        ws.send(JSON.stringify({ type: "GetClusterData", position, userId }));
-      };
-
-      ws.addEventListener("open", () => {
-        const statusDiv = document.getElementById("status");
-        statusDiv.innerHTML = "Loading...";
-        ws.send(
-          JSON.stringify({
-            type: "InitializeDatuPage",
-            pageId,
-            userId,
-          })
-        );
-      });
-
-      ws.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        handleServerResponse(data);
-      });
-
-      window.addEventListener("unload", () => {
-        ws.close();
-      });
-
       const redirectToSearch = () => {
         window.location.href = "/";
       };
 
-      const redirectToWiki = () => {
+      const redirectToDatu = () => {
         // Get the current URL
         const currentUrl = window.location.href;
 
         // Check if it matches the "/datu/" pattern
-        const datuPattern = /\/datu\/([^/]+)/;
-        const match = currentUrl.match(datuPattern);
+        const wikiPattern = /\/wiki\/([^/]+)/;
+        const match = currentUrl.match(wikiPattern);
 
         if (match) {
           // Replace "/datu/" with "/wiki/" and redirect
-          const newUrl = currentUrl.replace(datuPattern, "/wiki/$1");
+          const newUrl = currentUrl.replace(wikiPattern, "/datu/$1");
           window.location.href = newUrl;
         }
-      };
-
-      const regeneratePage = () => {
-        ws.send(JSON.stringify({ type: "RegenerateArticle", userId }));
       };
     </script>
   </head>
@@ -299,13 +191,11 @@
     <div class="container">
       <div class="button-container">
         <button onclick="redirectToSearch()">Datupedia Home</button>
-        <button onclick="redirectToWiki()">Wikipedia Page</button>
-        <button onclick="regeneratePage()">Regenerate Article</button>
+        <button onclick="redirectToDatu()">Datupedia Page</button>
       </div>
 
       <h1 id="pageTitle">{{pagename}}</h1>
-      <div id="status"></div>
-      <div id="data"></div>
+      {{content}}
     </div>
   </body>
 </html>

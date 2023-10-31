@@ -1,6 +1,6 @@
 :root {
   /* Set the width to be 80% of viewport width, but not exceeding 900px */
-  --gradient-width: min(80vw, 700px);
+  --gradient-width: min(80vw, 500px);
 }
 body {
   background: linear-gradient(
@@ -51,13 +51,29 @@ li {
 
 input {
   box-sizing: border-box; /* This line ensures padding and border are inside the width */
-  color: #ffffffc0;
-  border: 2px solid #ccc;
+  color: #f0f0f0;
+  border-radius: 10px;
+  border: 2px solid #4d4650;
+
+  background-color: #4d4650; /* Change background color when hovered over the div */
   background: #4d4650;
   padding: 12px;
   width: 100%;
   transition: width 0.3s ease-in-out;
+  outline: none;
+  box-shadow:  5px 5px 5px -1px #363339,  -5px -5px 5px -1px #635866;
+  text-align: center;
+  margin-bottom: 10px;
 }
+input::placeholder {
+  color: #f0f0f0; /* Replace #yourColorCode with the color you want */
+}
+
+input:focus {
+  outline: none;
+  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
+}
+
 
 #pagename {
   color: #ffffff;
@@ -91,18 +107,24 @@ nav {
   padding: 10px;
   width: 100%;
 
-  background: #363339; /* Background color for the dropdown */
-  position: absolute; /* Positions the dropdown relative to its parent */
   border: 1px solid #ccc; /* Adds a border */
   display: none; /* Hides the list by default */
+
+  
 }
 #suggestions {
-  border: 1px solid #ccc;
-  position: absolute;
   list-style: none;
   padding: 0;
   margin: 0;
   display: none;
+  border-radius: 10px;
+  background-color: #4d4650; /* Change background color when hovered over the div */
+  background: #4d4650;
+  transition: width 0.3s ease-in-out;
+  outline: none;
+  box-shadow:   5px 5px 5px -1px #363339,  -5px -5px 5px -1px #635866;
+  text-align: center;
+  margin-bottom: 10px;
 }
 #suggestions li {
   padding: 5px;
@@ -110,8 +132,10 @@ nav {
   line-height: 1.6;
 }
 #suggestions li:hover {
-  background-color: #f0f0f0;
-  color: #363339;
+  box-shadow:   7px 7px 7px -1px #363339,  -7px -7px 7px -1px #635866;
+  text-align: center;
+    border-radius: 10px;
+
 }
 /* Step 3: Add the styles */
 .content-wrapper {
@@ -130,7 +154,7 @@ header,
 
 .container {
   width: 80%;
-  max-width: 700px;
+  max-width: 500px;
   margin: 0 auto;
 }
 /* For very small screens, typically phones */

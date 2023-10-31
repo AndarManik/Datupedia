@@ -1,10 +1,10 @@
-const InlinkAnalysis = require("./InlinkAnalysis");
+const InlinkRetreival = require("./InlinkRetreival");
 const InlinkCluster = require("./InlinkCluster");
 const ArticleGenerator = require("./ArticleGenerator");
 const { getDb } = require("../APIs/MongoAPI");
 class DatuPage {
   constructor(pageName, position = []) {
-    this.inlinks = new InlinkAnalysis(pageName);
+    this.inlinks = new InlinkRetreival(pageName);
     this.pageName = pageName;
     this.position = position;
     this.fetchDone = false;
