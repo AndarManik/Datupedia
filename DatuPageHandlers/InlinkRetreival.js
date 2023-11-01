@@ -139,6 +139,14 @@ class InlinkRetreival {
 
   async _loadFromDb() {
     try {
+      if (
+        !await getDb()
+        .collection("datuPages")
+        .findOne({ pageName: pageName, type: "length" })
+      ) {
+        return false;
+      }
+
       this.data = [];
       let chunkExists = true;
       let chunkNumber = 0;
@@ -194,7 +202,7 @@ class InlinkRetreival {
     const doc = await getDb()
       .collection("datuPages")
       .findOne({ pageName: pageName, type: "length" });
-    return doc.inlinkLength > 21;
+    return (doc) ? doc.inlinkLength > 21: false;
   }
 }
 class Inlink {

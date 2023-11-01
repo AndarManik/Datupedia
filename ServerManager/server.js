@@ -199,8 +199,11 @@ async function getClusterData(ws, parsedMessage, user) {
 }
 
 async function clusterDataStream(ws, user) {
-  if(!generators.has(user.clusterId)) {
-    const parsedText = await ArticleGenerator.getParsedText(user.pageId, user.position);
+  if (!generators.has(user.clusterId)) {
+    const parsedText = await ArticleGenerator.getParsedText(
+      user.pageId,
+      user.position
+    );
     ws.send(
       JSON.stringify({
         status: "success",
@@ -238,20 +241,18 @@ async function getRecommendation(ws, parsedMessage, user) {
 }
 
 async function regenerateArticle(ws, user) {
-  if (user && user.datuPageInstance) {
-    if (user.datuPageInstance.isGenerating()) {
-      return;
-    }
-    await user.datuPageInstance.resetArticle();
-    await user.datuPageInstance.generatePage();
+  const generator = new ArticleGenerator(user.pageId, parsedMessage.position);
+  await generator.resetArticle();
 
-    ws.send(
-      JSON.stringify({
-        status: "success",
-        message: `generating page`,
-      })
-    );
-  }
+  generator.generatePage(generators);
+  generators.set(user.clusterId, generator);
+
+  ws.send(
+    JSON.stringify({
+      status: "success",
+      message: `generating page`,
+    })
+  );
 }
 
 // Centralized Error Handling

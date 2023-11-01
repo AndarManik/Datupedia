@@ -88,9 +88,9 @@ class DatuPage {
   async isAnalysisDone() {
     const db = getDb();
     if (
-      await db
-        .collection("datuPages")
-        .findOne({ pageName: this.pageName, chunkNumber: 0 })
+      await getDb()
+      .collection("datuPages")
+      .findOne({ pageName: this.pageName, type: "length" })
     ) {
       return true;
     }
