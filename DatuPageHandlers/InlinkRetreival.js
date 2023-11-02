@@ -11,6 +11,8 @@ class InlinkRetreival {
   static MAX_REQUESTS = 100;
   static DELAY_TIME = 500;
   static MAX_CHUNK_SIZE = 250;
+  static MAX_RETREIVE = 1500;
+  static MAX_STORE = 500
 
   constructor(pageName) {
     this.pageName = pageName;
@@ -29,14 +31,11 @@ class InlinkRetreival {
       }
 
     const startTime = Date.now();
-    const inlinks = (await wikipediaAPI.getInlinks(this.pageName)).slice(
-      0,
-      5000
-    );
+    const inlinks = await wikipediaAPI.getInlinks(this.pageName, MAX_RETREIVE);
 
     for (
       let i = 0;
-      i < inlinks.length && this.data.length < 2000;
+      i < inlinks.length && this.data.length < MAX_STORE;
       i += InlinkRetreival.MAX_REQUESTS
     ) {
       const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
@@ -44,8 +43,8 @@ class InlinkRetreival {
       this.data.push(...results);
       this._logProgress(
         startTime,
-        Math.min(inlinks.length, 2000),
-        (inlinks.length < 2000) ? i : this.data.length
+        Math.min(inlinks.length, MAX_STORE),
+        (inlinks.length < MAX_STORE) ? i : this.data.length
       );
       await this._delay(InlinkRetreival.DELAY_TIME);
     }
