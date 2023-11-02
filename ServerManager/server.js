@@ -125,6 +125,9 @@ wss.on("connection", (ws) => {
         break;
       case "pong":
         break;
+      case "disconnect":
+        users.delete(parsedMessage.userId);  
+        break;
     }
   });
 });

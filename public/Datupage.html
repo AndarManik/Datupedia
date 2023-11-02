@@ -28,7 +28,7 @@
         margin: 0 auto;
       }
 
-      h1 ,
+      h1,
       h2,
       h3,
       h4 {
@@ -49,8 +49,7 @@
         cursor: pointer; /* Changes the cursor to a hand when hovered over the div */
         transition: background-color 0.3s ease; /* Smooth transition for background color change */
         border: none;
-        box-shadow: 5px 5px 5px -1px #363339,
-                    -5px -5px 5px -1px #635866;
+        box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
         margin-top: 30px;
         margin-bottom: 30px;
         border-radius: 30px;
@@ -61,11 +60,11 @@
         color: #f0f0f0;
         background-color: #4d4650; /* Change background color when hovered over the div */
         box-shadow: inset 5px 5px 5px -1px #363339,
-                    inset -5px -5px 5px -1px #635866;
+          inset -5px -5px 5px -1px #635866;
       }
       .article-section:active {
         box-shadow: inset 7px 7px 7px -1px #363339,
-                    inset -7px -7px 7px -1px #635866;
+          inset -7px -7px 7px -1px #635866;
       }
       a {
         color: #a4c5fb;
@@ -90,20 +89,18 @@
         font-size: 18px;
         border-radius: 10px;
         border: none;
-        box-shadow: 3px 3px 3px -1px #363339,
-                    -3px -3px 3px -1px #635866;
+        box-shadow: 3px 3px 3px -1px #363339, -3px -3px 3px -1px #635866;
       }
       .button-container button:hover {
         background: #4d4650; /* Slightly lighter shade for hover */
         color: #f0f0f0;
         box-shadow: inset 3px 3px 3px -1px #363339,
-                    inset -3px -3px 3px -1px #635866;
-      
+          inset -3px -3px 3px -1px #635866;
       }
 
       .button-container button:active {
         box-shadow: inset 5px 5px 5px -1px #363339,
-                    inset -5px -5px 5px -1px #635866;
+          inset -5px -5px 5px -1px #635866;
       }
 
       @media only screen and (max-width: 480px) {
@@ -162,7 +159,6 @@
           transition: background 0.3s ease;
           font-size: 16px; /* Reduced font size to fit better and to allow for more padding */
         }
-
       }
     </style>
     <title>{{pagename}}</title>
@@ -239,7 +235,8 @@
             dataDiv.innerHTML = data.clusterData;
             break;
           case "Recommendations":
-            statusDiv.innerHTML = "There weren't enough links to generate the article.";
+            statusDiv.innerHTML =
+              "There weren't enough links to generate the article.";
             dataDiv.innerHTML = data.clusterData;
             break;
         }
@@ -268,7 +265,13 @@
       });
 
       window.addEventListener("unload", () => {
-        ws.close();
+        ws.send(
+          JSON.stringify({ type: "disconnect", userId})
+        );
+
+        setTimeout(() => {
+          ws.close();
+        }, 100);
       });
 
       const redirectToSearch = () => {

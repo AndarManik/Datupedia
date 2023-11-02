@@ -50,17 +50,16 @@ li {
 }
 
 input {
+  -webkit-appearance: none;
   box-sizing: border-box; /* This line ensures padding and border are inside the width */
   color: #f0f0f0;
   border-radius: 10px;
-  border: 2px solid #4d4650;
-
-  background-color: #4d4650; /* Change background color when hovered over the div */
+  border: 0px solid #ffffff00;
+  font-family: Arial;
   background: #4d4650;
   padding: 12px;
   width: 100%;
   transition: width 0.3s ease-in-out;
-  outline: none;
   box-shadow:  5px 5px 5px -1px #363339,  -5px -5px 5px -1px #635866;
   text-align: center;
   margin-bottom: 10px;
