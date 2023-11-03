@@ -12,7 +12,7 @@ class InlinkRetreival {
   static DELAY_TIME = 500;
   static MAX_CHUNK_SIZE = 250;
   static MAX_RETREIVE = 1500;
-  static InlinkRetreival.MAX_STORE = 500
+  static MAX_STORE = 500
 
   constructor(pageName) {
     this.pageName = pageName;
