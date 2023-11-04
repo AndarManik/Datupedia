@@ -141,7 +141,7 @@ class InlinkRetreival {
       if (
         !await getDb()
         .collection("datuPages")
-        .findOne({ pageName: pageName, type: "length" })
+        .findOne({ pageName: this.pageName, type: "length" })
       ) {
         return false;
       }
