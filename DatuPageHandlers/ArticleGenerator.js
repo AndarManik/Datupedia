@@ -33,8 +33,7 @@ Article Guidelines:
 7. Every section should have two paragraphs.
 8. Include at least four wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
 9. Each section needs a unique, relevant title, formatted as ==header==.
-10. Avoid starting paragraphs with "In this cluster", "In this section", or anything similar. Instead start with something related to \`${this.pageName}\`. 
-11.     
+10. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`. 
 Example Format:
 
 ==Article header==

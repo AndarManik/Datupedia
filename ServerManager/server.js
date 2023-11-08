@@ -244,7 +244,7 @@ async function getRecommendation(ws, parsedMessage, user) {
 }
 
 async function regenerateArticle(ws, user) {
-  const generator = new ArticleGenerator(user.pageId, parsedMessage.position);
+  const generator = new ArticleGenerator(user.pageId, user.position);
   await generator.resetArticle();
 
   generator.generatePage(generators);
