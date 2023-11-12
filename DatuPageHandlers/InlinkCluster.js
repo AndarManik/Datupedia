@@ -174,7 +174,6 @@ class InlinkCluster {
       await child.saveNodeAndChildren();
     }
     if(this.position.length === 0){
-      console.log("clusterSaveFinished");
     }
   }
 

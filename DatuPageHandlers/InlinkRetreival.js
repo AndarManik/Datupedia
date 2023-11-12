@@ -25,7 +25,6 @@ class InlinkRetreival {
   async fetchData() {
 
       if (await this._loadFromDb()) {
-        console.log("fetch");
         this.finished = true;
         return;
       }

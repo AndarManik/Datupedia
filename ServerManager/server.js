@@ -233,7 +233,6 @@ async function getRecommendation(ws, parsedMessage, user) {
   const recommendation = removeEditSpans(
     await wikipediaAPI.getContent(pageName)
   ).replace(/\/wiki\//g, "/datu/");
-  console.log(recommendation);
   ws.send(
     JSON.stringify({
       status: "success",

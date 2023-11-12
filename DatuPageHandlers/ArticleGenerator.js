@@ -48,7 +48,6 @@ And even more detail...`;
     let prompt =
       "\nSTART OF PROVIDED TEXT\n" + this.prompt + "\nEND OF PROVIDED TEXT";
 
-    console.log(system + prompt);
     this.wikitextStoreStream(
       await openai.gpt4Stream(system, prompt),
       generators
@@ -63,7 +62,6 @@ And even more detail...`;
       }
       prevChunk = chunk;
     }
-    console.log(this.superText + this.wikiText);
     this.processedWikiText = await datuParse(
       this.superText,
       this.wikiText,
@@ -86,7 +84,6 @@ And even more detail...`;
     const uniqueId = this.pageName + this.position.join("-");
 
     await collection.updateOne({ _id: uniqueId }, { $set: dataToSave });
-    console.log("articleSaveSucc");
     if (this.childCount !== 0) {
       this.wikiText.match(/==[^=]+==[^=]+/g).forEach(async (text, index) => {
         if (index < this.childCount) {
@@ -98,7 +95,6 @@ And even more detail...`;
           );
         }
       });
-      console.log("childSaveSucc");
     }
   }
 
@@ -112,7 +108,6 @@ And even more detail...`;
     if (!data) {
       throw new Error("Data not found for given pageName and position");
     }
-    console.log(data.hasArticle);
     if (data.hasArticle) {
       this.processedWikiText = data.article;
       this.wikiTextFinished = true;
