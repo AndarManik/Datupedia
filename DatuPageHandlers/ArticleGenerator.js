@@ -98,6 +98,20 @@ And even more detail...`;
     }
   }
 
+  static async hasInData(pageName, position) {
+    const db = getDb();
+    const collection = db.collection("datuCluster");
+    const uniqueId = pageName + position.join("-");
+    const data = await collection.findOne({
+      _id: uniqueId,
+    });
+    if (data) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
   async fetchData(pageName, position) {
     const db = getDb();
     const collection = db.collection("datuCluster");

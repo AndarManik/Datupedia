@@ -188,6 +188,10 @@ async function getClusterData(ws, parsedMessage, user) {
   const clusterId = user.pageId + parsedMessage.position;
   user.clusterId = clusterId;
   user.position = parsedMessage.position;
+  if(!(await ArticleGenerator.hasInData(user.pageId, parsedMessage.position))) {
+    return;
+  }
+
   if (!generators.has(clusterId)) {
     const generator = new ArticleGenerator(user.pageId, parsedMessage.position);
     generator.generatePage(generators);

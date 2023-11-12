@@ -243,7 +243,6 @@
       };
 
       const handleClientResponse = (position) => {
-        const dataDiv = document.getElementById("data");
         ws.send(JSON.stringify({ type: "GetClusterData", position, userId }));
       };
 

@@ -25,7 +25,7 @@ class DatuPage {
   }
 
   static async isLargeEnough(pageName) {
-    return this.isLarge || await InlinkRetreival.isLargeEnough(pageName);
+    return await InlinkRetreival.isLargeEnough(pageName);
   }
 
   async has(position) {
