@@ -2,7 +2,10 @@
 
 <html lang="en">
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1"
+    />
     <link rel="stylesheet" type="text/css" href="styles.css" />
     <title>Datupedia</title>
     <script>
@@ -17,6 +20,11 @@
           if (query) {
             const response = await fetch(`/suggestions?query=${query}`);
             console.log("Fetch initiated.");
+
+            if (inputField.value !== query) {
+              console.log("Query changed. Ignoring outdated suggestions.");
+              return;
+            }
 
             const suggestions = await response.json();
             console.log(`Received suggestions: ${suggestions}`);
@@ -45,6 +53,10 @@
           }
         });
       });
+
+      async function getRandom() {
+        window.location.href = `/random`;
+      }
     </script>
   </head>
   <body>
@@ -52,20 +64,25 @@
       <header>
         <h1>Datupedia</h1>
       </header>
-      <p>Type in a Wikipedia page of interest. Our system will gather all the 
-        paragraphs containing that link and transform it into an interactive article. 
-        If a section piques your interest click on the header to read more.
+      <p>
+        Search here to create an article based on Wikipedia references. Our
+        system assembles information from various Wikipedia pages which lead to
+        your search term.
       </p>
 
       <div id="status"></div>
-      <input
-        type="text"
-        id="pagename"
-        name="pagename"
-        placeholder="Wikipedia Page Name"
-        required
-        autocomplete="off"
-      />
+      <div class="inputField">
+        <input
+          type="text"
+          id="pagename"
+          name="pagename"
+          placeholder="Search"
+          required
+          autocomplete="off"
+        />
+        <button onclick="getRandom()">Random</button>
+      </div>
+
       <ul id="suggestions"></ul>
     </div>
   </body>

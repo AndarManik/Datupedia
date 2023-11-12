@@ -93,6 +93,26 @@ app.get("/wiki/:pagename", async (req, res) => {
   }
 });
 
+async function findRandomPageWithInlinks(minInlinks = 350) {
+  const randomPage = await wikipediaAPI.getRandom();
+  const inlinks = await wikipediaAPI.getInlinks(randomPage);
+  if (inlinks.length >= minInlinks) {
+    return randomPage;
+  } else {
+    return findRandomPageWithInlinks(minInlinks); // Recursive call
+  }
+}
+
+app.get("/random", async (req, res) => {
+  try {
+    const suitablePage = await findRandomPageWithInlinks();
+    res.redirect(`/datu/${encodeURIComponent(suitablePage)}`);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
 const interval = setInterval(() => {
   wss.clients.forEach((ws) => {
     ws.send(JSON.stringify({ status: "ping" }));

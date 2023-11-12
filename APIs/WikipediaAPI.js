@@ -164,6 +164,23 @@ class WikipediaAPI {
     }
   }
 
+  async getRandom() {
+    const params = {
+      action: "query",
+      format: "json",
+      list: "random",
+      rnnamespace: 0, // namespace 0 refers to Wikipedia articles
+      rnlimit: 1, // number of random articles to fetch
+    };
+
+    const data = await this._apiCall(params);
+    if (data && data.query && data.query.random && data.query.random.length > 0) {
+      return data.query.random[0].title; // returns the title of the random article
+    } else {
+      console.log("An error occurred while fetching a random page");
+      return null;
+    }
+  }
 }
 
 module.exports = WikipediaAPI;

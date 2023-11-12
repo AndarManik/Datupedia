@@ -21,6 +21,7 @@ h1 {
   font-size: 40px;
 }
 
+
 h1,
 h2,
 h3,
@@ -29,7 +30,33 @@ h4 {
   font-weight: 300;
   text-align: center;
 }
+button {
+  height: 50px; /* Set a fixed height */
+  margin-left: 1%;
+  margin-bottom: 10px;
+  width: 17%;
+  background: #4d4650; /* Same as body background */
+  color: #f0f0f0; /* Matching the anchor tag color */
+  cursor: pointer; /* Make the button show a hand cursor on hover */
+  transition: background 2s ease; /* Smooth transition for hover effect */
+  font-size: 18px;
+  border-radius: 10px;
+  border: none;
+  font-family: georgia;
+  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+  border-radius: 10px;
+  text-align: center;
+  font-size: 16px;
+}
+button:hover {
+  background: #4d4650; /* Slightly lighter shade for hover */
+  color: #f0f0f0;
+  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
+}
 
+button:active {
+  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
+}
 a {
   color: #ceb9e3;
   text-decoration: none;
@@ -53,16 +80,18 @@ input {
   -webkit-appearance: none;
   box-sizing: border-box; /* This line ensures padding and border are inside the width */
   color: #f0f0f0;
-  border-radius: 10px;
+  
   border: 0px solid #ffffff00;
-  font-family: Arial;
   background: #4d4650;
   padding: 12px;
-  width: 100%;
+  width: 80%;
+  height: 50px;
   transition: width 0.3s ease-in-out;
-  box-shadow:  5px 5px 5px -1px #363339,  -5px -5px 5px -1px #635866;
+  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+  border-radius: 10px;
   text-align: center;
   margin-bottom: 10px;
+  font-size: 16px;
 }
 input::placeholder {
   color: #f0f0f0; /* Replace #yourColorCode with the color you want */
@@ -73,24 +102,9 @@ input:focus {
   box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
 }
 
-
 #pagename {
   color: #ffffff;
   font-family: Georgia;
-}
-
-button {
-  background: #4d4650; /* Same as body background */
-  color: #ffffffc0; /* Matching the anchor tag color */
-  border: 1px solid #ccc; /* Similar to the search input border */
-  padding: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease; /* Smooth transition for hover effect */
-}
-
-button:hover {
-  background: #504a50d5; /* Slightly lighter shade for hover */
-  text-decoration: underline; /* Consistent with the anchor hover effect */
 }
 
 nav {
@@ -104,14 +118,13 @@ nav {
 #suggestionsList {
   list-style-type: none; /* Removes bullet points */
   padding: 10px;
-  width: 100%;
+  width: 80%;
 
   border: 1px solid #ccc; /* Adds a border */
   display: none; /* Hides the list by default */
-
-  
 }
 #suggestions {
+  width: 80%;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -121,7 +134,7 @@ nav {
   background: #4d4650;
   transition: width 0.3s ease-in-out;
   outline: none;
-  box-shadow:   5px 5px 5px -1px #363339,  -5px -5px 5px -1px #635866;
+  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -131,25 +144,12 @@ nav {
   line-height: 1.6;
 }
 #suggestions li:hover {
-  box-shadow:   7px 7px 7px -1px #363339,  -7px -7px 7px -1px #635866;
+  box-shadow: 7px 7px 7px -1px #363339, -7px -7px 7px -1px #635866;
   text-align: center;
-    border-radius: 10px;
-
+  border-radius: 10px;
 }
-/* Step 3: Add the styles */
-.content-wrapper {
-  display: flex;
-  align-items: flex-start; /* Align items to the top */
-  gap: 20px; /* Add a gap between flex items */
-}
-
 /* You might want to style or adjust the width of the elements inside for a better look */
-header,
-#status,
-#pagename,
-#suggestions {
-  flex: 1; /* Make these take equal width */
-}
+
 
 .container {
   width: 80%;
