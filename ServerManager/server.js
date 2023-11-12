@@ -93,13 +93,18 @@ app.get("/wiki/:pagename", async (req, res) => {
   }
 });
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 async function findRandomPageWithInlinks(minInlinks = 350) {
   const randomPage = await wikipediaAPI.getRandom();
   const inlinks = await wikipediaAPI.getInlinks(randomPage);
   if (inlinks.length >= minInlinks) {
     return randomPage;
   } else {
-    return findRandomPageWithInlinks(minInlinks); // Recursive call
+    await sleep(500); // Waits for 2 seconds before the next recursive call
+    return findRandomPageWithInlinks(minInlinks);
   }
 }
 
