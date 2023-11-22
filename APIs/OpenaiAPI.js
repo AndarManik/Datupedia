@@ -33,7 +33,7 @@ class OpenaiAPI {
       const completion = await this.openai.chat.completions.create({
         messages: [{"role": "system", "content": `${system}`},
           {"role": "user", "content": `${prompt}`}],
-        model: 'gpt-4',
+        model: 'gpt-4-1106-preview',
       });
       return completion.choices[0].message.content;
     });

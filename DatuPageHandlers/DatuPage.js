@@ -76,7 +76,7 @@ class DatuPage {
       if(!data.version) {
         return false;
       }
-      if(data.version !== 1.1) {
+      if(data.version !== 1.2) {
         return false;
       }
 
