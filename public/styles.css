@@ -28,7 +28,6 @@ h1 {
   justify-content: space-between;
   align-items: center;
   background: #4d4650;
-  border-bottom: 2px solid #f0f0f0; /* 2px solid line in a light color */
   padding-bottom: 5px;
 }
 
@@ -44,8 +43,10 @@ h1 {
 }
 
 .nav-links li {
+  font-family: georgia;
   display: inline;
   margin-left: 20px;
+  font-size: 24px;
 }
 
 .navbar a {
@@ -68,6 +69,7 @@ h4 {
 }
 
 .description {
+  font-family: georgia;
   color: #f0f0f0;
   font-size: 18px; /* Slightly larger font for emphasis */
   line-height: 1.4; /* Adjust line height for better readability */

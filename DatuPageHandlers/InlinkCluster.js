@@ -2,7 +2,7 @@ const ml = require("ml-kmeans");
 const { getDb } = require("../APIs/MongoAPI");
 const NUMCLUSTERS = 3;
 const NUMTOP = 8;
-const MAXCHILDRENPROMPT = 3
+const MAXCHILDRENPROMPT = 2
 class InlinkCluster {
   constructor(
     pageName,
@@ -180,7 +180,7 @@ class InlinkCluster {
   async saveVersion() {
     const db = getDb();
     const collection = db.collection("datuCluster");
-    await collection.updateOne({ _id: this.pageName + "VERSION" }, { $set: {version: 1.2} }, { upsert: true });
+    await collection.updateOne({ _id: this.pageName + "VERSION" }, { $set: {version: 1.3} }, { upsert: true });
   }
 }
 

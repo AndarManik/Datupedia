@@ -24,26 +24,32 @@ Task:
 
 Article Guidelines:
 
-1. The purpose of the article is to outline ${NUMCLUSTERS} different ways \`${this.pageName}\` is understood.
+1. The purpose of the article is to summarize the ${NUMCLUSTERS} different ways \`${this.pageName}\` is understood.
 2. Your article should have ${NUMCLUSTERS} sections, one for each cluster in the provided text.
-3. Ensure each section has its own consistent theme. 
-4. Maintain a neutral, informative tone, avoiding calls to action.
-5. Instead of listing, provide in-depth analysis.
+3. Ensure each section has its own consistent theme and follows a single line of thought.
+4. Maintain a neutral, informative tone, avoiding calls to action or editorializing.
+5. Don't list or enumerate, instead, provide a complete line of thought, and choose to ignore a provided link for clarity
 6. If two sections are similar, consider focusing on what differentiates the two.   
-7. Every section should have two paragraphs.
-8. Include at least four wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
-9. Each section needs a unique, relevant title, formatted as ==header==.
-10. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`. 
+7. Each section should consist of one longer paragraph with 6-7 sentences.
+8. Include wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
+9. Each section needs a unique, specific, relevant title, formatted as ==header==.
+10. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`.
+11. Avoid these words in the headers, unless the page topic uses these words: "in various fields", "in different contexts", "influences", "perspectives", "context", "diverse/different domains"... or anything similar. Instead these headers should be about a specific aspect of \`${this.pageName}\`.
 Example Format:
 
 ==Article header==
 This is the first paragraph, which includes a [[link]].
 Here's more detail...
+==Another unique header==
+this is the second paragraph, which includes a [[link|replacement]].
+Here's more detail...
+==Final unique header==
+this is the third paragraph, which also includes a [[link]].
+Here's more detail...
 
-The next paragraph might use another link type, [[link|display text]].
-And even more detail...`;
+`;
     if (this.superText.length !== 0) {
-      system += `The article should extend this provided article: ${this.superText}`;
+      system += `The provided text is a subclustering of this article section, meaning the article should extend this one: ${this.superText}`;
     }
     let prompt =
       "\nSTART OF PROVIDED TEXT\n" + this.prompt + "\nEND OF PROVIDED TEXT";
