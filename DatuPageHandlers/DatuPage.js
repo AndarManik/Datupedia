@@ -8,11 +8,14 @@ class DatuPage {
     this.pageName = pageName;
     this.position = position;
     this.fetchDone = false;
+    this.isAnalysing = false;
   }
 
   async fetchData(datuPages) {
     if (!(await this.isAnalysisDone()) || !(await this.isClusterDone())) {
+      this.isAnalysing = true;
       await this.inlinks.fetchData();
+      this.isAnalysing = false;
       this.rootCluster = new InlinkCluster(this.pageName, 6, this.inlinks.data);
     } 
     datuPages.delete(this.pageName);
@@ -57,7 +60,12 @@ class DatuPage {
     return this.article.wikiTextFinished;
   }
   getState() {
-    return this.inlinks.state;
+    if(this.isAnalysing){
+      return this.inlinks.state;
+    }
+    else{
+      return "Organizing the information, this task can't really be estimated.";
+    }
   }
 
   isFetchDone() {

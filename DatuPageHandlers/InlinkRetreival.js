@@ -17,7 +17,7 @@ class InlinkRetreival {
   constructor(pageName) {
     this.pageName = pageName;
     this.db = getDb();
-    this.state = "Initializing Load";
+    this.state = "We're getting things started";
     this.finished = false;
     this.data = [];
   }
@@ -85,12 +85,7 @@ class InlinkRetreival {
     const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
 
-    this.state = `
-    Loading:${progress.toFixed(2)}%
-    ETA:${eta.toFixed(2)} seconds 
-    Run Time: ${runTimeSeconds.toFixed(2)} 
-    Found: ${this.data.length}
-    `;
+    this.state = `We've found ${this.data.length} ${runTimeSeconds.toFixed(0)} of ${(eta+runTimeSeconds).toFixed(0)} seconds ${progress.toFixed(0)}%   `;
 
     console.log(this.state);
   }
