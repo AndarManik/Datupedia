@@ -3,14 +3,16 @@
   --gradient-width: min(80vw, 500px);
 }
 body {
-  background: linear-gradient(
+  /*background: linear-gradient(
     to right,
     #363339 0%,
     #4d4650 calc(50% - (var(--gradient-width) / 2)),
     #4d4650 calc(50% + (var(--gradient-width) / 2)),
     #363339 100%
   );
+  */
 
+  background: #4d4650;
   font-family: Arial;
   margin: 0;
   line-height: 1.3;
@@ -21,6 +23,40 @@ h1 {
   font-size: 40px;
 }
 
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #4d4650;
+  border-bottom: 2px solid #f0f0f0; /* 2px solid line in a light color */
+  padding-bottom: 5px;
+}
+
+.navbar h1 {
+  margin: 0;
+  font-size: 24px;
+}
+
+.nav-links {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li {
+  display: inline;
+  margin-left: 20px;
+}
+
+.navbar a {
+  color: #f0f0f0;
+  text-decoration: none;
+  transition: color 0.3s ease-in-out;
+}
+
+.navbar a:hover {
+  color: #ceb9e3; /* Change color on hover */
+}
 
 h1,
 h2,
@@ -30,11 +66,19 @@ h4 {
   font-weight: 300;
   text-align: center;
 }
+
+.description {
+  color: #f0f0f0;
+  font-size: 18px; /* Slightly larger font for emphasis */
+  line-height: 1.4; /* Adjust line height for better readability */
+  margin-left: auto; /* Centering the paragraph */
+  margin-right: auto; /* Centering the paragraph */
+  margin-top: 60px;
+}
 button {
   height: 50px; /* Set a fixed height */
-  margin-left: 1%;
   margin-bottom: 10px;
-  width: 17%;
+  width: 26%;
   background: #4d4650; /* Same as body background */
   color: #f0f0f0; /* Matching the anchor tag color */
   cursor: pointer; /* Make the button show a hand cursor on hover */
@@ -84,13 +128,14 @@ input {
   border: 0px solid #ffffff00;
   background: #4d4650;
   padding: 12px;
-  width: 80%;
+  width: 70%;
   height: 50px;
   transition: width 0.3s ease-in-out;
   box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
   border-radius: 10px;
   text-align: center;
   margin-bottom: 10px;
+  margin-right: 2%;
   font-size: 16px;
 }
 input::placeholder {
@@ -107,24 +152,16 @@ input:focus {
   font-family: Georgia;
 }
 
-nav {
-  display: flex;
-  flex-direction: row;
-  align-items: left;
-  justify-content: left;
-  margin-top: 20px;
-}
-
 #suggestionsList {
   list-style-type: none; /* Removes bullet points */
   padding: 10px;
-  width: 80%;
+  width: 70%;
 
   border: 1px solid #ccc; /* Adds a border */
   display: none; /* Hides the list by default */
 }
 #suggestions {
-  width: 80%;
+  width: 70%;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -144,7 +181,6 @@ nav {
   line-height: 1.6;
 }
 #suggestions li:hover {
-  box-shadow: 7px 7px 7px -1px #363339, -7px -7px 7px -1px #635866;
   text-align: center;
   border-radius: 10px;
 }
@@ -152,10 +188,52 @@ nav {
 
 
 .container {
-  width: 80%;
+  width: 70%;
   max-width: 500px;
-  margin: 0 auto;
+  margin: auto;
+  margin-top: 18vh;
+
+  box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+  border-radius: 40px;
+  padding: 40px;
 }
+
+.containerhow {
+  width: 70%;
+  max-width: 500px;
+  margin: auto;
+  margin-top: 3vh;
+
+  box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+  border-radius: 40px;
+  padding: 40px;
+}
+
+.about-section {
+  line-height: 1.5rem;
+}
+
+
+.how-it-works h2 {
+  text-align: center;
+  color: #f0f0f0; /* Light color for the heading */
+  margin-bottom: 40px;
+}
+
+.step {
+  margin-bottom: 40px;
+}
+
+.step h3 {
+  margin-bottom: 10px;
+}
+
+.step p {
+  color: #f0f0f0; /* Light color for descriptions */
+  line-height: 1.5;
+}
+
+/* Additional styling as needed */
 /* For very small screens, typically phones */
 @media only screen and (max-width: 480px) {
   :root {
@@ -176,11 +254,10 @@ nav {
     font-size: 1.5em; /* Adjust based on your design */
   }
 
-  nav {
-    flex-direction: column;
-    align-items: flex-start;
-    margin-top: 10px; /* Reduce some spacings for smaller screens */
-  }
+  
+  
+
+
 
   .content-wrapper {
     flex-direction: column; /* Stack flex items vertically */

@@ -93,8 +93,38 @@ app.get("/wiki/:pagename", async (req, res) => {
   }
 });
 
+app.get("/how-it-works", async (req, res) => {
+  fs.readFile(
+    path.join(__dirname, "../public/how.html"),
+    "utf8",
+    (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      res.send(data);
+    }
+  );
+});
+
+app.get("/about", async (req, res) => {
+  fs.readFile(
+    path.join(__dirname, "../public/about.html"),
+    "utf8",
+    (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      res.send(data);
+    }
+  );
+});
+
 function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 async function findRandomPageWithInlinks(minInlinks = 350) {
@@ -151,7 +181,7 @@ wss.on("connection", (ws) => {
       case "pong":
         break;
       case "disconnect":
-        users.delete(parsedMessage.userId);  
+        users.delete(parsedMessage.userId);
         break;
     }
   });
@@ -213,7 +243,9 @@ async function getClusterData(ws, parsedMessage, user) {
   const clusterId = user.pageId + parsedMessage.position;
   user.clusterId = clusterId;
   user.position = parsedMessage.position;
-  if(!(await ArticleGenerator.hasInData(user.pageId, parsedMessage.position))) {
+  if (
+    !(await ArticleGenerator.hasInData(user.pageId, parsedMessage.position))
+  ) {
     return;
   }
 

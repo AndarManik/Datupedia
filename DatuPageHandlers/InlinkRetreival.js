@@ -30,6 +30,7 @@ class InlinkRetreival {
       }
 
     const startTime = Date.now();
+    this.state = "Counting backlinks";
     const inlinks = await wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
 
     for (

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Head content like meta tags, title, link to CSS goes here -->
+    <title>How It Works - Datupedia</title>
+    <link rel="stylesheet" type="text/css" href="styles.css" />
+  </head>
+  <body>
+    <div class="containerhow">
+      <header>
+        <nav class="navbar">
+          <h1><a href="/">Datupedia</a></h1>
+          <ul class="nav-links">
+            <li><a href="/how-it-works">How It Works</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
+      </header>
+
+      <section class="how-it-works">
+        <h2>How Datupedia Works</h2>
+        <div class="step" id="step1">
+          <h3>Step 1: Text Extraction</h3>
+          <p>
+            First, our system combs through Wikipedia, identifying pages that
+            reference your search term. We then isolate the relevant paragraphs
+            linking to your chosen topic, ensuring focused and pertinent
+            content.
+          </p>
+        </div>
+        <div class="step" id="step2">
+          <h3>Step 2: Text Organization</h3>
+          <p>
+            Next, these paragraphs are transformed into a numerical format using
+            text embeddings. This advanced technique groups similar ideas
+            together and separates distinct concepts, effectively organizing the
+            information hierarchically.
+          </p>
+        </div>
+        <div class="step" id="step3">
+          <h3>Step 3: Article Generation</h3>
+          <p>
+            Finally, from this organized data, we craft a unique prompt for
+            GPT-4. The resulting output, tailored specifically to your query,
+            includes comprehensive section divisions and hyperlinks, presenting
+            you with a rich, detailed article.
+          </p>
+        </div>
+        <!-- Add more steps as necessary -->
+      </section>
+
+      <footer>
+        <!-- Footer content goes here -->
+      </footer>
+    </div>
+  </body>
+</html>

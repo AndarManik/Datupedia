@@ -180,7 +180,7 @@ class InlinkCluster {
   async saveVersion() {
     const db = getDb();
     const collection = db.collection("datuCluster");
-    await collection.updateOne({ _id: this.pageName + "VERSION" }, { $set: {version: 1.1} }, { upsert: true });
+    await collection.updateOne({ _id: this.pageName + "VERSION" }, { $set: {version: 1.2} }, { upsert: true });
   }
 }
 

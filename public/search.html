@@ -30,20 +30,17 @@
             console.log(`Received suggestions: ${suggestions}`);
 
             suggestionList.innerHTML = "";
-            suggestions.forEach((suggestion) => {
-              console.log(`Appending suggestion: ${suggestion}`);
-
-              const listItem = document.createElement("li");
-              listItem.textContent = suggestion;
-              listItem.addEventListener("click", () => {
-                console.log(
-                  `Clicked on suggestion: ${suggestion}. Redirecting...`
-                );
-                window.location.href = `/datu/${encodeURIComponent(
-                  suggestion
-                )}`;
-              });
-              suggestionList.appendChild(listItem);
+            suggestions.forEach((suggestion, index) => {
+              if (index < 5) {
+                const listItem = document.createElement("li");
+                listItem.textContent = suggestion;
+                listItem.addEventListener("click", () => {
+                  window.location.href = `/datu/${encodeURIComponent(
+                    suggestion
+                  )}`;
+                });
+                suggestionList.appendChild(listItem);
+              }
             });
             suggestionList.style.display =
               suggestions.length > 0 ? "block" : "none";
@@ -62,12 +59,17 @@
   <body>
     <div class="container">
       <header>
-        <h1>Datupedia</h1>
+        <nav class="navbar">
+          <h1><a href="/">Datupedia</a></h1>
+          <ul class="nav-links">
+            <li><a href="/how-it-works">How It Works</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
       </header>
-      <p>
-        Search here to create an article based on Wikipedia references. Our
-        system assembles information from various Wikipedia pages which lead to
-        your search term.
+      <p class="description">
+        Explore Wikipedia's Knowledge: Enter a page title and reveal how it's
+        referenced throughout the site.
       </p>
 
       <div id="status"></div>
