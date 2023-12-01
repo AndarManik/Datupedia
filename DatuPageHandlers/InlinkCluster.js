@@ -45,7 +45,6 @@ class InlinkCluster {
 
   inlinkMeans(inlinks) {
     const embeddings = this.centerVectors(inlinks.map((inlink) => inlink.embedding));
-
     const result = ml.kmeans(embeddings, NUMCLUSTERS, { distanceFunction: this.cosineDistance });
     const clusters = Array.from({ length: NUMCLUSTERS }, () => []);
     result.clusters.forEach((clusterIndex, i) => {

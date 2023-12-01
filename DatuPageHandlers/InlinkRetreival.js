@@ -17,7 +17,7 @@ class InlinkRetreival {
   constructor(pageName) {
     this.pageName = pageName;
     this.db = getDb();
-    this.state = "We're getting things started";
+    this.state = "0";
     this.finished = false;
     this.data = [];
   }
@@ -30,7 +30,7 @@ class InlinkRetreival {
       }
 
     const startTime = Date.now();
-    this.state = "Counting backlinks";
+    
     const inlinks = await wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
 
     for (
@@ -81,11 +81,11 @@ class InlinkRetreival {
   }
 
   _logProgress(startTime, inlinksLength, dataLength) {
-    const progress = (dataLength / inlinksLength) * 100; //in percent
+    const progress = Math.min(100,(dataLength / Math.min(inlinksLength,  InlinkRetreival.MAX_STORE)) * 100); //in percent
     const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
 
-    this.state = `We've found ${this.data.length} ${runTimeSeconds.toFixed(0)} of ${(eta+runTimeSeconds).toFixed(0)} seconds ${progress.toFixed(0)}%   `;
+    this.state = `${progress.toFixed(0)}`;
 
     console.log(this.state);
   }
@@ -97,73 +97,36 @@ class InlinkRetreival {
 
   async _saveToDb() {
     try {
-      const numChunks = Math.ceil(
-        this.data.length / InlinkRetreival.MAX_CHUNK_SIZE
-      );
-
-      await this.db
-        .collection("datuPages")
-        .updateOne(
-          { pageName: this.pageName, type: "length" },
-          { $set: { inlinkLength: this.data.length } },
-          { upsert: true }
-        );
-
-      for (let i = 0; i < numChunks; i++) {
-        const chunkData = this.data.slice(
-          i * InlinkRetreival.MAX_CHUNK_SIZE,
-          (i + 1) * InlinkRetreival.MAX_CHUNK_SIZE
-        );
-
-        await this.db
-          .collection("datuPages")
-          .updateOne(
-            { pageName: this.pageName, chunkNumber: i },
-            { $set: { inlinkData: chunkData } },
-            { upsert: true }
-          );
+      for (const inlink of this.data) {
+        await this.db.collection("datuPages").insertOne({
+          pageName: this.pageName,
+          title: inlink.title,
+          paragraph: inlink.paragraph,
+          embedding: inlink.embedding
+        });
       }
       console.log(`Successful save for ${this.pageName}`);
     } catch (error) {
-      console.error(
-        `Failed to save data to DB for page ${this.pageName}: ${error}`
-      );
+      console.error(`Failed to save data to DB for page ${this.pageName}: ${error}`);
     }
   }
+  
 
   async _loadFromDb() {
     try {
-      if (
-        !await getDb()
-        .collection("datuPages")
-        .findOne({ pageName: this.pageName, type: "length" })
-      ) {
-        return false;
-      }
-
-      this.data = [];
-      let chunkExists = true;
-      let chunkNumber = 0;
-      while (chunkExists) {
-        const doc = await this.db
-          .collection("datuPages")
-          .findOne({ pageName: this.pageName, chunkNumber: chunkNumber });
-        if (doc) {
-          this.data.push(...doc.inlinkData);
-          chunkNumber++;
-        } else {
-          chunkExists = false;
-        }
-      }
+      const cursor = this.db.collection("datuPages").find({ pageName: this.pageName });
+      this.data = await cursor.toArray();
+      
       if (this.data.length > 0) {
         return true; // Successfully loaded from DB
       }
       return false; // Data doesn't exist in DB
     } catch (error) {
-      console.log(error);
+      console.log(`Error loading data from DB for page ${this.pageName}: ${error}`);
       return false;
     }
   }
+  
 
   async _loadFromLocal() {
     const filename = `./Datupages/${this.pageName}.json`;
@@ -193,10 +156,13 @@ class InlinkRetreival {
   }
 
   static async isLargeEnough(pageName) {
-    const doc = await getDb()
-      .collection("datuPages")
-      .findOne({ pageName: pageName, type: "length" });
-    return (doc) ? doc.inlinkLength > 21: false;
+     const cursor = getDb().collection("datuPages").find({ pageName: pageName });
+      const data = await cursor.toArray();
+      
+      if (data.length > 21) {
+        return true; // Successfully loaded from DB
+      }
+      return false; // Data doesn't exist in DB
   }
 }
 class Inlink {

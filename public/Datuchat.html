@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <style>
+      body {
+        background: #4d4650;
+        font-family: Arial;
+        margin: 0;
+        line-height: 1.3;
+        color: #f0f0f0;
+      }
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #4d4650;
+        padding-bottom: 10px;
+      }
+
+      .navbar h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .nav-links {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+
+      .nav-links li {
+        font-family: georgia;
+        display: inline;
+        margin-left: 20px;
+        font-size: 24px;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column; /* Align children vertically */
+        width: 100%; /* Take full width of the container */
+        flex-grow: 1; /* Grow to fill available space */
+      }
+
+      #data {
+        width: 100%;
+        height: 425px; /* Adjust height as needed */
+        overflow-y: scroll; /* Add scroll for vertical overflow */
+        box-shadow: inset 10px 10px 10px -1px #363339,
+          inset -10px -10px 10px -1px #635866;
+        margin-bottom: 20px;
+        border-radius: 10px;
+        font-size: 14px;
+        line-height: 20px;
+      }
+      #data::-webkit-scrollbar {
+        display: none; /* Hide scrollbar for Webkit browsers */
+      }
+
+      .user {
+        padding: 15px;
+        margin-left: 25px;
+      }
+
+      .bot {
+        padding: 15px;
+        margin-right: 25px;
+      }
+
+      .navbar a {
+        color: #f0f0f0;
+        text-decoration: none;
+        transition: color 0.3s ease-in-out;
+      }
+
+      .navbar a:hover {
+        color: #ceb9e3; /* Change color on hover */
+      }
+      .container {
+        display: flex;
+        flex-direction: column; /* Align children vertically */
+        width: 70%;
+        height: 540px;
+        max-width: 500px;
+        margin: auto;
+        margin-top: 5vh;
+        box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+        border-radius: 40px;
+        padding: 40px;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: Georgia;
+        font-weight: 300;
+        text-align: center;
+      }
+      input {
+        -webkit-appearance: none;
+        box-sizing: border-box; /* This line ensures padding and border are inside the width */
+        color: #f0f0f0;
+        border: 0px solid #ffffff00;
+        background: #4d4650;
+        padding: 12px;
+        width: 82%;
+        height: 50px;
+        transition: width 0.3s ease-in-out;
+        box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        margin-right: 2%;
+        font-size: 16px;
+      }
+      input::placeholder {
+        color: #f0f0f0; /* Replace #yourColorCode with the color you want */
+      }
+
+      input:focus {
+        outline: none;
+        box-shadow: inset 5px 5px 5px -1px #363339,
+          inset -5px -5px 5px -1px #635866;
+      }
+      button {
+        height: 50px; /* Set a fixed height */
+        margin-bottom: 10px;
+        width: 15%;
+        background: #4d4650; /* Same as body background */
+        color: #f0f0f0; /* Matching the anchor tag color */
+        cursor: pointer; /* Make the button show a hand cursor on hover */
+        transition: background 2s ease; /* Smooth transition for hover effect */
+        font-size: 18px;
+        border-radius: 10px;
+        border: none;
+        box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #4d4650; /* Slightly lighter shade for hover */
+        color: #f0f0f0;
+        box-shadow: inset 5px 5px 5px -1px #363339,
+          inset -5px -5px 5px -1px #635866;
+      }
+
+      button:active {
+        box-shadow: inset 5px 5px 5px -1px #363339,
+          inset -5px -5px 5px -1px #635866;
+      }
+    </style>
+    <title>{{pagename}}</title>
+    <script>
+      const userId = "{{userID}}"; // Assume you have some way to populate this value
+      const pageId = "{{pagename}}";
+      // Initialize WebSocket connection
+      const ws = new WebSocket("{{wss}}");
+
+      var isWriting = true;
+      // Function to handle the server response
+      const handleServerResponse = (data) => {
+        const statusDiv = document.getElementById("status");
+        const dataDiv = document.getElementById("data");
+        if (data.status === "error") {
+          statusDiv.innerHTML = data.message;
+          return;
+        }
+
+        if (data.status === "ping") {
+          ws.send(JSON.stringify({ type: "pong", userId }));
+          return;
+        }
+
+        switch (data.message) {
+          case "Message":
+            addBotMessage(data.content);
+            ws.send(JSON.stringify({ type: "Message", userId }));
+            break;
+          case "End Message":
+            addBotMessage(data.content);
+            isWriting = false;
+            break;
+        }
+      };
+
+      ws.addEventListener("open", () => {
+        const statusDiv = document.getElementById("status");
+        ws.send(
+          JSON.stringify({
+            type: "Initial Message",
+            pageId,
+            userId,
+          })
+        );
+      });
+
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleServerResponse(data);
+      });
+
+      window.addEventListener("unload", () => {
+        ws.send(JSON.stringify({ type: "disconnect", userId }));
+
+        setTimeout(() => {
+          ws.close();
+        }, 100);
+      });
+
+      const addBotMessage = (content) => {
+        const dataField = document.getElementById("data");
+        dataField.lastElementChild.textContent = content;
+        scrollToBottom();
+      };
+
+      const sendMessage = () => {
+        if (isWriting) {
+          return;
+        }
+        const inputField = document.getElementById("chatInput");
+        const query = inputField.value;
+        if (query === "") {
+          return;
+        }
+
+        inputField.value = "";
+
+        isWriting = true;
+
+        const dataField = document.getElementById("data");
+        const newDiv = document.createElement("div");
+        newDiv.classList.add("user");
+        newDiv.textContent = query;
+        dataField.appendChild(newDiv);
+
+        const botDiv = document.createElement("div");
+        botDiv.classList.add("bot");
+        dataField.appendChild(botDiv);
+
+        scrollToBottom();
+        ws.send(
+          JSON.stringify({ type: "New Message", message: query, userId })
+        );
+
+        console.log("sent to ws");
+      };
+
+      function scrollToBottom() {
+        var div = document.getElementById("data");
+        div.scrollTop = div.scrollHeight;
+      }
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const inputField = document.getElementById("chatInput");
+
+        inputField.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <nav class="navbar">
+          <h1><a href="/">Datupedia</a></h1>
+          <ul class="nav-links">
+            <li><a href="/how-it-works">How It Works</a></li>
+            <li><a href="/about">About</a></li>
+          </ul>
+        </nav>
+      </header>
+      <div class="content">
+        <div id="data">
+          <div class="bot"></div>
+        </div>
+
+        <div class="inputField">
+          <input
+            type="text"
+            id="chatInput"
+            name="chatInput"
+            placeholder="Message {{pagename}}"
+            required
+            autocomplete="off"
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

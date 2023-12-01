@@ -44,7 +44,7 @@ class OpenaiAPI {
       return await this.openai.chat.completions.create({
         messages: [{"role": "system", "content": `${system}`},
           {"role": "user", "content": `${prompt}`}],
-        model: 'gpt-4',
+        model: 'gpt-4-1106-preview',
         stream: true,
       });
     });

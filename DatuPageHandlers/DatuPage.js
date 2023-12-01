@@ -12,7 +12,7 @@ class DatuPage {
   }
 
   async fetchData(datuPages) {
-    if (!(await this.isAnalysisDone()) || !(await this.isClusterDone())) {
+    if (!(await this.isClusterDone())) {
       this.isAnalysing = true;
       await this.inlinks.fetchData();
       this.isAnalysing = false;
@@ -82,19 +82,21 @@ class DatuPage {
     const data = await collection.findOne({ _id: this.pageName + "VERSION"});
     if (data) {
       if(!data.version) {
+        console.log("no version");
         return false;
       }
       if(data.version !== 1.3) {
+        console.log("wrong version");
         return false;
       }
 
       return true;
     }
+    console.log("no data");
     return false;
   }
 
   async isAnalysisDone() {
-    const db = getDb();
     if (
       await getDb()
       .collection("datuPages")
@@ -102,6 +104,7 @@ class DatuPage {
     ) {
       return true;
     }
+    console.log("no analysis");
     return false;
   }
 

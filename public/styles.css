@@ -1,17 +1,4 @@
-:root {
-  /* Set the width to be 80% of viewport width, but not exceeding 900px */
-  --gradient-width: min(80vw, 500px);
-}
 body {
-  /*background: linear-gradient(
-    to right,
-    #363339 0%,
-    #4d4650 calc(50% - (var(--gradient-width) / 2)),
-    #4d4650 calc(50% + (var(--gradient-width) / 2)),
-    #363339 100%
-  );
-  */
-
   background: #4d4650;
   font-family: Arial;
   margin: 0;

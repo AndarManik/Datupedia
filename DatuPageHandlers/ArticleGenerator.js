@@ -3,6 +3,7 @@ const openai = new OpenaiApi();
 const { datuParse } = require("./DatuParser");
 const { getDb } = require("../APIs/MongoAPI");
 const NUMCLUSTERS = 3;
+
 class ArticleGenerator {
   constructor(pageName, position) {
     this.pageName = pageName;
@@ -61,6 +62,8 @@ Here's more detail...
   }
 
   async wikitextStoreStream(wikitextStream, generators) {
+    //This previous chunk mechanisms purpose is to prevent the last token to print
+    //The last token is going to be a stop token
     let prevChunk = null;
     for await (const chunk of wikitextStream) {
       if (prevChunk !== null) {

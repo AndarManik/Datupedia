@@ -14,7 +14,10 @@ const wikipediaAPI = new WikipediaAPI();
 const { v4: uuidv4 } = require("uuid");
 const { removeEditSpans } = require("../DatuPageHandlers/DatuParser");
 const ArticleGenerator = require("../DatuPageHandlers/ArticleGenerator");
-const { log } = require("console");
+const VectorSearch = require("../DatuPageHandlers/VectorSearch");
+const DatuChat = require("../DatuPageHandlers/DatuChat");
+
+const vectorSearch = new VectorSearch();
 const users = new Map();
 const datuPages = new Map();
 const generators = new Map();
@@ -53,6 +56,12 @@ app.get("/", (req, res) => {
   );
 });
 
+app.get("/test/", async (req, res) => {
+  const results = await vectorSearch.ragResponse("Ventriloquism", "Who are some notable ventriloquists?", 7);
+  console.log(results);
+  res.json(results);  // Send the results back as a response
+});
+
 app.get("/suggestions", async (req, res) => {
   const query = req.query.query;
   const suggestions = await wikipediaAPI.searchSuggestions(query);
@@ -64,7 +73,41 @@ app.get("/datu/:pagename", async (req, res) => {
     const pagename = decodeURIComponent(
       req.params.pagename.replaceAll("_", " ")
     );
+    const filePath = path.join(__dirname, "../public/Datuhome.html");
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
+    renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
+    renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS);
+    res.send(renderedHtml);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/datu/:pagename/article", async (req, res) => {
+  try {
+    const pagename = decodeURIComponent(
+      req.params.pagename.replaceAll("_", " ")
+    );
     const filePath = path.join(__dirname, "../public/Datupage.html");
+    const fileContent = fs.readFileSync(filePath, "utf-8");
+    let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
+    renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
+    renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS);
+    res.send(renderedHtml);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+app.get("/datu/:pagename/chat", async (req, res) => {
+  try {
+    const pagename = decodeURIComponent(
+      req.params.pagename.replaceAll("_", " ")
+    );
+    const filePath = path.join(__dirname, "../public/Datuchat.html");
     const fileContent = fs.readFileSync(filePath, "utf-8");
     let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
     renderedHtml = renderedHtml.replace(/{{userID}}/g, uuidv4());
@@ -178,6 +221,17 @@ wss.on("connection", (ws) => {
       case "RegenerateArticle":
         await regenerateArticle(ws, user);
         break;
+      case "Initial Message":
+        console.log("Initial Message");
+        await initialMessage(ws, parsedMessage.pageId, parsedMessage.userId);
+        break;
+      case "Message":
+        await sendMessage(ws, user);  
+        break;
+      case "New Message":
+        console.log("New Message");
+        await newMessage(ws, user, parsedMessage.message) ;
+        break;
       case "pong":
         break;
       case "disconnect":
@@ -203,7 +257,7 @@ function initializeDatuPage(ws, parsedMessage) {
     JSON.stringify({
       status: "success",
       message: "Loading state",
-      state: "Loading...",
+      state: "0",
     })
   );
 }
@@ -316,6 +370,86 @@ async function regenerateArticle(ws, user) {
       message: `generating page`,
     })
   );
+}
+
+async function initialMessage(ws, pageId, userId) {
+  const user = {
+    pageId,
+    chatLog:  [],
+    isGenerating: true,
+  };
+  users.set(userId, user);
+
+  const messageStream = await DatuChat.generateInitialMessage(user.pageId);
+  console.log("here");
+  const message = {assistant: ""};
+  user.chatLog.push(message)
+  
+  ws.send(
+    JSON.stringify({
+      status: "success",
+      message: `Message`,
+      content: message.assistant,
+    })
+  );
+
+  let prevChunk = null;
+  for await (const chunk of messageStream) {
+    if (prevChunk !== null) {
+      message.assistant += prevChunk.choices[0].delta.content;
+    }
+    prevChunk = chunk;
+  }
+  user.isGenerating = false;
+}
+
+async function sendMessage(ws, user) {
+  if(!user.isGenerating) {
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: `End Message`,
+        content: user.chatLog[user.chatLog.length - 1].assistant,
+      })
+    );
+    return;
+  }
+  ws.send(
+    JSON.stringify({
+      status: "success",
+      message: `Message`,
+      content: user.chatLog[user.chatLog.length - 1].assistant,
+    })
+  );
+}
+
+async function newMessage(ws, user, content) {
+  user.isGenerating = true;
+  const userMessage = {};
+  userMessage.user = content;
+  user.chatLog.push(userMessage);
+
+  const messageStream = await DatuChat.generateMessage(content, user.chatLog, user.pageId);
+  const botMessage = {};
+  botMessage.assistant = "";
+  user.chatLog.push(botMessage)
+  
+  ws.send(
+    JSON.stringify({
+      status: "success",
+      message: `Message`,
+      content: "",
+    })
+  );
+
+  let prevChunk = null;
+  for await (const chunk of messageStream) {
+    if (prevChunk !== null) {
+      botMessage.assistant += prevChunk.choices[0].delta.content;
+    }
+    prevChunk = chunk;
+  }
+  user.isGenerating = false;
 }
 
 // Centralized Error Handling
