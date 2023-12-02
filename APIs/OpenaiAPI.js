@@ -1,5 +1,5 @@
 require("dotenv").config();
-const OpenAI = require('openai');
+const OpenAI = require("openai");
 
 class OpenaiAPI {
   constructor() {
@@ -11,7 +11,7 @@ class OpenaiAPI {
   }
 
   async exponentialBackoffRequest(apiCall) {
-    let retryCount = 0
+    let retryCount = 0;
     while (retryCount < this.maxRetries) {
       try {
         const result = await apiCall();
@@ -25,15 +25,27 @@ class OpenaiAPI {
   }
 
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   async gpt4(system, prompt) {
     return this.exponentialBackoffRequest(async () => {
       const completion = await this.openai.chat.completions.create({
-        messages: [{"role": "system", "content": `${system}`},
-          {"role": "user", "content": `${prompt}`}],
-        model: 'gpt-4-1106-preview',
+        messages: [
+          { role: "system", content: `${system}` },
+          { role: "user", content: `${prompt}` },
+        ],
+        model: "gpt-4-1106-preview",
+      });
+      return completion.choices[0].message.content;
+    });
+  }
+
+  async gpt4ChatLog(system, chatLog, prompt) {
+    return this.exponentialBackoffRequest(async () => {
+      const completion = await this.openai.chat.completions.create({
+        messages: [{ role: "system", content: `${system}` }, ...chatLog],
+        model: "gpt-4-1106-preview",
       });
       return completion.choices[0].message.content;
     });
@@ -42,9 +54,21 @@ class OpenaiAPI {
   async gpt4Stream(system, prompt) {
     return this.exponentialBackoffRequest(async () => {
       return await this.openai.chat.completions.create({
-        messages: [{"role": "system", "content": `${system}`},
-          {"role": "user", "content": `${prompt}`}],
-        model: 'gpt-4-1106-preview',
+        messages: [
+          { role: "system", content: `${system}` },
+          { role: "user", content: `${prompt}` },
+        ],
+        model: "gpt-4-1106-preview",
+        stream: true,
+      });
+    });
+  }
+
+  async gpt4StreamChatLog(system, chatLog) {
+    return this.exponentialBackoffRequest(async () => {
+      return await this.openai.chat.completions.create({
+        messages: [{ role: "system", content: `${system}` }, ...chatLog],
+        model: "gpt-4-1106-preview",
         stream: true,
       });
     });
@@ -66,7 +90,7 @@ class OpenaiAPI {
         model: "text-embedding-ada-002",
         input: textInputs,
       });
-      return embeddings.data.map(data => data.embedding);
+      return embeddings.data.map((data) => data.embedding);
     });
   }
 }

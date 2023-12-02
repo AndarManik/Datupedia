@@ -429,7 +429,7 @@ async function newMessage(ws, user, content) {
   userMessage.user = content;
   user.chatLog.push(userMessage);
 
-  const messageStream = await DatuChat.generateMessage(content, user.chatLog, user.pageId);
+  const messageStream = await DatuChat.generateMessage(user.chatLog, user.pageId);
   const botMessage = {};
   botMessage.assistant = "";
   user.chatLog.push(botMessage)

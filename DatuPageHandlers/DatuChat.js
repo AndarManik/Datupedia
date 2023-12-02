@@ -11,9 +11,9 @@ class DatuChat {
         );
     }
 
-    static async generateMessage(content, chatLog, pageName) {
+    static async generateMessage(chatLog, pageName) {
         console.log(chatLog);
-        return await vectorSearch.ragResponse(pageName, chatLog.slice(-8), content, 10);
+        return await vectorSearch.ragResponse(pageName, chatLog.slice(-8), 10);
     }
 }
 
