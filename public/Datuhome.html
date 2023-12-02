@@ -75,6 +75,7 @@
         height: 40px;
         border-radius: 10px;
         border: 2px solid #f0f0f0;
+        padding: 0;
       }
 
       #loadingBar {
@@ -181,9 +182,8 @@
         #chat {
           font-size: 14px;
         }
-        #article{
+        #article {
           font-size: 14px;
-
         }
       }
     </style>
@@ -288,14 +288,17 @@
       };
 
       const redirectToChat = () => {
-        // Get the current URL
-        const currentUrl = window.location.href;
-        window.location.href = currentUrl + "/chat";
+        // Get the origin and pathname of the current URL
+        const baseUrl = window.location.origin + window.location.pathname;
+        // Redirect to the new URL
+        window.location.href = baseUrl + "/chat";
       };
+
       const redirectToArticle = () => {
-        // Get the current URL
-        const currentUrl = window.location.href;
-        window.location.href = currentUrl + "/article";
+        // Get the origin and pathname of the current URL
+        const baseUrl = window.location.origin + window.location.pathname;
+        // Redirect to the new URL
+        window.location.href = baseUrl + "/article";
       };
     </script>
   </head>
