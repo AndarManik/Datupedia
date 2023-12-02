@@ -13,7 +13,9 @@ class TextExtractor {
     const hrefDistances = [];
     const normalized_link_title = encodeURIComponent(
       link_title.replace(/ /g, "_")
-    ).replace(/'/g, "%27").toLowerCase();
+    )
+      .replace(/'/g, "%27")
+      .toLowerCase();
     const link_href = "/wiki/" + normalized_link_title;
 
     for (const element of elements) {
@@ -51,6 +53,11 @@ class TextExtractor {
       console.log("5 nearest hrefs:", nearestHrefs);
     }
     return null;
+  }
+  getParagraphList(pageContent) {
+    const root = parse(pageContent);
+    const paragraphs = root.querySelectorAll("p");
+    return paragraphs.map((p) => p.text.trim());
   }
 }
 

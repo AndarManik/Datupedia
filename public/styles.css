@@ -224,13 +224,16 @@ input:focus {
 
 /* Additional styling as needed */
 /* For very small screens, typically phones */
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 560px) {
   :root {
     --gradient-width: 90%;
   }
 
   .container {
-    width: 90%; /* Use even more of the screen's width */
+    width: 70%; 
+    border-radius: 30px;
+    padding: 30px;
+    margin-top: 15px;
   }
   body {
     font-size: 18px;
@@ -242,11 +245,28 @@ input:focus {
   h4 {
     font-size: 1.5em; /* Adjust based on your design */
   }
-
   
-  
+  .navbar h1 {
+    font-size: 16px;
+  }
 
+  .nav-links li {
+    margin-left: 10px;
+    font-size: 16px;
+  }
 
+  button {
+    height: 35px; /* Set a fixed height */
+    width: 26%;
+    font-size: 12px;
+    text-align: center;
+  }
+  input {
+    width: 70%;
+    height: 35px;
+    margin-right: 2%;
+    font-size: 12px;
+  }
 
   .content-wrapper {
     flex-direction: column; /* Stack flex items vertically */
@@ -258,8 +278,8 @@ input:focus {
   #suggestions {
     margin-bottom: 20px; /* Add some vertical spacing between stacked elements */
   }
-
-  .container {
-    width: 90%; /* Use a larger portion of the screen */
+  .description {
+    margin-top: 20px;
   }
+
 }

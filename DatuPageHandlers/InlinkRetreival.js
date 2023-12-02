@@ -12,7 +12,7 @@ class InlinkRetreival {
   static DELAY_TIME = 500;
   static MAX_CHUNK_SIZE = 250;
   static MAX_RETREIVE = 1500;
-  static MAX_STORE = 500
+  static MAX_STORE = 500;
 
   constructor(pageName) {
     this.pageName = pageName;
@@ -23,45 +23,66 @@ class InlinkRetreival {
   }
 
   async fetchData() {
-
-      if (await this._loadFromDb()) {
-        this.finished = true;
-        return;
-      }
+    if (await this._loadFromDb()) {
+      this.finished = true;
+      return;
+    }
 
     const startTime = Date.now();
-    
-    const inlinks = await wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
+
+    const inlinks = await wikipediaAPI.getInlinks(
+      this.pageName,
+      InlinkRetreival.MAX_RETREIVE
+    );
 
     for (
       let i = 0;
       i < inlinks.length && this.data.length < InlinkRetreival.MAX_STORE;
       i += InlinkRetreival.MAX_REQUESTS
     ) {
+
       const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
       const results = await this._fetchParagraphsInBatch(batch);
       this.data.push(...results);
       this._logProgress(
         startTime,
         Math.min(inlinks.length, InlinkRetreival.MAX_STORE),
-        (inlinks.length < InlinkRetreival.MAX_STORE) ? i : this.data.length
+        inlinks.length < InlinkRetreival.MAX_STORE ? i : this.data.length
       );
       await this._delay(InlinkRetreival.DELAY_TIME);
     }
+
+
+    const paragraphs = textExtractor.getParagraphList(
+      await wikipediaAPI.getContent(this.pageName)
+    ).filter(paragraph => paragraph.trim() !== '');
+    console.log(paragraphs);
+    const embeddings = await openai.adaBatch(paragraphs);
+
+    paragraphs.forEach((paragraph, index) => {
+      const embedding = embeddings[index];
+      this.data.push(new Inlink(this.pageName + index, paragraph, embedding));
+    });
+
 
     await this._saveToDb();
     this.finished = true;
   }
 
   async _fetchParagraphsInBatch(inlinks) {
+    if(this.data.length > 360){
+    }
     const batchContent = await wikipediaAPI.getContentBatch(inlinks);
     const foundParagraphs = batchContent.map((content) =>
       textExtractor.getParagraphHasLink(content, this.pageName)
     );
-
+    
     const combinedTexts = foundParagraphs
       .map((paragraph, index) => {
         if (paragraph) {
+          if(this.data.length > 360){
+            console.log(paragraph);
+          }
           return {
             title: inlinks[index],
             paragraph: paragraph,
@@ -81,13 +102,16 @@ class InlinkRetreival {
   }
 
   _logProgress(startTime, inlinksLength, dataLength) {
-    const progress = Math.min(100,(dataLength / Math.min(inlinksLength,  InlinkRetreival.MAX_STORE)) * 100); //in percent
+    const progress = Math.min(
+      100,
+      (dataLength / Math.min(inlinksLength, InlinkRetreival.MAX_STORE)) * 100
+    ); //in percent
     const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
 
     this.state = `${progress.toFixed(0)}`;
 
-    console.log(this.state);
+    console.log(`${progress} ${runTimeSeconds} ${eta} ${inlinksLength} ${dataLength}`);
   }
 
   // Utility function to implement a delay
@@ -102,31 +126,35 @@ class InlinkRetreival {
           pageName: this.pageName,
           title: inlink.title,
           paragraph: inlink.paragraph,
-          embedding: inlink.embedding
+          embedding: inlink.embedding,
         });
       }
       console.log(`Successful save for ${this.pageName}`);
     } catch (error) {
-      console.error(`Failed to save data to DB for page ${this.pageName}: ${error}`);
+      console.error(
+        `Failed to save data to DB for page ${this.pageName}: ${error}`
+      );
     }
   }
-  
 
   async _loadFromDb() {
     try {
-      const cursor = this.db.collection("datuPages").find({ pageName: this.pageName });
+      const cursor = this.db
+        .collection("datuPages")
+        .find({ pageName: this.pageName });
       this.data = await cursor.toArray();
-      
+
       if (this.data.length > 0) {
         return true; // Successfully loaded from DB
       }
       return false; // Data doesn't exist in DB
     } catch (error) {
-      console.log(`Error loading data from DB for page ${this.pageName}: ${error}`);
+      console.log(
+        `Error loading data from DB for page ${this.pageName}: ${error}`
+      );
       return false;
     }
   }
-  
 
   async _loadFromLocal() {
     const filename = `./Datupages/${this.pageName}.json`;
@@ -156,13 +184,13 @@ class InlinkRetreival {
   }
 
   static async isLargeEnough(pageName) {
-     const cursor = getDb().collection("datuPages").find({ pageName: pageName });
-      const data = await cursor.toArray();
-      
-      if (data.length > 21) {
-        return true; // Successfully loaded from DB
-      }
-      return false; // Data doesn't exist in DB
+    const cursor = getDb().collection("datuPages").find({ pageName: pageName });
+    const data = await cursor.toArray();
+
+    if (data.length > 21) {
+      return true; // Successfully loaded from DB
+    }
+    return false; // Data doesn't exist in DB
   }
 }
 class Inlink {

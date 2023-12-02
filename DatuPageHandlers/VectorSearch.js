@@ -4,21 +4,22 @@ const { getDb } = require("../APIs/MongoAPI");
 class VectorSearch {
 
   async ragResponse(pageName, chatLog, text, k) {
-    const nearestText = await this.findNearestTexts(pageName, text, k);
-    const systemPrompt = `Previous ChatLog: '${chatLog}'Provided Text: '${JSON.stringify(nearestText)}' End Text. The provided text is up to date and can be relied on. Use the provided text to aid in your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize the provided text for knowledge. Output your text using only plain text, do not use any mark up.  Your output should be less than 150 words.`
+    const nearestText = await this.findNearestTexts(pageName,chatLog, text, k);
+    const systemPrompt = 
+    `"Previous ChatLog": '${chatLog}' 
+    "Provided Text": '${JSON.stringify(nearestText)}' The "Provided Text" is up to date and can be relied on. Use the "Provided Text" to aid in your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize the "Provided Text" for knowledge. You output should be relevant to the "Previous ChatLog". Output your text using standard html markup for styling text. Break up your text into multiple sections using <p> tags.`
     return openai.gpt4Stream(systemPrompt, text);
   }
 
-  async enrichQuery(pageName, text) {
-    const systemPrompt = `You are the wikipedia page '${pageName}'. Respond to the user query. In 75 words or less.`;
+  async enrichQuery(pageName, chatLog, text) {
+    const systemPrompt = `You are the wikipedia page '${pageName}'. Respond to the user query. In 75 words or less. Here is the chat log ${chatLog}`;
     const output =  await openai.gpt4(systemPrompt, text);
-    console.log(output);
     return output;
   }
 
-  async findNearestTexts(pageName, text, k) {
+  async findNearestTexts(pageName, chatLog, text, k) {
     const db = getDb();
-    const embedding = await openai.ada(await this.enrichQuery(pageName, text));
+    const embedding = await openai.ada(await this.enrichQuery(pageName, chatLog, text));
     try {
       const cursor = await db.collection("datuPages").aggregate([
         {
