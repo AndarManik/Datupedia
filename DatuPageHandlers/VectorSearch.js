@@ -16,9 +16,9 @@ class VectorSearch {
       k
     );
     const systemPrompt = ` 
-    "Provided Text": '${JSON.stringify(
+    "What you know": '${JSON.stringify(
       nearestText
-    )}' The "Provided Text" is up to date and can be relied on. Use the "Provided Text" to aid in your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize the "Provided Text" for knowledge. Output your text using standard html markup for styling text. Break up your text into multiple sections using <p> tags.`;
+    )}' "What you know" is up to date and can be relied on. Use "What you know" to aid your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize "What you know". Output your text using standard html markup for styling text. Break up your text into multiple sections using <p> tags.`;
     return openai.gpt4StreamChatLog(systemPrompt, convertedChat);
   }
 
@@ -29,7 +29,6 @@ class VectorSearch {
   }
 
   async findNearestTexts(pageName, convertedChat, k) {
-    console.log(k);
     const db = getDb();
     const embedding = await openai.ada(
       await this.enrichQuery(pageName, convertedChat)
