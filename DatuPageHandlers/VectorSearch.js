@@ -25,6 +25,7 @@ class VectorSearch {
   async enrichQuery(pageName, convertedChat) {
     const systemPrompt = `You are the wikipedia page '${pageName}'. Respond to the user query. In 75 words or less.`;
     const output = await openai.gpt4ChatLog(systemPrompt, convertedChat);
+    console.log(output);
     return output;
   }
 

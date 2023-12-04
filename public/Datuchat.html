@@ -10,13 +10,15 @@
         margin: 0;
         line-height: 1.3;
         color: #f0f0f0;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
       }
       .navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
         background: #4d4650;
-        padding-bottom: 12px;
       }
 
       .navbar h1 {
@@ -39,18 +41,20 @@
 
       .content {
         display: flex;
-        flex-direction: column; /* Align children vertically */
-        width: 100%; /* Take full width of the container */
-        flex-grow: 1; /* Grow to fill available space */
+        flex-direction: column;
+        flex-grow: 1; /* Allows the content to fill the space */
+        justify-content: space-between; /* Distributes space between children */
+        box-sizing: border-box;
       }
 
       #data {
+        margin: 20px 0; /* Adds space above and below */
         width: 100%;
-        height: 425px; /* Adjust height as needed */
+        flex-grow: 1; /* Allows the content to fill the space */
+        max-height: calc(100vh - 290px);
         overflow-y: scroll; /* Add scroll for vertical overflow */
         box-shadow: inset 10px 10px 10px -1px #363339,
           inset -10px -10px 10px -1px #635866;
-        margin-bottom: 20px;
         border-radius: 10px;
         font-size: 14px;
         line-height: 20px;
@@ -79,16 +83,16 @@
         color: #ceb9e3; /* Change color on hover */
       }
       .container {
+        flex-grow: 1; /* Allow the container to fill the available space */
         display: flex;
-        flex-direction: column; /* Align children vertically */
+        flex-direction: column;
         width: 70%;
-        height: 540px;
         max-width: 500px;
-        margin: auto;
-        margin-top: 5vh;
+        margin: 40px auto; /* Maintains the top and bottom margin */
         box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
         border-radius: 40px;
         padding: 40px;
+        overflow: hidden; /* Prevents content from overflowing */
       }
 
       h1,
@@ -163,11 +167,7 @@
         }
         .container {
           width: 70%;
-          height: 450px;
           max-width: 500px;
-          margin: auto;
-          margin-top: 15px;
-          box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
           border-radius: 30px;
           padding: 30px;
         }
@@ -183,12 +183,9 @@
           margin-right: 2%;
           font-size: 14px;
         }
-        #data {
-          height: 360px; /* Adjust height as needed */
-          overflow-y: scroll; /* Add scroll for vertical overflow */
-          margin-bottom: 20px;
-          font-size: 14px;
-          line-height: 20px;
+        #data{
+          max-height: calc(100vh - 220px);
+
         }
       }
     </style>
@@ -200,6 +197,7 @@
       const ws = new WebSocket("{{wss}}");
 
       var isWriting = true;
+      var isUserScrolling = false;
       // Function to handle the server response
       const handleServerResponse = (data) => {
         const statusDiv = document.getElementById("status");
@@ -253,6 +251,9 @@
       const addBotMessage = (content) => {
         const dataField = document.getElementById("data");
         dataField.lastElementChild.innerHTML = content;
+        if (!isUserScrolling) {
+          scrollToBottom();
+        }
       };
 
       const sendMessage = () => {
@@ -266,7 +267,7 @@
         }
 
         inputField.value = "";
-
+        isUserScrolling = false;
         isWriting = true;
 
         const dataField = document.getElementById("data");
@@ -300,7 +301,26 @@
             sendMessage();
           }
         });
+        const scrollableDiv = document.getElementById("data");
+        const div = document.getElementById("data");
+        scrollableDiv.addEventListener("wheel", function (event) {
+          if (event.deltaY < 0) {
+            // Check if scrolling up
+            console.log("Scroll");
+            isUserScrolling = true;
+          }
+          if (event.deltaY >= 0 && isScrolledToBottom(div)) {
+            isUserScrolling = false;
+          }
+        });
       });
+
+      function isScrolledToBottom(div) {
+        var totalScrollHeight = div.scrollHeight;
+        var visibleHeight = div.clientHeight;
+        var currentScrollPosition = div.scrollTop;
+        return currentScrollPosition >= totalScrollHeight - visibleHeight - 10;
+      }
     </script>
   </head>
   <body>
