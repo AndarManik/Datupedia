@@ -73,7 +73,7 @@ button {
   font-size: 18px;
   border-radius: 10px;
   border: none;
-  font-family: georgia;
+  font-family: 'Roboto Slab';        
   box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
   border-radius: 10px;
   text-align: center;
@@ -247,6 +247,7 @@ input:focus {
   }
 
   button {
+    font-family: 'Roboto Slab';        
     height: 35px; /* Set a fixed height */
     width: 26%;
     font-size: 12px;
