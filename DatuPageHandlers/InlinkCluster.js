@@ -121,14 +121,14 @@ class InlinkCluster {
       if (child.children.length < 2) {
         child.topInlinks.forEach((inlink) => {
           prompt += `LINK: [[${inlink.title}]]\n`;
-          prompt += `TEXT: ${inlink.paragraph}\n`;
+          prompt += `TEXT: ""${inlink.paragraph}""\n`;
         });
       } else {
         child.children.forEach((chichild) => {
           chichild.topInlinks.forEach((inlink, index) => {
             if (index < MAXCHILDRENPROMPT) {
               prompt += `LINK: [[${inlink.title}]]\n`;
-              prompt += `TEXT: ${inlink.paragraph}\n`;
+              prompt += `TEXT: ""${inlink.paragraph}""\n`;
             }
           });
         });
@@ -141,7 +141,7 @@ class InlinkCluster {
     let prompt = "";
     inlinks.forEach((inlink) => {
       prompt += `LINK: [[${inlink.title}]]\n`;
-      prompt += `TEXT: ${inlink.paragraph}\n`;
+      prompt += `TEXT: ""${inlink.paragraph}""\n`;
     });
     return prompt;
   }

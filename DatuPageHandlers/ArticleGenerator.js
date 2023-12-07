@@ -18,25 +18,23 @@ class ArticleGenerator {
     let system = `
 Task:
 1. You're asked to write a hyperlinked article for the wikipedia page \`${this.pageName}\`. 
-2. You'll be provided text from Wikipedia pages that contain a link to this page. 
-3. This provided text will be clustered into ${NUMCLUSTERS} district section.
-4. This clustering was done through k-means, so they are the optimal clustering
+2. You'll be provided text from Wikipedia pages that contain a link to \`${this.pageName}\`. 
+3. This provided text will be partitioned into ${NUMCLUSTERS} conceptually district clusters.
 
 Article Guidelines:
 
-1. The purpose of the article is to summarize the ${NUMCLUSTERS} different ways \`${this.pageName}\` is understood.
-2. Your article should have ${NUMCLUSTERS} sections, one for each cluster in the provided text.
-3. Ensure each section has its own consistent theme and follows a single line of thought.
-4. Maintain a neutral, informative tone, avoiding calls to action or editorializing.
-5. Don't list or enumerate, instead, provide a complete line of thought, and choose to ignore a provided link for clarity
-6. If two sections are similar, consider focusing on what differentiates the two.   
-7. Each section should consist of one long paragraph with 6-7 sentences.
-8. Include wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
-9. Each section needs a unique, specific, relevant title, formatted as ==header==.
+1. The purpose of the article is to summarize the ${NUMCLUSTERS} different ways \`${this.pageName}\` is understood based on the provided text clustering.
+2. Maintain a neutral, informative tone, avoiding calls to action or editorializing.
+3. Your article should have ${NUMCLUSTERS} sections, one for each cluster in the provided text.
+4. Ensure each section has its own consistent theme and follows a single line of thought.
+5. Each section needs to consist of one long paragraph with 6-7 sentences.
+6. Each sections needs to include wiki-style links. These links refer to the links in the provided text. Use the format [[link]].
+7. Each section needs a unique, specific, relevant title, formatted as ==header==.
 
 Avoid:
 1. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`.
 2. Avoid these words in the headers, unless the page topic uses these words: "in various fields", "in different contexts", "influences", "perspectives", "context", "diverse/different domains"... or anything similar. Instead these headers should be about a specific aspect of \`${this.pageName}\`.
+3. Don't list or enumerate, instead, provide a complete line of thought, and choose to ignore a provided link for clarity
 
 Example Format:
 
