@@ -46,8 +46,8 @@ class InlinkRetreival {
     const startTime = Date.now();
 
     const fetchFuture = this._fetchPageData();
-    const inlinksPromise = wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
-    const [_, inlinks] = await Promise.all([fetchFuture, inlinksPromise]);
+    const inlinks = await wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
+
 
     for (let i = 0; i < inlinks.length && this.inlinkData.length < InlinkRetreival.MAX_STORE; i += InlinkRetreival.MAX_REQUESTS) {
         const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
@@ -58,6 +58,8 @@ class InlinkRetreival {
         await this._saveToDb(results);
         await delayFuture;
     }
+
+    await fetchFuture;
     this.isLargeEnough = this.inlinkData.length > 21;
     this.isFinished = true;
 }
