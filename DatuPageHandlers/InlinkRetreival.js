@@ -64,6 +64,7 @@ class InlinkRetreival {
 
 
   async _fetchPageData() {
+    const data = []
     const paragraphs = textExtractor
       .getParagraphList(await wikipediaAPI.getContent(this.pageName))
       .filter((paragraph) => paragraph.trim() !== "");
@@ -71,8 +72,10 @@ class InlinkRetreival {
 
     paragraphs.forEach((paragraph, index) => {
       const embedding = embeddings[index];
-      this.inlinkData.push(new Inlink(this.pageName + index, paragraph, embedding));
+      data.push(new Inlink(this.pageName + index, paragraph, embedding));
     });
+
+    await this._saveToDb(data);
   }
 
   async _fetchParagraphsInBatch(inlinks) {
