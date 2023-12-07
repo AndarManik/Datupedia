@@ -25,4 +25,19 @@ function getDb() {
   return db;
 }
 
-module.exports = { connectToDb, getDb };
+async function getInlinkData(pageName) {
+  try {
+    const cursor = db
+      .collection("datuPages")
+      .find({ pageName: pageName });
+
+    return await cursor.toArray();
+  } catch (error) {
+    console.log(
+      `Error loading data from DB for page ${pageName}: ${error}`
+    );
+    return false;
+  }
+}
+
+module.exports = { connectToDb, getDb, getInlinkData };

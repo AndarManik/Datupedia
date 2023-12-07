@@ -11,9 +11,8 @@ class ArticleGenerator {
     this.wikiText = "";
   }
 
-  async generatePage(generators) {
+  async generatePage() {
     if (await this.fetchData(this.pageName, this.position)) {
-      generators.delete(this.pageName + this.position);
       return;
     }
     let system = `
@@ -31,11 +30,14 @@ Article Guidelines:
 4. Maintain a neutral, informative tone, avoiding calls to action or editorializing.
 5. Don't list or enumerate, instead, provide a complete line of thought, and choose to ignore a provided link for clarity
 6. If two sections are similar, consider focusing on what differentiates the two.   
-7. Each section should consist of one longer paragraph with 6-7 sentences.
+7. Each section should consist of one long paragraph with 6-7 sentences.
 8. Include wiki-style links in each section. These links refer to the links in the provided text. Use the format [[link]].
 9. Each section needs a unique, specific, relevant title, formatted as ==header==.
-10. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`.
-11. Avoid these words in the headers, unless the page topic uses these words: "in various fields", "in different contexts", "influences", "perspectives", "context", "diverse/different domains"... or anything similar. Instead these headers should be about a specific aspect of \`${this.pageName}\`.
+
+Avoid:
+1. Avoid starting paragraphs with "In this cluster", "In this section", "The second cluster"... or anything similar. Instead start with something related to \`${this.pageName}\`.
+2. Avoid these words in the headers, unless the page topic uses these words: "in various fields", "in different contexts", "influences", "perspectives", "context", "diverse/different domains"... or anything similar. Instead these headers should be about a specific aspect of \`${this.pageName}\`.
+
 Example Format:
 
 ==Article header==
@@ -55,13 +57,12 @@ Here's more detail...
     let prompt =
       "\nSTART OF PROVIDED TEXT\n" + this.prompt + "\nEND OF PROVIDED TEXT";
 
-    this.wikitextStoreStream(
+    await this.wikitextStoreStream(
       await openai.gpt4Stream(system, prompt),
-      generators
     );
   }
 
-  async wikitextStoreStream(wikitextStream, generators) {
+  async wikitextStoreStream(wikitextStream) {
     //This previous chunk mechanisms purpose is to prevent the last token to print
     //The last token is going to be a stop token
     let prevChunk = null;
@@ -77,7 +78,6 @@ Here's more detail...
       this.position
     );
     await this.saveArticleInformation();
-    generators.delete(this.pageName + this.position);
   }
 
   async saveArticleInformation() {

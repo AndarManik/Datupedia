@@ -6,7 +6,7 @@ class TextExtractor {
     this.log = false;
   }
 
-  getParagraphHasLink(pageContent, link_title) {
+  getParagraphWithLink(pageContent, link_title) {
     const root = parse(pageContent);
     const elements = root.querySelectorAll("p");
 

@@ -37,11 +37,9 @@ class InlinkCluster {
     } else {
       this.prompt = this.leafPrompt(inlinks);
     }
-    if(this.position.length === 0) {
-      this.saveVersion();
-      this.saveNodeAndChildren();
-    }
   }
+
+
 
   inlinkMeans(inlinks) {
     const embeddings = this.centerVectors(inlinks.map((inlink) => inlink.embedding));

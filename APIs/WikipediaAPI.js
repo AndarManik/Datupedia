@@ -57,12 +57,8 @@ class WikipediaAPI {
   }
 
   async getContentBatch(titles) {
-    // Map over titles and call getContent for each title
     const promises = titles.map((title) => this.getContent(title));
-
-    // Use Promise.all to wait for all promises to resolve
     const contents = await Promise.all(promises);
-
     return contents;
   }
 

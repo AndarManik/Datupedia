@@ -1,15 +1,20 @@
 const WebSocket = require("ws");
-const DatuPage = require("../DatuPageHandlers/DatuPage");
 const { removeEditSpans } = require("../DatuPageHandlers/DatuParser");
 const ArticleGenerator = require("../DatuPageHandlers/ArticleGenerator");
 const DatuChat = require("../DatuPageHandlers/DatuChat");
-
+const InlinkRetreival = require("../DatuPageHandlers/InlinkRetreival");
+const InlinkCluster = require("../DatuPageHandlers/InlinkCluster");
+const { getDb, getInlinkData } = require("../APIs/MongoAPI");
+const WikipediaAPI = require("../APIs/WikipediaAPI");
+const wikipediaAPI = new WikipediaAPI();
 class WebSocketHandler {
   constructor(server) {
     this.wss = new WebSocket.Server({ server });
     this.users = new Map();
-    this.datuPages = new Map();
-    this.generators = new Map();
+    this.inlinkRetreivers = new Map();
+    this.articleGenerators = new Map();
+    this.inlinkClusters = new Map();
+
     this.setupWebSocketServer();
   }
 
@@ -17,7 +22,6 @@ class WebSocketHandler {
     this.wss.on("connection", (ws) => {
       ws.on("message", (message) => this.handleMessage(ws, message));
     });
-
     this.setupPingInterval();
   }
 
@@ -26,80 +30,125 @@ class WebSocketHandler {
     const user = this.users.get(parsedMessage.userId);
 
     switch (parsedMessage.type) {
-      case "InitializeDatuPage":
-        this.initializeDatuPage(ws, parsedMessage);
+      case "Initialize Home":
+        await this.initializeHome(ws, parsedMessage.pageId, parsedMessage.userId);
         break;
-      case "Loading data stream":
-        await this.loadingDataStream(ws, user);
+
+      case "Get Home State":
+        await this.sleep(250);
+        await this.getHomeState(ws, user);
         break;
-      case "GetClusterData":
-        await this.getClusterData(ws, parsedMessage, user);
+
+      case "Get Recommendation":
+        await this.getRecommendation(ws, parsedMessage.pageId);
         break;
-      case "Cluster data stream":
+
+      case "Initialize Cluster":
+        await this.initializeCluster(ws, parsedMessage.pageId, parsedMessage.userId);
+        break;
+
+      case "Initialize Article":
+        await this.initializeArticle(ws, parsedMessage, user);
+        break;
+
+      case "Article Data Stream":
+        await this.sleep(250);
         await this.clusterDataStream(ws, user);
         break;
-      case "Get recommendation":
-        await this.getRecommendation(ws, parsedMessage, user);
-        break;
+
       case "RegenerateArticle":
         await this.regenerateArticle(ws, user);
         break;
+
       case "Initial Message":
-        console.log("Initial Message");
         await this.initialMessage(ws, parsedMessage.pageId, parsedMessage.userId);
         break;
+
       case "Message":
+        await this.sleep(250);
         await this.sendMessage(ws, user);
         break;
+
       case "New Message":
-        console.log("New Message");
         await this.newMessage(ws, user, parsedMessage.message);
         break;
+
       case "pong":
         break;
+
       case "disconnect":
+        console.log("disconnect reached");
         this.users.delete(parsedMessage.userId);
         break;
     }
   }
 
-  initializeDatuPage(ws, parsedMessage) {
-    const user = {
-      pageId: parsedMessage.pageId,
-    };
-    this.users.set(parsedMessage.userId, user);
 
-    if (!this.datuPages.has(parsedMessage.pageId)) {
-      const datuPageInstance = new DatuPage(parsedMessage.pageId);
-      datuPageInstance.fetchData(this.datuPages);
-      this.datuPages.set(parsedMessage.pageId, datuPageInstance);
+  async initializeHome(ws, pageId, userId) {
+    const user = { pageId };
+    this.users.set(userId, user);
+
+    if (this.inlinkRetreivers.has(pageId)) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: "Home Initialized",
+          state: "1",
+        })
+      );
+      return;
     }
+
+    const inlinkRetreivalInstance = new InlinkRetreival(pageId);
+    const retreivalPromise = inlinkRetreivalInstance.fetchData();
+    this.inlinkRetreivers.set(pageId, inlinkRetreivalInstance);
 
     ws.send(
       JSON.stringify({
         status: "success",
-        message: "Loading state",
-        state: "0",
+        message: "Home Initialized",
+        state: "1",
       })
     );
+    await retreivalPromise;
+    this.inlinkRetreivers.delete(pageId);
   }
 
-  async loadingDataStream(ws, user) {
-    if (this.datuPages.has(user.pageId)) {
-      const state = this.datuPages.get(user.pageId).getState();
-      ws.send(
-        JSON.stringify({
-          status: "success",
-          message: "Loading state",
-          state,
-        })
-      );
-    } else {
-      if (await DatuPage.isLargeEnough(user.pageId)) {
+  async getHomeState(ws, user) {
+    if (this.inlinkRetreivers.has(user.pageId)) {
+      const inlinkRetreiver = this.inlinkRetreivers.get(user.pageId);
+      if (inlinkRetreiver.isFinished) {
+        if (inlinkRetreiver.isLargeEnough) {
+          ws.send(
+            JSON.stringify({
+              status: "success",
+              message: "Home Complete",
+            })
+          );
+        } else {
+          ws.send(
+            JSON.stringify({
+              status: "success",
+              message: "Home Small",
+            })
+          );
+        }
+      } else {
+        const state = inlinkRetreiver.state;
         ws.send(
           JSON.stringify({
             status: "success",
-            message: "New DatuPage created",
+            message: "Home State",
+            state,
+          })
+        );
+      }
+    } else {
+      if (await InlinkRetreival.isLargeEnough(user.pageId)) {
+        ws.send(
+          JSON.stringify({
+            status: "success",
+            message: "Home Complete",
           })
         );
         return;
@@ -107,7 +156,7 @@ class WebSocketHandler {
         ws.send(
           JSON.stringify({
             status: "success",
-            message: "Not large enough",
+            message: "Home Small",
           })
         );
         return;
@@ -115,34 +164,116 @@ class WebSocketHandler {
     }
   }
 
-  async getClusterData(ws, parsedMessage, user) {
-    const clusterId = user.pageId + parsedMessage.position;
-    user.clusterId = clusterId;
-    user.position = parsedMessage.position;
-    if (
-      !(await ArticleGenerator.hasInData(user.pageId, parsedMessage.position))
-    ) {
+  async initializeCluster(ws, pageId, userId) {
+    const user = {
+      pageId,
+    };
+    this.users.set(userId, user);
+
+    if (this.inlinkClusters.has(pageId)) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: "Loading Cluster",
+        })
+      );
+      return
+    }
+
+    if(await this.isClusterDone(pageId)){
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: "Load Complete",
+        })
+      );
       return;
     }
 
-    if (!this.generators.has(clusterId)) {
-      const generator = new ArticleGenerator(
-        user.pageId,
-        parsedMessage.position
-      );
-      generator.generatePage(this.generators);
-      this.generators.set(clusterId, generator);
-    }
+    const processPromise = this.inlinkClusterProcess(pageId)
+    this.inlinkClusters.set(pageId, processPromise);
     ws.send(
       JSON.stringify({
         status: "success",
-        message: `generating page`,
+        message: "Loading Cluster",
       })
     );
+
+    await processPromise;
+
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: "Load Complete",
+      })
+    );
+
+    this.inlinkClusters.delete(pageId);
+  }
+
+  async isClusterDone(pageName) {
+    const db = getDb();
+    const collection = db.collection("datuCluster");
+
+    const data = await collection.findOne({ _id: pageName + "VERSION"});
+    if (data) {
+      if(!data.version) {
+        console.log("no version");
+        return false;
+      }
+      if(data.version !== 1.3) {
+        console.log("wrong version");
+        return false;
+      }
+
+      return true;
+    }
+    console.log("no data");
+    return false;
+  }
+
+  async inlinkClusterProcess(pageId) {
+    const data = await getInlinkData(pageId);
+    const inlinkClusterInstance = new InlinkCluster(pageId, 6, data);
+    await inlinkClusterInstance.saveVersion();
+    await inlinkClusterInstance.saveNodeAndChildren();
+  }
+
+  async initializeArticle(ws, parsedMessage, user) {
+    const clusterId = user.pageId + parsedMessage.position;
+    user.clusterId = clusterId;
+    user.position = parsedMessage.position;
+    if (this.articleGenerators.has(clusterId)) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: `Generating Article`,
+        })
+      );
+      return;
+    }
+
+    const articleGenerator = new ArticleGenerator(
+      user.pageId,
+      parsedMessage.position
+    );
+    const generatorPromise = articleGenerator.generatePage();
+    this.articleGenerators.set(clusterId, articleGenerator);
+
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: `Generating Article`,
+      })
+    );
+
+    await generatorPromise;
+
+    this.articleGenerators.delete(clusterId);
   }
 
   async clusterDataStream(ws, user) {
-    if (!this.generators.has(user.clusterId)) {
+    if (!this.articleGenerators.has(user.clusterId)) {
       const parsedText = await ArticleGenerator.getParsedText(
         user.pageId,
         user.position
@@ -150,26 +281,26 @@ class WebSocketHandler {
       ws.send(
         JSON.stringify({
           status: "success",
-          message: "Cluster data finished",
+          message: "Article Finished",
           clusterData: `${parsedText}`,
         })
       );
       return;
     }
 
-    const generator = this.generators.get(user.clusterId);
+    const generator = this.articleGenerators.get(user.clusterId);
     const wikitext = generator.getWikiText();
     ws.send(
       JSON.stringify({
         status: "Processing",
-        message: `Cluster data stream`,
+        message: `Article Data Stream`,
         clusterData: `${wikitext}`,
       })
     );
   }
 
-  async getRecommendation(ws, parsedMessage, user) {
-    const pageName = parsedMessage.pageId;
+  async getRecommendation(ws, pageId) {
+    const pageName = pageId;
     const recommendation = removeEditSpans(
       await wikipediaAPI.getContent(pageName)
     ).replace(/\/wiki\//g, "/datu/");
@@ -183,18 +314,31 @@ class WebSocketHandler {
   }
 
   async regenerateArticle(ws, user) {
+    if (this.articleGenerators.has(user.clusterId)) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: `Generating Article`,
+        })
+      );
+      return;
+    }
     const generator = new ArticleGenerator(user.pageId, user.position);
     await generator.resetArticle();
 
-    generator.generatePage(this.generators);
-    this.generators.set(user.clusterId, generator);
+    const generatorPromise = generator.generatePage();
+    this.articleGenerators.set(user.clusterId, generator);
 
     ws.send(
       JSON.stringify({
         status: "success",
-        message: `generating page`,
+        message: `Generating Article`,
       })
     );
+
+    await generatorPromise;
+
+    this.articleGenerators.delete(user.clusterId);
   }
 
   async initialMessage(ws, pageId, userId) {
@@ -206,7 +350,6 @@ class WebSocketHandler {
     this.users.set(userId, user);
 
     const messageStream = await DatuChat.generateInitialMessage(user.pageId);
-    console.log("here");
     const message = { assistant: "" };
     user.chatLog.push(message);
 
@@ -286,6 +429,9 @@ class WebSocketHandler {
         ws.send(JSON.stringify({ status: "ping" }));
       });
     }, 10000); // Send "ping" every 10 seconds
+  }
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }
 

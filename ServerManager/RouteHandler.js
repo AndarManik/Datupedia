@@ -1,7 +1,7 @@
-// RouteHandler.js
 const fs = require("fs");
 const path = require("path");
 const { v4: uuidv4 } = require("uuid");
+const WikipediaAPI = require("../APIs/WikipediaAPI");
 
 class RouteHandler {
   constructor(app, wikipediaAPI) {
@@ -14,10 +14,10 @@ class RouteHandler {
     this.app.get("/", this.handleRoot.bind(this));
     this.app.get("/suggestions", this.handleSuggestions.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
-    this.app.get("/datu/:pagename", this.handleDatuPage.bind(this));
+    this.app.get("/datu/:pagename", this.handleDatuPageHome.bind(this));
     this.app.get("/datu/:pagename/article", this.handleDatuPageArticle.bind(this));
     this.app.get("/datu/:pagename/chat", this.handleDatuPageChat.bind(this));
-    this.app.get("/wiki/:pagename", this.handleWikiPage.bind(this));
+    this.app.get("/wiki/:pagename/article", this.handleWikiPage.bind(this));
     this.app.get("/how-it-works", this.handleHow.bind(this));
     this.app.get("/about", this.handleAbout.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
@@ -44,7 +44,7 @@ class RouteHandler {
     res.json(suggestions);
   }
 
-  async handleDatuPage(req,res){
+  async handleDatuPageHome(req,res){
     try {
         const pagename = decodeURIComponent(
           req.params.pagename.replaceAll("_", " ")
@@ -103,7 +103,7 @@ class RouteHandler {
         const filePath = path.join(__dirname, "../public/Wikipage.html");
         const fileContent = fs.readFileSync(filePath, "utf-8");
         let renderedHtml = fileContent.replace(/{{pagename}}/g, pagename);
-        const page = await this.getContent(pagename);
+        const page = await this.wikipediaAPI.getContent(pagename);
         renderedHtml = renderedHtml.replace(/{{content}}/g, page);
         res.send(renderedHtml);
       } catch (err) {
@@ -142,11 +142,9 @@ class RouteHandler {
       );
   }
 
-  // ... other route handlers
-
   async handleRandom(req, res) {
     try {
-        const suitablePage = await findRandomPageWithInlinks();
+        const suitablePage = await this.findRandomPageWithInlinks();
         res.redirect(`/datu/${encodeURIComponent(suitablePage)}`);
       } catch (err) {
         console.error(err);
@@ -159,15 +157,13 @@ class RouteHandler {
     if (inlinks.length >= minInlinks) {
       return randomPage;
     } else {
-      await sleep(500); // Waits for 2 seconds before the next recursive call
-      return findRandomPageWithInlinks(minInlinks);
+      await this.sleep(100); 
+      return this.findRandomPageWithInlinks(minInlinks);
     }
   }
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
-
-  // Helper functions like 'renderHtml' and 'findRandomPageWithInlinks' can also be included here
 }
 
 module.exports = RouteHandler;

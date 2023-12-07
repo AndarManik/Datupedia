@@ -1,22 +1,21 @@
 require("dotenv").config();
 const express = require("express");
-const WikipediaAPI = require("../APIs/WikipediaAPI");
-const { connectToDb } = require("../APIs/MongoAPI");
 const path = require("path");
 const http = require("http");
 const app = express();
 const server = http.createServer(app);
+
+const RouteHandler = require("./RouteHandler");
+const WebSocketHandler = require("./WebSocketHandler");
+
+const WikipediaAPI = require("../APIs/WikipediaAPI");
+const { connectToDb } = require("../APIs/MongoAPI");
 const wikipediaAPI = new WikipediaAPI();
 
-const RouteHandler = require("./RouteHandler"); // Import RouteHandler
-const WebSocketHandler = require("./WebSocketHandler"); // Import WebSocketManager
 
-
-// Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "../public")));
-// Rate Limiting
 
 // Database connection
 connectToDb()

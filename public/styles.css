@@ -1,9 +1,9 @@
 body {
-  background: #4d4650;
-  font-family: Arial;
+  background: #d7cfda;
+  font-family: 'Roboto Slab';        
   margin: 0;
   line-height: 1.3;
-  color: #f0f0f0;
+  color: #2F2B32;
 }
 
 h1 {
@@ -14,7 +14,7 @@ h1 {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #4d4650;
+  background: #d7cfda;
   padding-bottom: 5px;
 }
 
@@ -30,20 +30,19 @@ h1 {
 }
 
 .nav-links li {
-  font-family: georgia;
   display: inline;
   margin-left: 20px;
   font-size: 24px;
 }
 
 .navbar a {
-  color: #f0f0f0;
+  color: #2F2B32;
   text-decoration: none;
   transition: color 0.3s ease-in-out;
 }
 
 .navbar a:hover {
-  color: #ceb9e3; /* Change color on hover */
+  color: #a260f8; /* Change color on hover */
 }
 
 h1,
@@ -56,8 +55,7 @@ h4 {
 }
 
 .description {
-  font-family: georgia;
-  color: #f0f0f0;
+  color: #2F2B32;
   font-size: 18px; /* Slightly larger font for emphasis */
   line-height: 1.4; /* Adjust line height for better readability */
   margin-left: auto; /* Centering the paragraph */
@@ -68,27 +66,27 @@ button {
   height: 50px; /* Set a fixed height */
   margin-bottom: 10px;
   width: 26%;
-  background: #4d4650; /* Same as body background */
-  color: #f0f0f0; /* Matching the anchor tag color */
+  background: #d7cfda; /* Same as body background */
+  color: #2F2B32; /* Matching the anchor tag color */
   cursor: pointer; /* Make the button show a hand cursor on hover */
   transition: background 2s ease; /* Smooth transition for hover effect */
   font-size: 18px;
   border-radius: 10px;
   border: none;
   font-family: georgia;
-  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+  box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
   border-radius: 10px;
   text-align: center;
   font-size: 16px;
 }
 button:hover {
-  background: #4d4650; /* Slightly lighter shade for hover */
-  color: #f0f0f0;
-  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
+  background: #d7cfda; /* Slightly lighter shade for hover */
+  color: #2F2B32;
+  box-shadow: inset 5px 5px 5px -1px #ccc4ce, inset -5px -5px 5px -1px #e3dbe6;
 }
 
 button:active {
-  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
+  box-shadow: inset 5px 5px 5px -1px #ccc4ce, inset -5px -5px 5px -1px #e3dbe6;
 }
 a {
   color: #ceb9e3;
@@ -106,21 +104,21 @@ footer {
 }
 
 li {
-  color: #f0f0f0;
+  color: #2F2B32;
 }
 
 input {
   -webkit-appearance: none;
   box-sizing: border-box; /* This line ensures padding and border are inside the width */
-  color: #f0f0f0;
+  color: #2F2B32;
   
   border: 0px solid #ffffff00;
-  background: #4d4650;
+  background: #d7cfda;
   padding: 12px;
   width: 70%;
   height: 50px;
   transition: width 0.3s ease-in-out;
-  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+  box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
   border-radius: 10px;
   text-align: center;
   margin-bottom: 10px;
@@ -128,17 +126,12 @@ input {
   font-size: 16px;
 }
 input::placeholder {
-  color: #f0f0f0; /* Replace #yourColorCode with the color you want */
+  color: #2F2B32; /* Replace #yourColorCode with the color you want */
 }
 
 input:focus {
   outline: none;
-  box-shadow: inset 5px 5px 5px -1px #363339, inset -5px -5px 5px -1px #635866;
-}
-
-#pagename {
-  color: #ffffff;
-  font-family: Georgia;
+  box-shadow: inset 5px 5px 5px -1px #ccc4ce, inset -5px -5px 5px -1px #e3dbe6;
 }
 
 #suggestionsList {
@@ -156,11 +149,11 @@ input:focus {
   margin: 0;
   display: none;
   border-radius: 10px;
-  background-color: #4d4650; /* Change background color when hovered over the div */
-  background: #4d4650;
+  background-color: #d7cfda; /* Change background color when hovered over the div */
+  background: #d7cfda;
   transition: width 0.3s ease-in-out;
   outline: none;
-  box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+  box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
   text-align: center;
   margin-bottom: 10px;
 }
@@ -182,7 +175,7 @@ input:focus {
   margin: auto;
   margin-top: 18vh;
 
-  box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+  box-shadow: 10px 10px 10px -1px #ccc4ce, -10px -10px 10px -1px #e3dbe6;
   border-radius: 40px;
   padding: 40px;
 }
@@ -193,7 +186,7 @@ input:focus {
   margin: auto;
   margin-top: 3vh;
 
-  box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+  box-shadow: 10px 10px 10px -1px #ccc4ce, -10px -10px 10px -1px #e3dbe6;
   border-radius: 40px;
   padding: 40px;
 }
@@ -205,7 +198,7 @@ input:focus {
 
 .how-it-works h2 {
   text-align: center;
-  color: #f0f0f0; /* Light color for the heading */
+  color: #2F2B32; /* Light color for the heading */
   margin-bottom: 40px;
 }
 
@@ -218,7 +211,7 @@ input:focus {
 }
 
 .step p {
-  color: #f0f0f0; /* Light color for descriptions */
+  color: #2F2B32; /* Light color for descriptions */
   line-height: 1.5;
 }
 

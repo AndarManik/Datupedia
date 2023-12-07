@@ -41,7 +41,7 @@ class OpenaiAPI {
     });
   }
 
-  async gpt4ChatLog(system, chatLog, prompt) {
+  async gpt4ChatLog(system, chatLog) {
     return this.exponentialBackoffRequest(async () => {
       const completion = await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],

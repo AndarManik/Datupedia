@@ -2,23 +2,26 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
       body {
-        background: #4d4650;
-        font-family: Arial;
+        background: #d7cfda;
+        font-family: 'Roboto Slab';        
         margin: 0;
         line-height: 1.3;
-        color: #f0f0f0;
+        color: #2F2B32;
         display: flex;
         flex-direction: column;
         height: 100vh;
+        font-weight: 500;
+        word-spacing: 1px;
       }
       .navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #4d4650;
+        background: #d7cfda;
       }
 
       .navbar h1 {
@@ -33,7 +36,6 @@
       }
 
       .nav-links li {
-        font-family: georgia;
         display: inline;
         margin-left: 20px;
         font-size: 24px;
@@ -45,6 +47,7 @@
         flex-grow: 1; /* Allows the content to fill the space */
         justify-content: space-between; /* Distributes space between children */
         box-sizing: border-box;
+        padding: 0px;
       }
 
       #data {
@@ -53,11 +56,12 @@
         flex-grow: 1; /* Allows the content to fill the space */
         max-height: calc(100vh - 290px);
         overflow-y: scroll; /* Add scroll for vertical overflow */
-        box-shadow: inset 10px 10px 10px -1px #363339,
-          inset -10px -10px 10px -1px #635866;
+        box-shadow: inset 10px 10px 10px -1px #ccc4ce,
+          inset -10px -10px 10px -1px #e3dbe6;
         border-radius: 10px;
-        font-size: 14px;
+        font-size: 16px;
         line-height: 20px;
+
       }
       #data::-webkit-scrollbar {
         display: none; /* Hide scrollbar for Webkit browsers */
@@ -70,17 +74,17 @@
 
       .bot {
         padding: 15px;
-        margin-right: 25px;
+        margin: 0px;
       }
 
       .navbar a {
-        color: #f0f0f0;
+        color: #2F2B32;
         text-decoration: none;
         transition: color 0.3s ease-in-out;
       }
 
       .navbar a:hover {
-        color: #ceb9e3; /* Change color on hover */
+        color: #a260f8; /* Change color on hover */
       }
       .container {
         flex-grow: 1; /* Allow the container to fill the available space */
@@ -89,7 +93,7 @@
         width: 70%;
         max-width: 500px;
         margin: 40px auto; /* Maintains the top and bottom margin */
-        box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+        box-shadow: 10px 10px 10px -1px #ccc4ce, -10px -10px 10px -1px #e3dbe6;
         border-radius: 40px;
         padding: 40px;
         overflow: hidden; /* Prevents content from overflowing */
@@ -99,61 +103,63 @@
       h2,
       h3,
       h4 {
-        font-family: Georgia;
-        font-weight: 300;
         text-align: center;
       }
       input {
         -webkit-appearance: none;
+        font-family: 'Roboto Slab';        
+
         box-sizing: border-box; /* This line ensures padding and border are inside the width */
-        color: #f0f0f0;
+        color: #2F2B32;
         border: 0px solid #ffffff00;
-        background: #4d4650;
+        background: #d7cfda;
         padding: 12px;
         width: 82%;
         height: 50px;
         transition: width 0.3s ease-in-out;
-        box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+        box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
         border-radius: 10px;
         margin-bottom: 10px;
         margin-right: 2%;
         font-size: 16px;
       }
       input::placeholder {
-        color: #f0f0f0; /* Replace #yourColorCode with the color you want */
+        color: #2F2B32; /* Replace #yourColorCode with the color you want */
       }
 
       input:focus {
         outline: none;
-        box-shadow: inset 5px 5px 5px -1px #363339,
-          inset -5px -5px 5px -1px #635866;
+        box-shadow: inset 5px 5px 5px -1px #ccc4ce,
+          inset -5px -5px 5px -1px #e3dbe6;
       }
       button {
+        font-family: 'Roboto Slab';        
+
         height: 50px; /* Set a fixed height */
         margin-bottom: 10px;
         width: 15%;
-        background: #4d4650; /* Same as body background */
-        color: #f0f0f0; /* Matching the anchor tag color */
+        background: #d7cfda; /* Same as body background */
+        color: #2F2B32; /* Matching the anchor tag color */
         cursor: pointer; /* Make the button show a hand cursor on hover */
         transition: background 2s ease; /* Smooth transition for hover effect */
         font-size: 18px;
         border-radius: 10px;
         border: none;
-        box-shadow: 5px 5px 5px -1px #363339, -5px -5px 5px -1px #635866;
+        box-shadow: 5px 5px 5px -1px #ccc4ce, -5px -5px 5px -1px #e3dbe6;
         border-radius: 10px;
         text-align: center;
         font-size: 16px;
       }
       button:hover {
-        background: #4d4650; /* Slightly lighter shade for hover */
-        color: #f0f0f0;
-        box-shadow: inset 5px 5px 5px -1px #363339,
-          inset -5px -5px 5px -1px #635866;
+        background: #d7cfda; /* Slightly lighter shade for hover */
+        color: #2F2B32;
+        box-shadow: inset 5px 5px 5px -1px #ccc4ce,
+          inset -5px -5px 5px -1px #e3dbe6;
       }
 
       button:active {
-        box-shadow: inset 5px 5px 5px -1px #363339,
-          inset -5px -5px 5px -1px #635866;
+        box-shadow: inset 5px 5px 5px -1px #ccc4ce,
+          inset -5px -5px 5px -1px #e3dbe6;
       }
 
       @media only screen and (max-width: 620px) {
@@ -336,7 +342,7 @@
       </header>
       <div class="content">
         <div id="data">
-          <div class="bot"></div>
+          <div class="bot">...</div>
         </div>
 
         <div class="inputField">

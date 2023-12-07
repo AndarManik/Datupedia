@@ -1,101 +1,105 @@
-const fs = require("fs").promises;
 const WikipediaAPI = require("../APIs/WikipediaAPI");
 const wikipediaAPI = new WikipediaAPI();
 const OpenaiApi = require("../APIs/OpenaiAPI");
 const openai = new OpenaiApi();
 const TextExtractor = require("./TextExtractor");
 const textExtractor = new TextExtractor();
-const { getDb } = require("../APIs/MongoAPI");
+const { getDb, getInlinkData } = require("../APIs/MongoAPI");
+
+class Inlink {
+  constructor(title, paragraph, embedding) {
+    this.title = title;
+    this.paragraph = paragraph;
+    this.embedding = embedding;
+  }
+}
 
 class InlinkRetreival {
+  //Rate limiting for WikipediaAPI
   static MAX_REQUESTS = 100;
   static DELAY_TIME = 500;
-  static MAX_CHUNK_SIZE = 250;
-  static MAX_RETREIVE = 1500;
+
+  //Limiting for number of linkings queried and stored
+  static MAX_RETREIVE = 1000;
   static MAX_STORE = 500;
 
   constructor(pageName) {
     this.pageName = pageName;
     this.db = getDb();
     this.state = "0";
-    this.finished = false;
-    this.data = [];
+
+    //These two variables are used for signaling when and how fetchData() finishes
+    this.isLargeEnough = false;
+    this.isFinished = false;
+
+    this.inlinkData = [];
   }
 
   async fetchData() {
-    if (await this._loadFromDb()) {
-      this.finished = true;
-      return;
+    this.inlinkData = await getInlinkData(this.pageName);
+    if (this.inlinkData.length > 0) {//The data has already been fetched
+        this.isLargeEnough = this.inlinkData.length > 21;
+        this.isFinished = true;
+        return;
     }
 
     const startTime = Date.now();
 
-    const inlinks = await wikipediaAPI.getInlinks(
-      this.pageName,
-      InlinkRetreival.MAX_RETREIVE
-    );
+    const fetchFuture = this._fetchPageData();
+    const inlinksPromise = wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
+    const [_, inlinks] = await Promise.all([fetchFuture, inlinksPromise]);
 
-    for (
-      let i = 0;
-      i < inlinks.length && this.data.length < InlinkRetreival.MAX_STORE;
-      i += InlinkRetreival.MAX_REQUESTS
-    ) {
-
-      const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
-      const results = await this._fetchParagraphsInBatch(batch);
-      this.data.push(...results);
-      this._logProgress(
-        startTime,
-        Math.min(inlinks.length, InlinkRetreival.MAX_STORE),
-        inlinks.length < InlinkRetreival.MAX_STORE ? i : this.data.length
-      );
-      await this._delay(InlinkRetreival.DELAY_TIME);
+    for (let i = 0; i < inlinks.length && this.inlinkData.length < InlinkRetreival.MAX_STORE; i += InlinkRetreival.MAX_REQUESTS) {
+        const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
+        const results = await this._fetchParagraphsInBatch(batch);
+        this.inlinkData.push(...results);
+        this._logProgress(startTime, Math.min(inlinks.length, InlinkRetreival.MAX_STORE), inlinks.length < InlinkRetreival.MAX_STORE ? i : this.inlinkData.length);
+        const delayFuture = this._delay(InlinkRetreival.DELAY_TIME);
+        await this._saveToDb(results);
+        await delayFuture;
     }
+    this.isLargeEnough = this.inlinkData.length > 21;
+    this.isFinished = true;
+}
 
 
-    const paragraphs = textExtractor.getParagraphList(
-      await wikipediaAPI.getContent(this.pageName)
-    ).filter(paragraph => paragraph.trim() !== '');
-    console.log(paragraphs);
+  async _fetchPageData() {
+    const paragraphs = textExtractor
+      .getParagraphList(await wikipediaAPI.getContent(this.pageName))
+      .filter((paragraph) => paragraph.trim() !== "");
     const embeddings = await openai.adaBatch(paragraphs);
 
     paragraphs.forEach((paragraph, index) => {
       const embedding = embeddings[index];
-      this.data.push(new Inlink(this.pageName + index, paragraph, embedding));
+      this.inlinkData.push(new Inlink(this.pageName + index, paragraph, embedding));
     });
-
-
-    await this._saveToDb();
-    this.finished = true;
   }
 
   async _fetchParagraphsInBatch(inlinks) {
-    if(this.data.length > 360){
-    }
     const batchContent = await wikipediaAPI.getContentBatch(inlinks);
     const foundParagraphs = batchContent.map((content) =>
-      textExtractor.getParagraphHasLink(content, this.pageName)
+      textExtractor.getParagraphWithLink(content, this.pageName)
     );
-    
+
     const combinedTexts = foundParagraphs
       .map((paragraph, index) => {
-        if (paragraph) {
-          if(this.data.length > 360){
-            console.log(paragraph);
-          }
-          return {
-            title: inlinks[index],
-            paragraph: paragraph,
-          };
+        if (!paragraph) {
+          return null;
         }
-        return null;
+        return {
+          title: inlinks[index],
+          paragraph: paragraph,
+        };
       })
       .filter((item) => item !== null);
+
     if (combinedTexts.length === 0) {
       return [];
     }
+
     const filteredParagraphs = combinedTexts.map((tuple) => tuple.paragraph);
     const batchEmbeddings = await openai.adaBatch(filteredParagraphs);
+
     return combinedTexts.map((tuple, index) => {
       return new Inlink(tuple.title, tuple.paragraph, batchEmbeddings[index]);
     });
@@ -106,22 +110,23 @@ class InlinkRetreival {
       100,
       (dataLength / Math.min(inlinksLength, InlinkRetreival.MAX_STORE)) * 100
     ); //in percent
-    const runTimeSeconds = (Date.now() - startTime) / 1000; // in secionds
+    const runTimeSeconds = (Date.now() - startTime) / 1000; // in seconds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
 
     this.state = `${progress.toFixed(0)}`;
 
-    console.log(`${progress} ${runTimeSeconds} ${eta} ${inlinksLength} ${dataLength}`);
+    console.log(
+      `${progress} ${runTimeSeconds} ${eta} ${inlinksLength} ${dataLength}`
+    );
   }
 
-  // Utility function to implement a delay
   _delay(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
-  async _saveToDb() {
+  async _saveToDb(data) {
     try {
-      for (const inlink of this.data) {
+      for (const inlink of data) {
         await this.db.collection("datuPages").insertOne({
           pageName: this.pageName,
           title: inlink.title,
@@ -137,67 +142,9 @@ class InlinkRetreival {
     }
   }
 
-  async _loadFromDb() {
-    try {
-      const cursor = this.db
-        .collection("datuPages")
-        .find({ pageName: this.pageName });
-      this.data = await cursor.toArray();
-
-      if (this.data.length > 0) {
-        return true; // Successfully loaded from DB
-      }
-      return false; // Data doesn't exist in DB
-    } catch (error) {
-      console.log(
-        `Error loading data from DB for page ${this.pageName}: ${error}`
-      );
-      return false;
-    }
-  }
-
-  async _loadFromLocal() {
-    const filename = `./Datupages/${this.pageName}.json`;
-    try {
-      const data = await fs.readFile(filename, "utf-8");
-      this.data = JSON.parse(data);
-      return true; // Data successfully loaded from the database (file)
-    } catch (err) {
-      //console.log(`Failed to load data for ${this.pageName} from the database.`, err);
-      return false; // Data not found or other read errors
-    }
-  }
-
-  async _saveToLocal() {
-    const filename = `./Datupages/${this.pageName}.json`;
-    try {
-      await fs.writeFile(filename, JSON.stringify(this.data, null, 2), "utf-8");
-      console.log(
-        `Data for ${this.pageName} successfully saved to the database.`
-      );
-    } catch (err) {
-      console.log(
-        `Failed to save data for ${this.pageName} to the database.`,
-        err
-      );
-    }
-  }
-
   static async isLargeEnough(pageName) {
-    const cursor = getDb().collection("datuPages").find({ pageName: pageName });
-    const data = await cursor.toArray();
-
-    if (data.length > 21) {
-      return true; // Successfully loaded from DB
-    }
-    return false; // Data doesn't exist in DB
-  }
-}
-class Inlink {
-  constructor(title, paragraph, embedding) {
-    this.title = title;
-    this.paragraph = paragraph;
-    this.embedding = embedding;
+    const data = await getInlinkData(pageName);
+    return (data.length > 21) 
   }
 }
 module.exports = InlinkRetreival;

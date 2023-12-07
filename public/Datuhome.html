@@ -2,20 +2,23 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
       body {
-        background: #4d4650;
-        font-family: Arial;
+        background: #d7cfda;
+        font-family: 'Roboto Slab';        
         margin: 0;
         line-height: 1.3;
-        color: #f0f0f0;
+        color: #2F2B32;
+        word-spacing: 1px;
+
       }
       .navbar {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background: #4d4650;
+        background: #d7cfda;
         padding-bottom: 5px;
       }
 
@@ -31,7 +34,6 @@
       }
 
       .nav-links li {
-        font-family: georgia;
         display: inline;
         margin-left: 20px;
         font-size: 24px;
@@ -40,17 +42,17 @@
       .content a {
         margin: 0;
         padding: 0;
-        color: #ceb9e3; /* Change color on hover */
+        color: #a260f8; /* Change color on hover */
       }
 
       .navbar a {
-        color: #f0f0f0;
+        color: #2F2B32;
         text-decoration: none;
         transition: color 0.3s ease-in-out;
       }
 
       .navbar a:hover {
-        color: #ceb9e3; /* Change color on hover */
+        color: #a260f8; /* Change color on hover */
       }
       .container {
         width: 70%;
@@ -58,7 +60,7 @@
         margin: auto;
         margin-top: 18vh;
 
-        box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+        box-shadow: 10px 10px 10px -1px #ccc4ce, -10px -10px 10px -1px #e3dbe6;
         border-radius: 40px;
         padding: 40px;
       }
@@ -66,7 +68,6 @@
       h2,
       h3,
       h4 {
-        font-family: Georgia;
         font-weight: 300;
         text-align: center;
       }
@@ -74,14 +75,14 @@
         width: 100%;
         height: 40px;
         border-radius: 10px;
-        border: 2px solid #f0f0f0;
+        border: 2px solid #2F2B32;
         padding: 0;
       }
 
       #loadingBar {
         width: 0%;
         height: 100%;
-        background-color: #f0f0f0;
+        background-color: #2F2B32;
         transition: width 3s linear;
         border-radius: 8px;
       }
@@ -100,54 +101,57 @@
       }
 
       #chat {
+        font-family: 'Roboto Slab';
         flex: 1; /* Each button will take equal space */
         margin: 0 5px; /* Add 5px margin on the left and right of each button */
-        background: #4d4650; /* Same as body background */
-        color: #f0f0f0; /* Matching the anchor tag color */
+        background: #d7cfda; /* Same as body background */
+        color: #2F2B32; /* Matching the anchor tag color */
         padding: 10px 20px; /* Padding for visual comfort */
         cursor: pointer; /* Make the button show a hand cursor on hover */
         transition: background 2s ease; /* Smooth transition for hover effect */
         font-size: 18px;
         border-radius: 10px;
         border: none;
-        box-shadow: 3px 3px 3px -1px #363339, -3px -3px 3px -1px #635866;
+        box-shadow: 3px 3px 3px -1px #ccc4ce, -3px -3px 3px -1px #e3dbe6;
       }
       #chat:hover {
-        background: #4d4650; /* Slightly lighter shade for hover */
-        color: #f0f0f0;
-        box-shadow: inset 3px 3px 3px -1px #363339,
-          inset -3px -3px 3px -1px #635866;
+        background: #d7cfda; /* Slightly lighter shade for hover */
+        color: #2F2B32;
+        box-shadow: inset 3px 3px 3px -1px #ccc4ce,
+          inset -3px -3px 3px -1px #e3dbe6;
       }
 
       #chat:active {
-        box-shadow: inset 5px 5px 5px -1px #363339,
-          inset -5px -5px 5px -1px #635866;
+        box-shadow: inset 5px 5px 5px -1px #ccc4ce,
+          inset -5px -5px 5px -1px #e3dbe6;
       }
 
       #article {
+        font-family: 'Roboto Slab';
+
         flex: 1; /* Each button will take equal space */
         margin: 0 5px; /* Add 5px margin on the left and right of each button */
 
-        background: #4d4650; /* Same as body background */
-        color: #f0f0f0; /* Matching the anchor tag color */
+        background: #d7cfda; /* Same as body background */
+        color: #2F2B32; /* Matching the anchor tag color */
         padding: 10px 20px; /* Padding for visual comfort */
         cursor: pointer; /* Make the button show a hand cursor on hover */
         transition: background 2s ease; /* Smooth transition for hover effect */
         font-size: 18px;
         border-radius: 10px;
         border: none;
-        box-shadow: 3px 3px 3px -1px #363339, -3px -3px 3px -1px #635866;
+        box-shadow: 3px 3px 3px -1px #ccc4ce, -3px -3px 3px -1px #e3dbe6;
       }
       #article:hover {
-        background: #4d4650; /* Slightly lighter shade for hover */
-        color: #f0f0f0;
-        box-shadow: inset 3px 3px 3px -1px #363339,
-          inset -3px -3px 3px -1px #635866;
+        background: #d7cfda; /* Slightly lighter shade for hover */
+        color: #2F2B32;
+        box-shadow: inset 3px 3px 3px -1px #ccc4ce,
+          inset -3px -3px 3px -1px #e3dbe6;
       }
 
       #article:active {
-        box-shadow: inset 5px 5px 5px -1px #363339,
-          inset -5px -5px 5px -1px #635866;
+        box-shadow: inset 5px 5px 5px -1px #ccc4ce,
+          inset -5px -5px 5px -1px #e3dbe6;
       }
       @media only screen and (max-width: 560px) {
         .navbar h1 {
@@ -163,7 +167,7 @@
           max-width: 500px;
           margin: auto;
           margin-top: 15px;
-          box-shadow: 10px 10px 10px -1px #363339, -10px -10px 10px -1px #635866;
+          box-shadow: 10px 10px 10px -1px #ccc4ce, -10px -10px 10px -1px #e3dbe6;
           border-radius: 30px;
           padding: 30px;
         }
@@ -193,7 +197,16 @@
       const pageId = "{{pagename}}";
       // Initialize WebSocket connection
       const ws = new WebSocket("{{wss}}");
-
+      ws.addEventListener("open", () => {
+        const statusDiv = document.getElementById("status");
+        ws.send(
+          JSON.stringify({
+            type: "Initialize Home",
+            pageId,
+            userId,
+          })
+        );
+      });
       // Function to handle the server response
       const handleServerResponse = (data) => {
         const statusDiv = document.getElementById("status");
@@ -209,25 +222,34 @@
         }
 
         switch (data.message) {
-          case "Loading state":
+          case "Home Initialized":
             updateLoadingBar(data.state);
             ws.send(
               JSON.stringify({
-                type: "Loading data stream",
+                type: "Get Home State",
                 userId,
               })
             );
             break;
-          case "New DatuPage created":
+          case "Home State":
+            updateLoadingBar(data.state);
+            ws.send(
+              JSON.stringify({
+                type: "Get Home State",
+                userId,
+              })
+            );
+            break;
+          case "Home Complete":
             removeLoadingBar();
             addButtons();
             break;
 
-          case "Not large enough":
+          case "Home Small":
             removeLoadingBar();
             ws.send(
               JSON.stringify({
-                type: "Get recommendation",
+                type: "Get Recommendation",
                 pageId,
                 userId,
               })
@@ -240,17 +262,6 @@
             break;
         }
       };
-
-      ws.addEventListener("open", () => {
-        const statusDiv = document.getElementById("status");
-        ws.send(
-          JSON.stringify({
-            type: "InitializeDatuPage",
-            pageId,
-            userId,
-          })
-        );
-      });
 
       ws.addEventListener("message", (event) => {
         const data = JSON.parse(event.data);
