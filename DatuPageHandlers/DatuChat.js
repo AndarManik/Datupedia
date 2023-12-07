@@ -74,10 +74,10 @@ class DatuChat {
       const results = await cursor.toArray();
       results.forEach((result) => {
         if(result.title.startsWith(pageName)){
-          result.title = `datu/${encodeURIComponent(pageName)}`
+          result.title = `/datu/${encodeURIComponent(pageName)}`
         }
         else{
-          result.title = `datu/${encodeURIComponent(result.title)}`
+          result.title = `/datu/${encodeURIComponent(result.title)}`
         }
       })
       console.log(results);
