@@ -2,20 +2,27 @@
 <html>
   <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
     <style>
       body {
         background: #d7cfda;
-        font-family: 'Roboto Slab';        
+        font-family: "Roboto Slab";
         margin: 0;
         line-height: 1.3;
-        color: #2F2B32;
+        color: #2f2b32;
         word-spacing: 1px;
-
       }
+
+      .content {
+        margin-top: 20px;
+      }
+
       .navbar {
-        font-family: 'Roboto Slab';        
+        font-family: "Roboto Slab";
         display: flex;
         justify-content: space-between;
         align-items: center;
@@ -24,7 +31,7 @@
       }
 
       .navbar h1 {
-        font-family: 'Roboto Slab';        
+        font-family: "Roboto Slab";
         margin: 0;
         font-size: 24px;
       }
@@ -48,7 +55,7 @@
       }
 
       .navbar a {
-        color: #2F2B32;
+        color: #2f2b32;
         text-decoration: none;
         transition: color 0.3s ease-in-out;
       }
@@ -77,15 +84,15 @@
         width: 100%;
         height: 40px;
         border-radius: 10px;
-        border: 2px solid #2F2B32;
+        border: 2px solid #2f2b32;
         padding: 0;
       }
 
       #loadingBar {
         width: 0%;
         height: 100%;
-        background-color: #2F2B32;
-        transition: width 3s linear;
+        background-color: #2f2b32;
+        transition: width 3s ease-in-out;
         border-radius: 8px;
       }
       #chat {
@@ -102,12 +109,14 @@
         justify-content: space-around;
       }
 
+
+
       #chat {
-        font-family: 'Roboto Slab';
+        font-family: "Roboto Slab";
         flex: 1; /* Each button will take equal space */
         margin: 0 5px; /* Add 5px margin on the left and right of each button */
         background: #d7cfda; /* Same as body background */
-        color: #2F2B32; /* Matching the anchor tag color */
+        color: #2f2b32; /* Matching the anchor tag color */
         padding: 10px 20px; /* Padding for visual comfort */
         cursor: pointer; /* Make the button show a hand cursor on hover */
         transition: background 2s ease; /* Smooth transition for hover effect */
@@ -118,7 +127,7 @@
       }
       #chat:hover {
         background: #d7cfda; /* Slightly lighter shade for hover */
-        color: #2F2B32;
+        color: #a260f8;
         box-shadow: inset 3px 3px 3px -1px #ccc4ce,
           inset -3px -3px 3px -1px #e3dbe6;
       }
@@ -129,13 +138,13 @@
       }
 
       #article {
-        font-family: 'Roboto Slab';
+        font-family: "Roboto Slab";
 
         flex: 1; /* Each button will take equal space */
         margin: 0 5px; /* Add 5px margin on the left and right of each button */
 
         background: #d7cfda; /* Same as body background */
-        color: #2F2B32; /* Matching the anchor tag color */
+        color: #2f2b32; /* Matching the anchor tag color */
         padding: 10px 20px; /* Padding for visual comfort */
         cursor: pointer; /* Make the button show a hand cursor on hover */
         transition: background 2s ease; /* Smooth transition for hover effect */
@@ -146,7 +155,7 @@
       }
       #article:hover {
         background: #d7cfda; /* Slightly lighter shade for hover */
-        color: #2F2B32;
+        color: #a260f8;
         box-shadow: inset 3px 3px 3px -1px #ccc4ce,
           inset -3px -3px 3px -1px #e3dbe6;
       }
@@ -179,6 +188,7 @@
           font-size: 12px;
           text-align: center;
         }
+
         input {
           width: 78%;
           height: 35px;
@@ -321,13 +331,11 @@
         <nav class="navbar">
           <h1><a href="/">Datupedia</a></h1>
           <ul class="nav-links">
-            <li><a href="/how-it-works">How It Works</a></li>
-            <li><a href="/about">About</a></li>
+            <li>{{pagename}}</li>
           </ul>
         </nav>
       </header>
       <div class="content">
-        <h1 id="pageTitle">{{pagename}}</h1>
         <div id="status">
           <div id="loadingBar"></div>
         </div>

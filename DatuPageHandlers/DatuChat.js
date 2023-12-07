@@ -31,7 +31,15 @@ class DatuChat {
     const systemPrompt = `
     "What you know": '${JSON.stringify(
       nearestText
-    )}' "What you know" is up to date and can be relied on. Use only "What you know" to aid your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize "What you know". Output your text using standard html markup for styling text. Break up your text into multiple sections using <p> tags. Add <a> tags as hyperlinks to the titles in "What you know", these tags should have target="_blank". Keep your responses short at around 2-3 paragraphs worth of words or approx. 175 words, unless the user specifies otherwise.`;
+    )}'
+    Response Guidlines:
+
+    1. "What you know" is up to date and can be relied on. 
+    2. Use only "What you know" to aid your response for the users query, do not mention that a query is outside of the knowledge cutoff and instead utilize "What you know". 
+    3. Output your text using html tags for styling text such as <p> <strong> <i> <h1> <li> and so on. 
+    4. If no styling is needed place the output inside of a <p> tag. Break up long text into multiple <p> tags
+    5. Add <a> tags as hyperlinks in your response. These should link to the titles in "What you know", these tags should have target="_blank". 
+    6. Keep your responses short at around 2-3 paragraphs worth of words or approx. 175 words, unless the user specifies otherwise.`;
     return openai.gpt4StreamChatLog(systemPrompt, convertedChat);
   }
 

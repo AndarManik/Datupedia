@@ -31,46 +31,66 @@ class WebSocketHandler {
 
     switch (parsedMessage.type) {
       case "Initialize Home":
-        await this.initializeHome(ws, parsedMessage.pageId, parsedMessage.userId);
+        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
+          await this.initializeHome(ws, parsedMessage.pageId, parsedMessage.userId);
+        }
         break;
 
       case "Get Home State":
-        await this.sleep(250);
-        await this.getHomeState(ws, user);
+        if (user && user.pageId !== undefined) {
+          await this.sleep(250);
+          await this.getHomeState(ws, user.pageId);
+        }
         break;
 
       case "Get Recommendation":
-        await this.getRecommendation(ws, parsedMessage.pageId);
+        if (parsedMessage.pageId !== undefined) {
+          await this.getRecommendation(ws, parsedMessage.pageId);
+        }
         break;
 
       case "Initialize Cluster":
-        await this.initializeCluster(ws, parsedMessage.pageId, parsedMessage.userId);
+        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
+          await this.initializeCluster(ws, parsedMessage.pageId, parsedMessage.userId);
+        }
         break;
 
       case "Initialize Article":
-        await this.initializeArticle(ws, parsedMessage, user);
+        if (parsedMessage.position !== undefined && user) {
+          await this.initializeArticle(ws, parsedMessage.position, user);
+        }
         break;
 
       case "Article Data Stream":
-        await this.sleep(250);
-        await this.clusterDataStream(ws, user);
+        if (user && user.clusterId !== undefined && user.pageId !== undefined && user.position !== undefined) {
+          await this.sleep(250);
+          await this.clusterDataStream(ws, user.clusterId, user.pageId, user.position);
+        }
         break;
 
       case "RegenerateArticle":
-        await this.regenerateArticle(ws, user);
+        if (user && user.clusterId !== undefined && user.pageId !== undefined && user.position !== undefined) {
+          await this.regenerateArticle(ws, user.clusterId, user.pageId, user.position);
+        }
         break;
 
       case "Initial Message":
-        await this.initialMessage(ws, parsedMessage.pageId, parsedMessage.userId);
+        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
+          await this.initialMessage(ws, parsedMessage.pageId, parsedMessage.userId);
+        }
         break;
 
       case "Message":
-        await this.sleep(250);
-        await this.sendMessage(ws, user);
+        if (user && user.isGenerating !== undefined && user.chatLog !== undefined) {
+          await this.sleep(250);
+          await this.sendMessage(ws, user.isGenerating, user.chatLog);
+        }
         break;
 
       case "New Message":
-        await this.newMessage(ws, user, parsedMessage.message);
+        if (user && parsedMessage.message !== undefined) {
+          await this.newMessage(ws, user, parsedMessage.message);
+        }
         break;
 
       case "pong":
@@ -78,7 +98,9 @@ class WebSocketHandler {
 
       case "disconnect":
         console.log("disconnect reached");
-        this.users.delete(parsedMessage.userId);
+        if (parsedMessage.userId !== undefined) {
+          this.users.delete(parsedMessage.userId);
+        }
         break;
     }
   }
@@ -114,9 +136,9 @@ class WebSocketHandler {
     this.inlinkRetreivers.delete(pageId);
   }
 
-  async getHomeState(ws, user) {
-    if (this.inlinkRetreivers.has(user.pageId)) {
-      const inlinkRetreiver = this.inlinkRetreivers.get(user.pageId);
+  async getHomeState(ws, pageId) {
+    if (this.inlinkRetreivers.has(pageId)) {
+      const inlinkRetreiver = this.inlinkRetreivers.get(pageId);
       if (inlinkRetreiver.isFinished) {
         if (inlinkRetreiver.isLargeEnough) {
           ws.send(
@@ -144,7 +166,7 @@ class WebSocketHandler {
         );
       }
     } else {
-      if (await InlinkRetreival.isLargeEnough(user.pageId)) {
+      if (await InlinkRetreival.isLargeEnough(pageId)) {
         ws.send(
           JSON.stringify({
             status: "success",
@@ -239,10 +261,10 @@ class WebSocketHandler {
     await inlinkClusterInstance.saveNodeAndChildren();
   }
 
-  async initializeArticle(ws, parsedMessage, user) {
-    const clusterId = user.pageId + parsedMessage.position;
+  async initializeArticle(ws, position, user) {
+    const clusterId = user.pageId + position;
     user.clusterId = clusterId;
-    user.position = parsedMessage.position;
+    user.position = position;
     if (this.articleGenerators.has(clusterId)) {
       ws.send(
         JSON.stringify({
@@ -255,7 +277,7 @@ class WebSocketHandler {
 
     const articleGenerator = new ArticleGenerator(
       user.pageId,
-      parsedMessage.position
+      position
     );
     const generatorPromise = articleGenerator.generatePage();
     this.articleGenerators.set(clusterId, articleGenerator);
@@ -272,11 +294,11 @@ class WebSocketHandler {
     this.articleGenerators.delete(clusterId);
   }
 
-  async clusterDataStream(ws, user) {
-    if (!this.articleGenerators.has(user.clusterId)) {
+  async clusterDataStream(ws, clusterId, pageId, position) {
+    if (!this.articleGenerators.has(clusterId)) {
       const parsedText = await ArticleGenerator.getParsedText(
-        user.pageId,
-        user.position
+        pageId,
+        position
       );
       ws.send(
         JSON.stringify({
@@ -313,8 +335,8 @@ class WebSocketHandler {
     );
   }
 
-  async regenerateArticle(ws, user) {
-    if (this.articleGenerators.has(user.clusterId)) {
+  async regenerateArticle(ws, clusterId, pageId, position) {
+    if (this.articleGenerators.has(clusterId)) {
       ws.send(
         JSON.stringify({
           status: "success",
@@ -323,11 +345,11 @@ class WebSocketHandler {
       );
       return;
     }
-    const generator = new ArticleGenerator(user.pageId, user.position);
+    const generator = new ArticleGenerator(pageId, position);
     await generator.resetArticle();
 
     const generatorPromise = generator.generatePage();
-    this.articleGenerators.set(user.clusterId, generator);
+    this.articleGenerators.set(clusterId, generator);
 
     ws.send(
       JSON.stringify({
@@ -338,7 +360,7 @@ class WebSocketHandler {
 
     await generatorPromise;
 
-    this.articleGenerators.delete(user.clusterId);
+    this.articleGenerators.delete(clusterId);
   }
 
   async initialMessage(ws, pageId, userId) {
@@ -371,13 +393,13 @@ class WebSocketHandler {
     user.isGenerating = false;
   }
 
-  async sendMessage(ws, user) {
-    if (!user.isGenerating) {
+  async sendMessage(ws, isGenerating, chatLog) {
+    if (!isGenerating) {
       ws.send(
         JSON.stringify({
           status: "success",
           message: `End Message`,
-          content: user.chatLog[user.chatLog.length - 1].assistant,
+          content: chatLog[chatLog.length - 1].assistant,
         })
       );
       return;
@@ -386,7 +408,7 @@ class WebSocketHandler {
       JSON.stringify({
         status: "success",
         message: `Message`,
-        content: user.chatLog[user.chatLog.length - 1].assistant,
+        content: chatLog[chatLog.length - 1].assistant,
       })
     );
   }

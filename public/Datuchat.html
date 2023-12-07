@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no" />
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
 
     <style>
@@ -13,7 +13,7 @@
         color: #2F2B32;
         display: flex;
         flex-direction: column;
-        height: 100vh;
+        height: 100svh;
         font-weight: 500;
         word-spacing: 1px;
       }
@@ -58,7 +58,7 @@
         margin: 20px 0; /* Adds space above and below */
         width: 100%;
         flex-grow: 1; /* Allows the content to fill the space */
-        max-height: calc(100vh - 290px);
+        height: calc(100svh - 290px);
         overflow-y: scroll; /* Add scroll for vertical overflow */
         box-shadow: inset 10px 10px 10px -1px #ccc4ce,
           inset -10px -10px 10px -1px #e3dbe6;
@@ -156,7 +156,7 @@
       }
       button:hover {
         background: #d7cfda; /* Slightly lighter shade for hover */
-        color: #2F2B32;
+        color: #a260f8; /* Change color on hover */
         box-shadow: inset 5px 5px 5px -1px #ccc4ce,
           inset -5px -5px 5px -1px #e3dbe6;
       }
@@ -183,19 +183,18 @@
         }
         button {
           height: 35px; /* Set a fixed height */
-          width: 17%;
+          width: 19%;
           font-size: 12px;
           text-align: center;
         }
         input {
-          width: 78%;
+          width: 77%;
           height: 35px;
           margin-right: 2%;
           font-size: 14px;
         }
         #data{
-          max-height: calc(100vh - 220px);
-
+          height: calc(100svh - 240px);
         }
       }
     </style>
@@ -339,8 +338,7 @@
         <nav class="navbar">
           <h1><a href="/">Datupedia</a></h1>
           <ul class="nav-links">
-            <li><a href="/how-it-works">How It Works</a></li>
-            <li><a href="/about">About</a></li>
+            <li>{{pagename}}</li>
           </ul>
         </nav>
       </header>
