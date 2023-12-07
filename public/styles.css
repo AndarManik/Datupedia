@@ -92,9 +92,7 @@ a {
   color: #ceb9e3;
   text-decoration: none;
 }
-p {
-  color: #ffffffd1; /* Changes color of all <p> (paragraph) elements to a medium gray */
-}
+
 a:hover {
   text-decoration: underline;
 }
