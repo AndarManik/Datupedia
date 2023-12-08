@@ -310,7 +310,7 @@ class WebSocketHandler {
       return;
     }
 
-    const generator = this.articleGenerators.get(user.clusterId);
+    const generator = this.articleGenerators.get(clusterId);
     const wikitext = generator.getWikiText();
     ws.send(
       JSON.stringify({
