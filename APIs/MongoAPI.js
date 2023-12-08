@@ -40,4 +40,20 @@ async function getInlinkData(pageName) {
   }
 }
 
+async function getInlinkData(pageName, numDocuments) {
+  try {
+    const cursor = db
+      .collection("datuPages")
+      .find({ pageName: pageName })
+      .limit(numDocuments); // Apply the limit here
+
+    return await cursor.toArray();
+  } catch (error) {
+    console.log(
+      `Error loading data from DB for page ${pageName}: ${error}`
+    );
+    return false;
+  }
+}
+
 module.exports = { connectToDb, getDb, getInlinkData };

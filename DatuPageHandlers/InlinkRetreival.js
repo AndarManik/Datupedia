@@ -36,7 +36,7 @@ class InlinkRetreival {
   }
 
   async fetchData() {
-    this.inlinkData = await getInlinkData(this.pageName);
+    this.inlinkData = await getInlinkData(this.pageName, 22);
     if (this.inlinkData.length > 0) {//The data has already been fetched
         this.isLargeEnough = this.inlinkData.length > 21;
         this.isFinished = true;
@@ -47,7 +47,7 @@ class InlinkRetreival {
 
     const fetchFuture = this._fetchPageData();
     const inlinks = await wikipediaAPI.getInlinks(this.pageName, InlinkRetreival.MAX_RETREIVE);
-
+    await fetchFuture;
 
     for (let i = 0; i < inlinks.length && this.inlinkData.length < InlinkRetreival.MAX_STORE; i += InlinkRetreival.MAX_REQUESTS) {
         const batch = inlinks.slice(i, i + InlinkRetreival.MAX_REQUESTS);
@@ -59,7 +59,6 @@ class InlinkRetreival {
         await delayFuture;
     }
 
-    await fetchFuture;
     this.isLargeEnough = this.inlinkData.length > 21;
     this.isFinished = true;
 }
@@ -75,6 +74,7 @@ class InlinkRetreival {
     paragraphs.forEach((paragraph, index) => {
       const embedding = embeddings[index];
       data.push(new Inlink(this.pageName + index, paragraph, embedding));
+      this.state = `${index / paragraphs.length * 20}`;
     });
 
     await this._saveToDb(data);
@@ -113,7 +113,7 @@ class InlinkRetreival {
   _logProgress(startTime, inlinksLength, dataLength) {
     const progress = Math.min(
       100,
-      (dataLength / Math.min(inlinksLength, InlinkRetreival.MAX_STORE)) * 100
+      (dataLength / Math.min(inlinksLength, InlinkRetreival.MAX_STORE)) * 80 + 20
     ); //in percent
     const runTimeSeconds = (Date.now() - startTime) / 1000; // in seconds
     const eta = (runTimeSeconds / dataLength) * (inlinksLength - dataLength);
@@ -148,7 +148,7 @@ class InlinkRetreival {
   }
 
   static async isLargeEnough(pageName) {
-    const data = await getInlinkData(pageName);
+    const data = await getInlinkData(pageName, 22);
     return (data.length > 21) 
   }
 }
