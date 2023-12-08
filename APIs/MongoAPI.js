@@ -40,7 +40,7 @@ async function getInlinkData(pageName) {
   }
 }
 
-async function getInlinkData(pageName, numDocuments) {
+async function getInlinkDataLimit(pageName, numDocuments) {
   try {
     const cursor = db
       .collection("datuPages")
@@ -56,4 +56,4 @@ async function getInlinkData(pageName, numDocuments) {
   }
 }
 
-module.exports = { connectToDb, getDb, getInlinkData };
+module.exports = { connectToDb, getDb, getInlinkData, getInlinkDataLimit };

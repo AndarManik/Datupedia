@@ -4,7 +4,7 @@ const OpenaiApi = require("../APIs/OpenaiAPI");
 const openai = new OpenaiApi();
 const TextExtractor = require("./TextExtractor");
 const textExtractor = new TextExtractor();
-const { getDb, getInlinkData } = require("../APIs/MongoAPI");
+const { getDb, getInlinkData, getInlinkDataLimit } = require("../APIs/MongoAPI");
 
 class Inlink {
   constructor(title, paragraph, embedding) {
@@ -36,7 +36,7 @@ class InlinkRetreival {
   }
 
   async fetchData() {
-    this.inlinkData = await getInlinkData(this.pageName, 22);
+    this.inlinkData = await getInlinkDataLimit(this.pageName, 22);
     if (this.inlinkData.length > 0) {//The data has already been fetched
         this.isLargeEnough = this.inlinkData.length > 21;
         this.isFinished = true;

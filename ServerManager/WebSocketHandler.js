@@ -129,7 +129,7 @@ class WebSocketHandler {
       JSON.stringify({
         status: "success",
         message: "Home Initialized",
-        state: "1",
+        state: "0",
       })
     );
     await retreivalPromise;
