@@ -4,7 +4,7 @@ const ArticleGenerator = require("../DatuPageHandlers/ArticleGenerator");
 const DatuChat = require("../DatuPageHandlers/DatuChat");
 const InlinkRetreival = require("../DatuPageHandlers/InlinkRetreival");
 const InlinkCluster = require("../DatuPageHandlers/InlinkCluster");
-const { getDb, getInlinkData } = require("../APIs/MongoAPI");
+const { getDb, getInlinkData, getInlinkDataLimit } = require("../APIs/MongoAPI");
 const WikipediaAPI = require("../APIs/WikipediaAPI");
 const wikipediaAPI = new WikipediaAPI();
 class WebSocketHandler {
@@ -121,6 +121,28 @@ class WebSocketHandler {
       return;
     }
 
+    const sizeTest = await getInlinkDataLimit(pageId, 22);
+
+    if (sizeTest.length > 21) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: "Home Complete",
+        })
+      );
+      return;
+    }
+
+    if(sizeTest.length !== 0) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: "Home Small",
+        })
+      );
+      return;
+    }
+
     const inlinkRetreivalInstance = new InlinkRetreival(pageId);
     const retreivalPromise = inlinkRetreivalInstance.fetchData();
     this.inlinkRetreivers.set(pageId, inlinkRetreivalInstance);
@@ -129,7 +151,7 @@ class WebSocketHandler {
       JSON.stringify({
         status: "success",
         message: "Home Initialized",
-        state: "0",
+        state: "5",
       })
     );
     await retreivalPromise;

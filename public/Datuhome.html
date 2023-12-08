@@ -215,6 +215,7 @@
       const ws = new WebSocket("{{wss}}");
       ws.addEventListener("open", () => {
         const statusDiv = document.getElementById("status");
+        updateLoadingBar("5");
         ws.send(
           JSON.stringify({
             type: "Initialize Home",

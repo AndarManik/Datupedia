@@ -26,7 +26,7 @@ class InlinkRetreival {
   constructor(pageName) {
     this.pageName = pageName;
     this.db = getDb();
-    this.state = "0";
+    this.state = "5";
 
     //These two variables are used for signaling when and how fetchData() finishes
     this.isLargeEnough = false;
@@ -36,14 +36,6 @@ class InlinkRetreival {
   }
 
   async fetchData() {
-    this.state = "5";
-    this.inlinkData = await getInlinkDataLimit(this.pageName, 22);
-    if (this.inlinkData.length > 0) {//The data has already been fetched
-        this.isLargeEnough = this.inlinkData.length > 21;
-        this.isFinished = true;
-        return;
-    }
-
     const startTime = Date.now();
 
     const fetchFuture = this._fetchPageData();
