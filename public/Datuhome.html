@@ -81,6 +81,8 @@
         text-align: center;
       }
       #status {
+        display: flex;
+        flex-direction: column;
         width: 100%;
         height: 40px;
         border-radius: 10px;
@@ -95,6 +97,10 @@
         transition: width 5s ease-in-out;
         border-radius: 8px;
       }
+
+      #loadingText {
+        text-align: center;
+      }
       #chat {
         display: none;
       }
@@ -108,8 +114,6 @@
         margin-top: 10px; /* Add 10px of space at the top */
         justify-content: space-around;
       }
-
-
 
       #chat {
         font-family: "Roboto Slab";
@@ -297,10 +301,13 @@
         // Select the status and loading bar elements
         const statusDiv = document.getElementById("status");
         const loadingBar = document.getElementById("loadingBar");
+        const loadingText = document.getElementById("loadingText");
 
         // Set the display of these elements to 'none' to hide them
         statusDiv.style.display = "none";
         loadingBar.style.display = "none";
+        loadingText.style.display = "none";
+
       };
 
       const addButtons = () => {
@@ -336,6 +343,9 @@
         </nav>
       </header>
       <div class="content">
+        <div id="loadingText">
+          <p>Loading, feel free to leave and comeback.</p>
+        </div>
         <div id="status">
           <div id="loadingBar"></div>
         </div>

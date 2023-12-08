@@ -36,6 +36,7 @@ class InlinkRetreival {
   }
 
   async fetchData() {
+    this.state = "5";
     this.inlinkData = await getInlinkDataLimit(this.pageName, 22);
     if (this.inlinkData.length > 0) {//The data has already been fetched
         this.isLargeEnough = this.inlinkData.length > 21;
@@ -74,7 +75,7 @@ class InlinkRetreival {
     paragraphs.forEach((paragraph, index) => {
       const embedding = embeddings[index];
       data.push(new Inlink(this.pageName + index, paragraph, embedding));
-      this.state = `${index / paragraphs.length * 20}`;
+      this.state = `${index / paragraphs.length * 15 + 5}`;
     });
 
     await this._saveToDb(data);
