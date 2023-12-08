@@ -149,7 +149,7 @@ class InlinkRetreival {
   }
 
   static async isLargeEnough(pageName) {
-    const data = await getInlinkData(pageName, 22);
+    const data = await getInlinkDataLimit(pageName, 22);
     return (data.length > 21) 
   }
 }
