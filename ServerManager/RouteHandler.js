@@ -18,6 +18,7 @@ class RouteHandler {
     this.app.get("/datu/:pagename/article", this.handleDatuPageArticle.bind(this));
     this.app.get("/datu/:pagename/chat", this.handleDatuPageChat.bind(this));
     this.app.get("/wiki/:pagename/article", this.handleWikiPage.bind(this));
+    this.app.get("/wiki/:pagename", this.handleWikiPage.bind(this));
     this.app.get("/how-it-works", this.handleHow.bind(this));
     this.app.get("/about", this.handleAbout.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
