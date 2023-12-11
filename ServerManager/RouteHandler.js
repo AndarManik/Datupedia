@@ -19,10 +19,10 @@ class RouteHandler {
     this.app.get("/datu/:pagename/chat", this.handleDatuPageChat.bind(this));
     this.app.get("/wiki/:pagename/article", this.handleWikiPage.bind(this));
     this.app.get("/wiki/:pagename", this.handleWikiPage.bind(this));
-    this.app.get("/sitemap", this.handleMap.bind(this));
     this.app.get("/how-it-works", this.handleHow.bind(this));
     this.app.get("/about", this.handleAbout.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
+    this.app.get("/sitemap.xml", this.handleSiteMap.bind(this));
   }
 
   handleRoot(req, res) {
@@ -113,9 +113,10 @@ class RouteHandler {
         res.status(500).send("Internal Server Error");
       }
   }
-  handleMap(req,res){
+
+  handleSiteMap(req,res){
     fs.readFile(
-        path.join(__dirname, "../public/sitemap.html"),
+        path.join(__dirname, "../public/sitemap.xml"),
         "utf8",
         (err, data) => {
           if (err) {
