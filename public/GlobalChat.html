@@ -50,6 +50,27 @@
         font-size: 0.85em; /* Smaller font size; adjust as needed */
       }
 
+      .wikiLink {
+        position: absolute; /* Position the element absolutely within its parent */
+        top: 10px; /* Distance from the top of the parent container */
+        right: 10px; /* Distance from the right of the parent container */
+        display: inline-block;
+        width: 15px;
+        height: 15px;
+        border-radius: 5px;
+        border: 2px solid #2f2b32;
+        background-color: #f1f1f1;
+      }
+
+      .wikiLink:hover {
+        background: #f1f1f1; /* Slightly lighter shade for hover */
+        box-shadow: 3px 3px 0px #2f2b32;
+      }
+
+      .wikiLink:active {
+        box-shadow: 1px 1px 0px #2f2b32;
+      }
+
       .tooltip p {
         margin: 0px;
       }
@@ -225,7 +246,7 @@
         -webkit-appearance: none;
         font-family: "Roboto Slab";
         border: 2px solid #2f2b32;
-        flex-grow:1;
+        flex-grow: 1;
         box-sizing: border-box; /* This line ensures padding and border are inside the width */
         color: #2f2b32;
         background: #f1f1f1;
@@ -279,7 +300,6 @@
         }
         .container {
           border-radius: 30px;
-
         }
         button {
           height: 35px; /* Set a fixed height */
@@ -341,29 +361,44 @@
             ws.send(JSON.stringify({ type: "Global Message", userId }));
             break;
           case "Citations":
-            citations.push(
-              data.citations.map((citation) => {
-                return (
-                  "<h2>" +
-                  citation.headings[0] +
-                  "</h2>" +
-                  (citation.headings.length != 1
-                    ? "<h3>" +
-                      citation.headings[citation.headings.length - 1] +
-                      "</h3>"
-                    : "") +
-                  "<p>" +
-                  citation.paragraph +
-                  "</p>"
-                );
-              })
-            );
+            formatCitation(data);
             break;
           case "End Global Message":
             addBotMessage(data.content);
             isWriting = false;
             break;
         }
+      };
+
+      const formatCitation = (data) => {
+        citations.push(
+          data.citations.map((citation) => {
+            return (
+              `<h2>${citation.headings[0]}${getWikiLink(
+                citation.headings
+              )}</h2>` +
+              (citation.headings.length !== 1
+                ? `<h3>${citation.headings[citation.headings.length - 1]}</h3>`
+                : "") +
+              `<p>${citation.paragraph}</p>`
+            );
+          })
+        );
+      };
+
+      const getWikiLink = (headings) => {
+        const baseUrl = "https://en.wikipedia.org/wiki/";
+        const title = encodeURIComponent(headings[0].replace(/ /g, "_"));
+        let url = baseUrl + title;
+
+        if (headings.length > 1) {
+          const subTitle = encodeURIComponent(
+            headings[headings.length - 1].replace(/ /g, "_")
+          );
+          url += "#" + subTitle;
+        }
+
+        return `<div class="wikiLink" onclick="window.open('${url}', '_blank')"></div>`;
       };
 
       ws.addEventListener("message", (event) => {
