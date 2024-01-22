@@ -11,7 +11,7 @@ class RouteHandler {
   }
 
   setupRoutes() {
-    this.app.get("/", this.handleRoot.bind(this));
+    this.app.get("/home", this.handleRoot.bind(this));
     this.app.get("/suggestions", this.handleSuggestions.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
     this.app.get("/datu/:pagename", this.handleDatuPageHome.bind(this));
@@ -23,6 +23,7 @@ class RouteHandler {
     this.app.get("/about", this.handleAbout.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
     this.app.get("/sitemap.xml", this.handleSiteMap.bind(this));
+    this.app.get("/", this.handleChat.bind(this));
   }
 
   handleRoot(req, res) {
@@ -180,6 +181,19 @@ class RouteHandler {
   }
   sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  async handleChat(req, res) {
+    try {
+      const filePath = path.join(__dirname, "../public/GlobalChat.html");
+      const fileContent = fs.readFileSync(filePath, "utf-8");
+      let renderedHtml = fileContent.replace(/{{userID}}/g, uuidv4());
+      renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS);
+      res.send(renderedHtml);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
   }
 }
 

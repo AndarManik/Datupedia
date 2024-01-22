@@ -153,7 +153,7 @@ class WikipediaAPI {
 
     const data = await this._apiCall(params);
     if (data && data.query && data.query.search) {
-      return data.query.search.map(item => item.title);
+      return data.query.search.map((item) => item.title);
     } else {
       console.log("An error occurred while fetching 'more like' results");
       return [];
@@ -170,12 +170,67 @@ class WikipediaAPI {
     };
 
     const data = await this._apiCall(params);
-    if (data && data.query && data.query.random && data.query.random.length > 0) {
+    if (
+      data &&
+      data.query &&
+      data.query.random &&
+      data.query.random.length > 0
+    ) {
       return data.query.random[0].title; // returns the title of the random article
     } else {
       console.log("An error occurred while fetching a random page");
       return null;
     }
+  }
+
+  async searchWikipedia(title) {
+    const params = {
+      action: "query",
+      list: "search",
+      srsearch: title,
+      format: "json",
+    };
+    const data = await this._apiCall(params);
+    return data.query.search;
+  }
+
+  async resolveRedirectsOrSearch(titles) {
+    const resolvedTitles = [];
+
+    const joinedTitles = titles.join("|");
+    const params = {
+      action: "query",
+      titles: joinedTitles,
+      redirects: "",
+      format: "json",
+    };
+    const data = await this._apiCall(params);
+
+    const redirects = data.query.redirects || [];
+    const normalized = data.query.normalized || [];
+    const redirectMap = Object.fromEntries(
+      redirects.map((r) => [r.from, r.to])
+    );
+    const normalizeMap = Object.fromEntries(
+      normalized.map((n) => [n.from, n.to])
+    );
+
+    for (const title of titles) {
+      let resolvedTitle = normalizeMap[title] || title;
+      resolvedTitle = redirectMap[resolvedTitle] || resolvedTitle;
+
+      if (!(resolvedTitle in data.query.pages)) {
+        const searchResults = await this.searchWikipedia(title);
+        resolvedTitle =
+          searchResults.length > 0
+            ? searchResults[0].title.toLowerCase()
+            : null;
+      }
+
+      resolvedTitles.push(resolvedTitle);
+    }
+
+    return [...new Set(resolvedTitles)];
   }
 }
 

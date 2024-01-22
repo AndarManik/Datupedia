@@ -26,6 +26,7 @@
     "express-rate-limit": "^6.11.0",
     "jsdom": "^22.1.0",
     "kmeans-js": "^0.1.2",
+    "mathjs": "^12.3.0",
     "ml-distance": "^4.0.1",
     "ml-kmeans": "^6.0.0",
     "mongodb": "^6.0.0",

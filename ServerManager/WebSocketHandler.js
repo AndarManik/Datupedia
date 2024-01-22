@@ -4,7 +4,11 @@ const ArticleGenerator = require("../DatuPageHandlers/ArticleGenerator");
 const DatuChat = require("../DatuPageHandlers/DatuChat");
 const InlinkRetreival = require("../DatuPageHandlers/InlinkRetreival");
 const InlinkCluster = require("../DatuPageHandlers/InlinkCluster");
-const { getDb, getInlinkData, getInlinkDataLimit } = require("../APIs/MongoAPI");
+const {
+  getDb,
+  getInlinkData,
+  getInlinkDataLimit,
+} = require("../APIs/MongoAPI");
 const WikipediaAPI = require("../APIs/WikipediaAPI");
 const wikipediaAPI = new WikipediaAPI();
 class WebSocketHandler {
@@ -26,13 +30,21 @@ class WebSocketHandler {
   }
 
   async handleMessage(ws, message) {
+    
     const parsedMessage = JSON.parse(message);
     const user = this.users.get(parsedMessage.userId);
 
     switch (parsedMessage.type) {
       case "Initialize Home":
-        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
-          await this.initializeHome(ws, parsedMessage.pageId, parsedMessage.userId);
+        if (
+          parsedMessage.pageId !== undefined &&
+          parsedMessage.userId !== undefined
+        ) {
+          await this.initializeHome(
+            ws,
+            parsedMessage.pageId,
+            parsedMessage.userId
+          );
         }
         break;
 
@@ -50,8 +62,15 @@ class WebSocketHandler {
         break;
 
       case "Initialize Cluster":
-        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
-          await this.initializeCluster(ws, parsedMessage.pageId, parsedMessage.userId);
+        if (
+          parsedMessage.pageId !== undefined &&
+          parsedMessage.userId !== undefined
+        ) {
+          await this.initializeCluster(
+            ws,
+            parsedMessage.pageId,
+            parsedMessage.userId
+          );
         }
         break;
 
@@ -62,30 +81,82 @@ class WebSocketHandler {
         break;
 
       case "Article Data Stream":
-        if (user && user.clusterId !== undefined && user.pageId !== undefined && user.position !== undefined) {
+        if (
+          user &&
+          user.clusterId !== undefined &&
+          user.pageId !== undefined &&
+          user.position !== undefined
+        ) {
           await this.sleep(250);
-          await this.clusterDataStream(ws, user.clusterId, user.pageId, user.position);
+          await this.clusterDataStream(
+            ws,
+            user.clusterId,
+            user.pageId,
+            user.position
+          );
         }
         break;
 
       case "RegenerateArticle":
-        if (user && user.clusterId !== undefined && user.pageId !== undefined && user.position !== undefined) {
-          await this.regenerateArticle(ws, user.clusterId, user.pageId, user.position);
+        if (
+          user &&
+          user.clusterId !== undefined &&
+          user.pageId !== undefined &&
+          user.position !== undefined
+        ) {
+          await this.regenerateArticle(
+            ws,
+            user.clusterId,
+            user.pageId,
+            user.position
+          );
         }
         break;
 
-      case "Initial Message":
-        if (parsedMessage.pageId !== undefined && parsedMessage.userId !== undefined) {
-          await this.initialMessage(ws, parsedMessage.pageId, parsedMessage.userId);
+      case "Initialize Global Message":
+        if (parsedMessage.userId !== undefined) {
+          await this.initializeGlobalChat(ws, parsedMessage.userId);
         }
         break;
+      case "Initial Message":
+        if (
+          parsedMessage.pageId !== undefined &&
+          parsedMessage.userId !== undefined
+        ) {
+          await this.initialMessage(
+            ws,
+            parsedMessage.pageId,
+            parsedMessage.userId
+          );
+        }
+        break;
+
+      case "Global Message":
+          if (
+            user &&
+            user.isGenerating !== undefined &&
+            user.chatLog !== undefined
+          ) {
+            await this.sendGlobalMessage(ws, user.isGenerating, user.chatLog);
+            await this.sleep(350);
+          }
+          break;  
 
       case "Message":
-        if (user && user.isGenerating !== undefined && user.chatLog !== undefined) {
+        if (
+          user &&
+          user.isGenerating !== undefined &&
+          user.chatLog !== undefined
+        ) {
           await this.sleep(250);
           await this.sendMessage(ws, user.isGenerating, user.chatLog);
         }
         break;
+      case "New Global Message":
+          if (user && parsedMessage.message !== undefined) {
+            await this.newGlobalMessage(ws, user, parsedMessage.message);
+          }
+          break;
 
       case "New Message":
         if (user && parsedMessage.message !== undefined) {
@@ -104,7 +175,6 @@ class WebSocketHandler {
         break;
     }
   }
-
 
   async initializeHome(ws, pageId, userId) {
     const user = { pageId };
@@ -133,7 +203,7 @@ class WebSocketHandler {
       return;
     }
 
-    if(sizeTest.length !== 0) {
+    if (sizeTest.length !== 0) {
       ws.send(
         JSON.stringify({
           status: "success",
@@ -221,10 +291,10 @@ class WebSocketHandler {
           message: "Loading Cluster",
         })
       );
-      return
+      return;
     }
 
-    if(await this.isClusterDone(pageId)){
+    if (await this.isClusterDone(pageId)) {
       ws.send(
         JSON.stringify({
           status: "success",
@@ -234,7 +304,7 @@ class WebSocketHandler {
       return;
     }
 
-    const processPromise = this.inlinkClusterProcess(pageId)
+    const processPromise = this.inlinkClusterProcess(pageId);
     this.inlinkClusters.set(pageId, processPromise);
     ws.send(
       JSON.stringify({
@@ -259,13 +329,13 @@ class WebSocketHandler {
     const db = getDb();
     const collection = db.collection("datuCluster");
 
-    const data = await collection.findOne({ _id: pageName + "VERSION"});
+    const data = await collection.findOne({ _id: pageName + "VERSION" });
     if (data) {
-      if(!data.version) {
+      if (!data.version) {
         console.log("no version");
         return false;
       }
-      if(data.version !== 1.3) {
+      if (data.version !== 1.3) {
         console.log("wrong version");
         return false;
       }
@@ -297,10 +367,7 @@ class WebSocketHandler {
       return;
     }
 
-    const articleGenerator = new ArticleGenerator(
-      user.pageId,
-      position
-    );
+    const articleGenerator = new ArticleGenerator(user.pageId, position);
     const generatorPromise = articleGenerator.generatePage();
     this.articleGenerators.set(clusterId, articleGenerator);
 
@@ -318,10 +385,7 @@ class WebSocketHandler {
 
   async clusterDataStream(ws, clusterId, pageId, position) {
     if (!this.articleGenerators.has(clusterId)) {
-      const parsedText = await ArticleGenerator.getParsedText(
-        pageId,
-        position
-      );
+      const parsedText = await ArticleGenerator.getParsedText(pageId, position);
       ws.send(
         JSON.stringify({
           status: "success",
@@ -385,6 +449,25 @@ class WebSocketHandler {
     this.articleGenerators.delete(clusterId);
   }
 
+  async initializeGlobalChat(ws, userId) {
+    const user = {
+      chatLog: [],
+      isGenerating: false,
+    };
+    this.users.set(userId, user);
+
+    const message = { assistant: `<p>Hello! I'm Datupedia, your go-to chatbot for reasoning with facts. I have access to Wikipedia to ensure that my responses are factual and well-informed. Feel free to ask me anything!<span citation="[0,1]">[1]</span><span citation="[0,2]">[2]</span></p>` };
+    user.chatLog.push(message);
+
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: "Global Message",
+        content: message.assistant,
+      })
+    );
+  }
+
   async initialMessage(ws, pageId, userId) {
     const user = {
       pageId,
@@ -415,6 +498,26 @@ class WebSocketHandler {
     user.isGenerating = false;
   }
 
+  async sendGlobalMessage(ws, isGenerating, chatLog) {
+    if (!isGenerating) {
+      ws.send(
+        JSON.stringify({
+          status: "success",
+          message: `End Global Message`,
+          content: chatLog[chatLog.length - 1].assistant,
+        })
+      );
+      return;
+    }
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: `Global Message`,
+        content: chatLog[chatLog.length - 1].assistant,
+      })
+    );
+  }
+
   async sendMessage(ws, isGenerating, chatLog) {
     if (!isGenerating) {
       ws.send(
@@ -433,6 +536,46 @@ class WebSocketHandler {
         content: chatLog[chatLog.length - 1].assistant,
       })
     );
+  }
+
+  async newGlobalMessage(ws, user, content) {
+    user.isGenerating = true;
+    const userMessage = {};
+    userMessage.user = content;
+    user.chatLog.push(userMessage);
+
+    const {messageStream, nearestText} = await DatuChat.generateGlobalMessage(
+      user.chatLog
+    );
+    const botMessage = {};
+    botMessage.assistant = ``;
+    user.chatLog.push(botMessage);
+
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: `Citations`,
+        citations: nearestText,
+      })
+    )
+
+    ws.send(
+      JSON.stringify({
+        status: "success",
+        message: `Global Message`,
+        content: "",
+      })
+    );
+
+    let prevChunk = null;
+    console.log(messageStream);
+    for await (const chunk of messageStream) {
+      if (prevChunk !== null) {
+        botMessage.assistant += prevChunk.choices[0].delta.content;
+      }
+      prevChunk = chunk;
+    }
+    user.isGenerating = false;
   }
 
   async newMessage(ws, user, content) {
@@ -475,7 +618,7 @@ class WebSocketHandler {
     }, 10000); // Send "ping" every 10 seconds
   }
   sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

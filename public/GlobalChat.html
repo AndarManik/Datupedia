@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0,maximum-scale=1, user-scalable=no"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      .container {
+        flex-grow: 1; /* Allow the container to fill the available space */
+        display: flex;
+        flex-direction: column;
+        width: 90%;
+        max-width: 650px;
+        margin: 0px auto; /* Maintains the top and bottom margin */
+        padding: 10px;
+        overflow: hidden; /* Prevents content from overflowing */
+      }
+
+      #data {
+        height: calc(100svh - 290px);
+
+        margin-bottom: 20px; /* Adds space above and below */
+        margin-top: 10px;
+        width: 100%;
+        flex-grow: 1; /* Allows the content to fill the space */
+        overflow-y: scroll; /* Add scroll for vertical overflow */
+        border: 2px solid #2f2b32;
+        border-radius: 10px;
+        font-size: 16px;
+        line-height: 20px;
+      }
+
+      .tooltip {
+        box-shadow: 5px 5px 0px #2f2b32;
+        max-width: 400px;
+        position: absolute;
+        padding: 10px;
+        background-color: #f1f1f1;
+        color: #2f2b32;
+        border: 1px solid #2f2b32;
+        border-radius: 10px;
+        opacity: 0; /* Start invisible */
+        transition: opacity 0.3s;
+        z-index: 1000; /* Make sure it's on top of other elements */
+        font-size: 0.85em; /* Smaller font size; adjust as needed */
+      }
+
+      .tooltip p {
+        margin: 0px;
+      }
+
+      .tooltip h2 {
+        margin: 0px;
+        padding: 0px;
+      }
+      .tooltip h3 {
+        margin: 0px;
+      }
+
+      /* To smoothly transition the tooltip in and out */
+      .show-tooltip {
+        opacity: 1;
+      }
+
+      span[citation] {
+        display: inline-block; /* Or 'inline' depending on the exact behavior you want */
+        margin: 0; /* Adjust margin as needed */
+        padding: 0; /* Adjust padding as needed */
+        font-size: 0.8em; /* Smaller font size; adjust as needed */
+        color: #a260f8;
+        /* Additional styling here */
+      }
+
+      span[citation]:hover {
+        cursor: default;
+      }
+      body {
+        background: #f1f1f1;
+        font-family: "Roboto Slab";
+        margin: 0;
+        line-height: 1.3;
+        color: #2f2b32;
+        display: flex;
+        flex-direction: column;
+        height: 100svh;
+        font-weight: 500;
+        word-spacing: 1px;
+      }
+
+      .spinner {
+        display: inline-block; /* Or 'inline' depending on the exact behavior you want */
+        border-radius: 10px;
+        width: 30px;
+        height: 30px;
+        background-color: #f1f1f1; /* or any color of your choice */
+        border: 2px solid #2f2b32;
+        animation: oscillate 1s infinite;
+        margin-bottom: 10px;
+      }
+
+      @keyframes oscillate {
+        0%,
+        100% {
+          box-shadow: 5px 5px 0px #2f2b32;
+        }
+        50% {
+          box-shadow: 0px 0px 0px #2f2b32;
+        }
+      }
+
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #f1f1f1;
+      }
+
+      .navbar h1 {
+        margin: 0;
+        font-size: 24px;
+      }
+
+      .nav-links {
+        list-style-type: none;
+        margin: 0;
+        padding: 0;
+      }
+      a {
+        color: #a260f8;
+        text-decoration: none;
+      }
+
+      p {
+        margin-top: 0px;
+      }
+
+      .nav-links li {
+        display: inline;
+        margin-left: 20px;
+        font-size: 24px;
+      }
+
+      .content {
+        display: flex;
+        flex-direction: column;
+        flex-grow: 1; /* Allows the content to fill the space */
+        justify-content: space-between; /* Distributes space between children */
+        box-sizing: border-box;
+        padding: 0px;
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        line-height: 40px;
+      }
+
+      /* Styling the scrollbar track (the part the thumb moves along) */
+      #data::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light grey track */
+        border-radius: 10px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+
+      /* Styling the scrollbar thumb (the part you drag) */
+      #data::-webkit-scrollbar-thumb {
+        background: #2f2b32; /* Dark grey thumb */
+        border-radius: 10px;
+      }
+
+      /* Styling the scrollbar thumb on hover */
+      #data::-webkit-scrollbar-thumb:hover {
+        background: #796f81; /* Darker grey on hover */
+      }
+
+      /* Styling the scrollbar itself (width or height) */
+      #data::-webkit-scrollbar {
+        width: 10px; /* Width of the vertical scrollbar */
+        height: 10px; /* Height of the horizontal scrollbar */
+      }
+
+      .user {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
+        margin-left: 25px;
+      }
+
+      .bot {
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 10px;
+        margin: 0px;
+      }
+
+      .navbar a {
+        color: #2f2b32;
+        text-decoration: none;
+        transition: color 0.3s ease-in-out;
+      }
+
+      .navbar a:hover {
+        color: #a260f8; /* Change color on hover */
+      }
+
+      h1,
+      h2,
+      h3,
+      h4 {
+        text-align: center;
+      }
+      input {
+        -webkit-appearance: none;
+        font-family: "Roboto Slab";
+        border: 2px solid #2f2b32;
+
+        box-sizing: border-box; /* This line ensures padding and border are inside the width */
+        color: #2f2b32;
+        background: #f1f1f1;
+        padding: 12px;
+        width: 82%;
+        height: 50px;
+        transition: width 0.3s ease-in-out;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        margin-right: 2%;
+        font-size: 16px;
+      }
+      input::placeholder {
+        color: #2f2b32; /* Replace #yourColorCode with the color you want */
+      }
+
+      input:focus {
+        outline: none;
+        box-shadow: 5px 5px 0px #2f2b32;
+      }
+      button {
+        font-family: "Roboto Slab";
+        border: 2px solid #2f2b32;
+        height: 50px; /* Set a fixed height */
+        margin-bottom: 10px;
+        width: 15%;
+        background: #f1f1f1; /* Same as body background */
+        color: #2f2b32; /* Matching the anchor tag color */
+        cursor: pointer; /* Make the button show a hand cursor on hover */
+        font-size: 18px;
+        border-radius: 10px;
+        border-radius: 10px;
+        text-align: center;
+        font-size: 16px;
+      }
+      button:hover {
+        background: #f1f1f1; /* Slightly lighter shade for hover */
+        box-shadow: 5px 5px 0px #2f2b32;
+      }
+
+      button:active {
+        box-shadow: 3px 3px 0px #2f2b32;
+      }
+
+      @media only screen and (max-width: 620px) {
+        .navbar h1 {
+          font-size: 16px;
+        }
+
+        .nav-links li {
+          margin-left: 0px;
+          font-size: 16px;
+        }
+        .container {
+          width: 70%;
+          max-width: 500px;
+          border-radius: 30px;
+          padding: 30px;
+        }
+        button {
+          height: 35px; /* Set a fixed height */
+          width: 19%;
+          font-size: 12px;
+          text-align: center;
+        }
+        input {
+          width: 77%;
+          height: 35px;
+          margin-right: 2%;
+          font-size: 14px;
+        }
+        #data {
+          height: calc(100svh - 240px);
+        }
+      }
+    </style>
+    <title>Datupedia</title>
+    <script>
+      const userId = "{{userID}}"; // Assume you have some way to populate this value
+      const ws = new WebSocket("{{wss}}");
+
+      var isWriting = true;
+      var isUserScrolling = false;
+
+      var citations = [
+        [
+          `These citation reveal the facts from Wikipedia which are used in the response. Datupedia will include these citations throughout this chat to ensure everything is fact checked.`,
+          `You may see multiple citations in a group. This happens when Datupedia integrates multiple sources of information.`,
+        ],
+      ]; // Your list of citations
+
+      ws.addEventListener("open", () => {
+        const statusDiv = document.getElementById("status");
+        ws.send(
+          JSON.stringify({
+            type: "Initialize Global Message",
+            userId,
+          })
+        );
+      });
+      // Function to handle the server response
+      const handleServerResponse = (data) => {
+        const statusDiv = document.getElementById("status");
+        const dataDiv = document.getElementById("data");
+        if (data.status === "error") {
+          statusDiv.innerHTML = data.message;
+          return;
+        }
+
+        if (data.status === "ping") {
+          ws.send(JSON.stringify({ type: "pong", userId }));
+          return;
+        }
+
+        switch (data.message) {
+          case "Global Message":
+            addBotMessage(data.content);
+            ws.send(JSON.stringify({ type: "Global Message", userId }));
+            break;
+          case "Citations":
+            citations.push(
+              data.citations.map((citation) => {
+                return (
+                  "<h2>" +
+                  citation.headings[0] +
+                  "</h2>" +
+                  (citation.headings.length != 1
+                    ? "<h3>" +
+                      citation.headings[citation.headings.length - 1] +
+                      "</h3>"
+                    : "") +
+                  "<p>" +
+                  citation.paragraph +
+                  "</p>"
+                );
+              })
+            );
+            break;
+          case "End Global Message":
+            addBotMessage(data.content);
+            isWriting = false;
+            break;
+        }
+      };
+
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleServerResponse(data);
+      });
+
+      window.addEventListener("unload", () => {
+        ws.send(JSON.stringify({ type: "disconnect", userId }));
+
+        setTimeout(() => {
+          ws.close();
+        }, 100);
+      });
+
+      const addBotMessage = (content) => {
+        const dataField = document.getElementById("data");
+        dataField.lastElementChild.innerHTML = content;
+        if (!isUserScrolling) {
+          scrollToBottom();
+        }
+      };
+
+      const sendMessage = () => {
+        if (isWriting) {
+          return;
+        }
+        const inputField = document.getElementById("chatInput");
+        const query = inputField.value;
+        if (query === "") {
+          return;
+        }
+
+        inputField.value = "";
+        isUserScrolling = false;
+        isWriting = true;
+
+        const dataField = document.getElementById("data");
+        const newDiv = document.createElement("div");
+        newDiv.classList.add("user");
+        newDiv.textContent = query;
+        dataField.appendChild(newDiv);
+
+        const botDiv = document.createElement("div");
+        botDiv.classList.add("bot");
+        dataField.appendChild(botDiv);
+
+        const spinner = document.createElement("div");
+        spinner.classList.add("spinner");
+        botDiv.appendChild(spinner);
+
+        scrollToBottom();
+        ws.send(
+          JSON.stringify({ type: "New Global Message", message: query, userId })
+        );
+
+        console.log("sent to ws");
+      };
+
+      function scrollToBottom() {
+        var div = document.getElementById("data");
+        div.scrollTop = div.scrollHeight;
+      }
+      document.addEventListener("DOMContentLoaded", (event) => {
+        const inputField = document.getElementById("chatInput");
+
+        inputField.addEventListener("keypress", function (e) {
+          if (e.key === "Enter") {
+            sendMessage();
+          }
+        });
+        const scrollableDiv = document.getElementById("data");
+        const div = document.getElementById("data");
+        scrollableDiv.addEventListener("wheel", function (event) {
+          if (event.deltaY < 0) {
+            // Check if scrolling up
+            console.log("Scroll");
+            isUserScrolling = true;
+          }
+          if (event.deltaY >= 0 && isScrolledToBottom(div)) {
+            isUserScrolling = false;
+          }
+        });
+
+        // Create a tooltip element
+        var tooltip = document.createElement("div");
+        tooltip.classList.add("tooltip");
+        document.body.appendChild(tooltip);
+
+        // Flag to track if mouse is over a citation div or tooltip
+        var isMouseOver = false;
+
+        // Function to update tooltip content and position
+        function updateTooltip(text, x, y) {
+          tooltip.innerHTML = text;
+
+          // Calculate tooltip's position
+          tooltip.style.left = Math.max(0, x - tooltip.offsetWidth / 2) + "px";
+          tooltip.style.top = Math.max(0, y - tooltip.offsetHeight) + "px";
+
+          // Show tooltip
+          tooltip.style.visibility = "visible";
+          tooltip.style.opacity = "1";
+          isMouseOver = true;
+        }
+
+        // Function to hide tooltip
+        function hideTooltip() {
+          if (!isMouseOver) {
+            tooltip.style.visibility = "hidden";
+            tooltip.style.opacity = "0";
+          }
+        }
+
+        // Event to show tooltip on mouseover
+        document.body.addEventListener("mouseover", function (event) {
+          if (event.target.matches("span[citation]")) {
+            var indexes = JSON.parse(event.target.getAttribute("citation"));
+            var rect = event.target.getBoundingClientRect();
+            var posX = rect.left + window.scrollX; // X position of the element
+            var posY = rect.top + window.scrollY; // Y position of the element
+
+            updateTooltip(citations[indexes[0]][indexes[1] - 1], posX, posY);
+          }
+        });
+
+        // Event to hide tooltip on mouseout
+        document.body.addEventListener("mouseout", function (event) {
+          if (event.target.matches("span[citation]")) {
+            isMouseOver = false;
+            setTimeout(hideTooltip, 150); // Delayed hide
+          }
+        });
+
+        // Prevent hiding if mouse is over tooltip
+        tooltip.addEventListener("mouseover", function () {
+          isMouseOver = true;
+        });
+
+        // Hide tooltip when mouse leaves tooltip
+        tooltip.addEventListener("mouseout", function () {
+          isMouseOver = false;
+          setTimeout(hideTooltip, 150); // Delayed hide
+        });
+      });
+
+      function isScrolledToBottom(div) {
+        var totalScrollHeight = div.scrollHeight;
+        var visibleHeight = div.clientHeight;
+        var currentScrollPosition = div.scrollTop;
+        return currentScrollPosition >= totalScrollHeight - visibleHeight - 10;
+      }
+    </script>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <nav class="navbar">
+          <h1><a href="/">Datupedia</a></h1>
+          <ul class="nav-links">
+            <li></li>
+          </ul>
+        </nav>
+      </header>
+      <div class="content">
+        <div id="data">
+          <div class="bot">Give me second while I fetch some files.</div>
+        </div>
+
+        <div class="inputField">
+          <input
+            type="text"
+            id="chatInput"
+            name="chatInput"
+            placeholder="Message "
+            required
+            autocomplete="off"
+          />
+          <button onclick="sendMessage()">Send</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
