@@ -18,7 +18,20 @@ class DatuChat {
 
   static async generateGlobalMessage(chatLog) {
     console.log(chatLog);
-    return await this.ragGlobalResponse(chatLog.slice(-8), 3);
+    let attempts = 0;
+
+    while (attempts < 5) {
+      try {
+        return await this.ragGlobalResponse(chatLog.slice(-8), 3);
+      } catch (error) {
+        console.error("Attempt failed:", attempts, error);
+        attempts++;
+
+        if (attempts >= 5) {
+          throw error; // Re-throw the error if all attempts fail
+        }
+      }
+    }
   }
 
   static async ragGlobalResponse(chatLog, k) {
@@ -29,7 +42,11 @@ class DatuChat {
       return { role, content };
     });
     console.log(`ragGlobalResponse ${k}`);
-    const nearestText = await this.findGlobalNearestTexts(convertedChat, chatIndex, k);
+    const nearestText = await this.findGlobalNearestTexts(
+      convertedChat,
+      chatIndex,
+      k
+    );
     const nearestTextforGPT = this.parseforGPT(nearestText);
     console.log(nearestTextforGPT);
     const systemPrompt = `
@@ -40,27 +57,30 @@ class DatuChat {
     Use html to format your response using tags such as <h>, <p>, <b>, and so on. 
     Use citations at the end of sentences by referencing the index in "what you know".
     This is done by inserting a span tag with an attribute "citation"=Knowledge Index, the text of the span should be the second value in the array in brackets.
-    Here is an example for index = [ 6, 12 ]:
+    Here is an example for Knowledge Index = 6, 12
     <p>This text is in a p tag and will end with a citation, this citation must be before the p tag ends.<span citation="[6,12]">[12]</span></p>
     If multiple citations are needed for at the end of a sentence, use seperate spans, for example:
     DO THIS: <span citation="[2,1]">[1]</span><span citation="[2,4]">[4]</span><span citation="[2,11]">[11]</span>
     `;
-    const messageStream = await openai.gpt4StreamChatLog(systemPrompt, convertedChat);
-    return {messageStream , nearestText};
+    const messageStream = await openai.gpt4StreamChatLog(
+      systemPrompt,
+      convertedChat
+    );
+    return { messageStream, nearestText };
   }
 
   static parseforGPT(nearestText) {
     const text = [];
     nearestText.forEach((nearest) => {
-        const stringToAdd = `
+      const stringToAdd = `
 Knowledge Index = ${nearest.index}
 Titles = ${nearest.headings}
 Text = "${nearest.paragraph}"
 Links = ${nearest.links}
 Knowledge End
         `;
-        text.push(stringToAdd);
-    })
+      text.push(stringToAdd);
+    });
     return text.join("");
   }
   /*
@@ -81,22 +101,7 @@ Knowledge End
       Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics", are references heavily and thus would require a larger search space.
       These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
       Example Format:
-      {
-        articles: [
-          'supervised learning',
-          'unsupervised learning',
-          'reinforcement learning',
-          'deep learning',
-          'transfer learning'
-        ],
-        paragraphs: [
-          'Supervised learning is a vital branch of machine learning and involves training a model on a labeled dataset, allowing it to make predictions or decisions based on the provided input data.',
-          'Unsupervised learning, as a core field of machine learning, involves training models on input data without labeled responses, aiming to draw inferences from datasets to describe hidden structures or underlying patterns.',
-          'Reinforcement learning is a key area in machine learning, where an agent learns to make decisions by interacting with an environment to achieve the highest cumulative reward.',
-          'Deep learning, a specialized subset of machine learning, leverages neural networks with numerous layers to analyze data and extract intricate patterns for decision making and prediction.',
-          'Transfer learning is a field in machine learning that explores the strategy of transferring knowledge from one domain to another, often utilizing pre-trained models to tackle new, but related, problems.'  
-        ]
-      }
+      { articles: ["title","title"], paragraphs: ["text","text"] }
       `;
     const data = await openai.gpt3ChatLogJSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
