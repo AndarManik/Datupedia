@@ -53,7 +53,8 @@ class DatuChat {
     "What you know": '${nearestTextforGPT}'
     Response Guidlines: 
     Construct an accurate and neutral response to the user's query by utilizing only "what you know". 
-    Utilize as much of "what you know" by being detailed and thorough, while being interesting and exciting. 
+    Utilize as much of "what you know" by being detailed and thorough, while being interesting and exciting.\
+    The way "What you know" was obtained through querying a vector database contain all of wikipedia.
     Use html to format your response using tags such as <h>, <p>, <b>, and so on. 
     Use citations at the end of sentences by referencing the index in "what you know".
     This is done by inserting a span tag with an attribute "citation"=Knowledge Index, the text of the span should be the second value in the array in brackets.

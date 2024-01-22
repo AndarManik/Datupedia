@@ -456,7 +456,7 @@ class WebSocketHandler {
     };
     this.users.set(userId, user);
 
-    const message = { assistant: `<p>Hello! I'm Datupedia, your go-to chatbot for reasoning with facts. I have access to Wikipedia to ensure that my responses are factual and well-informed. Feel free to ask me anything!<span citation="[0,1]">[1]</span><span citation="[0,2]">[2]</span></p>` };
+    const message = { assistant: `<p>Hello! I'm Datupedia, your go-to chatbot for reasoning with facts. I have access to Wikipedia to ensure that my responses are factual and well-informed, do note that I'm still being made so I might display text formated incorrectly. Feel free to ask me anything!<span citation="[0,1]">[1]</span><span citation="[0,2]">[2]</span></p>` };
     user.chatLog.push(message);
 
     ws.send(
