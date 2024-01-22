@@ -57,7 +57,7 @@ class DatuChat {
     Use html to format your response using tags such as <h>, <p>, <b>, and so on. 
     Use citations at the end of sentences by referencing the index in "what you know".
     This is done by inserting a span tag with an attribute "citation"=Knowledge Index, the text of the span should be the second value in the array in brackets.
-    Here is an example for Knowledge Index = 6, 12
+    Here is an example for Knowledge Index = [6,12]
     <p>This text is in a p tag and will end with a citation, this citation must be before the p tag ends.<span citation="[6,12]">[12]</span></p>
     If multiple citations are needed for at the end of a sentence, use seperate spans, for example:
     DO THIS: <span citation="[2,1]">[1]</span><span citation="[2,4]">[4]</span><span citation="[2,11]">[11]</span>
@@ -73,10 +73,10 @@ class DatuChat {
     const text = [];
     nearestText.forEach((nearest) => {
       const stringToAdd = `
-Knowledge Index = ${nearest.index}
+Knowledge Index = [${nearest.index}]
 Titles = ${nearest.headings}
 Text = "${nearest.paragraph}"
-Links = ${nearest.links}
+Links = [${nearest.links}]
 Knowledge End
         `;
       text.push(stringToAdd);
