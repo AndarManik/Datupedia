@@ -24,7 +24,6 @@
 
       #data {
         height: calc(100svh - 290px);
-
         margin-bottom: 20px; /* Adds space above and below */
         margin-top: 10px;
         width: 100%;
@@ -217,21 +216,24 @@
       h4 {
         text-align: center;
       }
+
+      .inputField {
+        display: flex;
+        gap: 10px;
+      }
       input {
         -webkit-appearance: none;
         font-family: "Roboto Slab";
         border: 2px solid #2f2b32;
-
+        flex-grow:1;
         box-sizing: border-box; /* This line ensures padding and border are inside the width */
         color: #2f2b32;
         background: #f1f1f1;
         padding: 12px;
-        width: 82%;
         height: 50px;
         transition: width 0.3s ease-in-out;
         border-radius: 10px;
         margin-bottom: 10px;
-        margin-right: 2%;
         font-size: 16px;
       }
       input::placeholder {
@@ -276,25 +278,22 @@
           font-size: 16px;
         }
         .container {
-          width: 70%;
-          max-width: 500px;
           border-radius: 30px;
-          padding: 30px;
+
         }
         button {
           height: 35px; /* Set a fixed height */
-          width: 19%;
+          width: 15%;
           font-size: 12px;
           text-align: center;
         }
         input {
-          width: 77%;
           height: 35px;
-          margin-right: 2%;
           font-size: 14px;
         }
         #data {
           height: calc(100svh - 240px);
+          border: 0px solid #f1f1f1;
         }
       }
     </style>
