@@ -8,7 +8,7 @@ var pca;
 (async () => {
   pca = await createPCA();
 })();
-const db = getDbGlobal();
+const dbGlobal = getDbGlobal();
 
 class DatuChat {
   static async generateInitialMessage(pageName) {
@@ -120,7 +120,7 @@ Knowledge End
       openai.ada(searchString)
     ]);
     const embedding = pca(preReduce).slice(0, 250);
-    const searchOperation = this.searchWithEmbedding(db, embedding, article, k);
+    const searchOperation = this.searchWithEmbedding(embedding, article, k);
     try {
       // Run all search operations concurrently and wait for all of them to complete
       const results = await searchOperation;
@@ -148,7 +148,7 @@ Knowledge End
 
     // Map each embedding to a search operation
     const searchOperations = embeddings.map((embedding) => {
-      return this.searchWithEmbedding(db, embedding, articles, k);
+      return this.searchWithEmbedding(embedding, articles, k);
     });
 
     try {
@@ -183,9 +183,9 @@ Knowledge End
     return Array.from(unique.values()).map(({ _id, ...rest }) => rest);
   }
 
-  static async searchWithEmbedding(db, embedding, articles, k) {
+  static async searchWithEmbedding(embedding, articles, k) {
     try {
-      const cursor = await db.collection("embeddings").aggregate([
+      const cursor = await dbGlobal.collection("embeddings").aggregate([
         {
           $vectorSearch: {
             index: "vector_index",

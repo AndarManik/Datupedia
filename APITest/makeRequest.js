@@ -3,8 +3,8 @@ async function callApi() {
     
     const url = 'https://datupedia.com/api/stringsearch';
     const data = {
-        searchString: "Your search string",
-        articleTitles: ["Title1", "Title2", "Title3"],
+        searchString: "What is philosphy?",
+        articleTitles: ["philosophy", "Knowledge", "experience"],
         k: 5
     };
 
