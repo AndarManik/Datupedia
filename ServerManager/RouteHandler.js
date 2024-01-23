@@ -201,8 +201,8 @@ class RouteHandler {
   }
 
   async kStringSearch(req, res) {
-    const searchString = req.query.SearchString; // A text string
-    const articleTitles = req.query.ArticleTitles; // Array of strings, sent as comma-separated values
+    const searchString = req.query.searchString; // A text string
+    const articleTitles = req.query.articleTitles; // Array of strings, sent as comma-separated values
     const k = parseInt(req.query.k, 10); // A number
     res.json(await DatuChat.stringSearch(searchString, articleTitles,k));
   }
