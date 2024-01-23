@@ -11,7 +11,7 @@ class RouteHandler {
   }
 
   setupRoutes() {
-    this.app.get("/home", this.handleRoot.bind(this));
+    this.app.get("/", this.handleRoot.bind(this));
     this.app.get("/suggestions", this.handleSuggestions.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
     this.app.get("/datu/:pagename", this.handleDatuPageHome.bind(this));
@@ -23,7 +23,7 @@ class RouteHandler {
     this.app.get("/about", this.handleAbout.bind(this));
     this.app.get("/random", this.handleRandom.bind(this));
     this.app.get("/sitemap.xml", this.handleSiteMap.bind(this));
-    this.app.get("/", this.handleChat.bind(this));
+    this.app.get("/chat", this.handleChat.bind(this));
   }
 
   handleRoot(req, res) {

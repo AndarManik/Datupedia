@@ -38,6 +38,7 @@
       .tooltip {
         box-shadow: 5px 5px 0px #2f2b32;
         max-width: 400px;
+        max-height: 400px; /* Set the maximum height as needed */
         position: absolute;
         padding: 10px;
         background-color: #f1f1f1;
@@ -48,6 +49,36 @@
         transition: opacity 0.3s;
         z-index: 1000; /* Make sure it's on top of other elements */
         font-size: 0.85em; /* Smaller font size; adjust as needed */
+        box-sizing: border-box;
+      }
+
+      .tooltip p {
+        overflow-y: scroll; /* Enable vertical scrolling */
+        max-height: 180px; /* Set the maximum height as needed */
+      }
+
+      .tooltip p::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Light grey track */
+        border-radius: 10px;
+        margin-top: 3px;
+        margin-bottom: 3px;
+      }
+
+      /* Styling the scrollbar thumb (the part you drag) */
+      .tooltip p::-webkit-scrollbar-thumb {
+        background: #2f2b32; /* Dark grey thumb */
+        border-radius: 10px;
+      }
+
+      /* Styling the scrollbar thumb on hover */
+      .tooltip p::-webkit-scrollbar-thumb:hover {
+        background: #796f81; /* Darker grey on hover */
+      }
+
+      /* Styling the scrollbar itself (width or height) */
+      .tooltip p::-webkit-scrollbar {
+        width: 5px; /* Width of the vertical scrollbar */
+        height: 5px; /* Height of the horizontal scrollbar */
       }
 
       .wikiLink {
@@ -208,9 +239,7 @@
       }
 
       .user {
-        padding-left: 10px;
-        padding-right: 10px;
-        padding-top: 10px;
+        padding: 10px;
         margin-left: 25px;
       }
 
@@ -290,27 +319,6 @@
       }
 
       @media only screen and (max-width: 620px) {
-        .navbar h1 {
-          font-size: 16px;
-        }
-
-        .nav-links li {
-          margin-left: 0px;
-          font-size: 16px;
-        }
-        .container {
-          border-radius: 30px;
-        }
-        button {
-          height: 35px; /* Set a fixed height */
-          width: 15%;
-          font-size: 12px;
-          text-align: center;
-        }
-        input {
-          height: 35px;
-          font-size: 14px;
-        }
         #data {
           height: calc(100svh - 240px);
           border: 0px solid #f1f1f1;
@@ -328,7 +336,7 @@
       var citations = [
         [
           `These citation reveal the facts from Wikipedia which are used in the response. Datupedia will include these citations throughout this chat to ensure everything is fact checked.`,
-          `You may see multiple citations in a group. This happens when Datupedia integrates multiple sources of information.`,
+          `Do note that I'm still being made so I might display text formated incorrectly.`,
         ],
       ]; // Your list of citations
 
@@ -565,7 +573,7 @@
       </header>
       <div class="content">
         <div id="data">
-          <div class="bot">Give me second while I fetch some files.</div>
+          <div class="bot"></div>
         </div>
 
         <div class="inputField">

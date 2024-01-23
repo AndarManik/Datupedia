@@ -1,21 +1,176 @@
-body {
-  background: #fbf3ff;
-  font-family: 'Roboto Slab';        
-  margin: 0;
-  line-height: 1.3;
-  color: #2F2B32;
+.container {
+  flex-grow: 1; /* Allow the container to fill the available space */
+  display: flex;
+  flex-direction: column;
+  width: 90%;
+  max-width: 650px;
+  margin: 0px auto; /* Maintains the top and bottom margin */
+  padding: 10px;
+  overflow: hidden; /* Prevents content from overflowing */
+}
+.button-container {
+  display: flex;
+  justify-content: center; /* Centers the buttons horizontally */
+  gap: 10px; /* Adjusts the space between buttons */
 }
 
-h1 {
-  font-size: 40px;
+#data {
+  height: calc(100svh - 290px);
+  margin-bottom: 20px; /* Adds space above and below */
+  margin-top: 10px;
+  width: 100%;
+  flex-grow: 1; /* Allows the content to fill the space */
+  border-radius: 10px;
+  font-size: 16px;
+  line-height: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+#data h1,
+h2,
+h3,
+h4 {
+  margin: 0px;
+}
+
+.tooltip {
+  box-shadow: 5px 5px 0px #2f2b32;
+  max-width: 400px;
+  max-height: 400px; /* Set the maximum height as needed */
+  position: absolute;
+  padding: 10px;
+  background-color: #f1f1f1;
+  color: #2f2b32;
+  border: 1px solid #2f2b32;
+  border-radius: 10px;
+  opacity: 0; /* Start invisible */
+  transition: opacity 0.3s;
+  z-index: 1000; /* Make sure it's on top of other elements */
+  font-size: 0.85em; /* Smaller font size; adjust as needed */
+  box-sizing: border-box;
+}
+
+.tooltip p {
+  overflow-y: scroll; /* Enable vertical scrolling */
+  max-height: 180px; /* Set the maximum height as needed */
+}
+
+.tooltip p::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Light grey track */
+  border-radius: 10px;
+  margin-top: 3px;
+  margin-bottom: 3px;
+}
+
+/* Styling the scrollbar thumb (the part you drag) */
+.tooltip p::-webkit-scrollbar-thumb {
+  background: #2f2b32; /* Dark grey thumb */
+  border-radius: 10px;
+}
+
+/* Styling the scrollbar thumb on hover */
+.tooltip p::-webkit-scrollbar-thumb:hover {
+  background: #796f81; /* Darker grey on hover */
+}
+
+/* Styling the scrollbar itself (width or height) */
+.tooltip p::-webkit-scrollbar {
+  width: 5px; /* Width of the vertical scrollbar */
+  height: 5px; /* Height of the horizontal scrollbar */
+}
+
+.wikiLink {
+  position: absolute; /* Position the element absolutely within its parent */
+  top: 10px; /* Distance from the top of the parent container */
+  right: 10px; /* Distance from the right of the parent container */
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 5px;
+  border: 2px solid #2f2b32;
+  background-color: #f1f1f1;
+}
+
+.wikiLink:hover {
+  background: #f1f1f1; /* Slightly lighter shade for hover */
+  box-shadow: 3px 3px 0px #2f2b32;
+}
+
+.wikiLink:active {
+  box-shadow: 1px 1px 0px #2f2b32;
+}
+
+.tooltip p {
+  margin: 0px;
+}
+
+.tooltip h2 {
+  margin: 0px;
+  padding: 0px;
+}
+.tooltip h3 {
+  margin: 0px;
+}
+
+/* To smoothly transition the tooltip in and out */
+.show-tooltip {
+  opacity: 1;
+}
+
+span[citation] {
+  display: inline-block; /* Or 'inline' depending on the exact behavior you want */
+  margin: 0; /* Adjust margin as needed */
+  padding: 0; /* Adjust padding as needed */
+  font-size: 0.8em; /* Smaller font size; adjust as needed */
+  color: #a260f8;
+  /* Additional styling here */
+}
+
+span[citation]:hover {
+  cursor: default;
+}
+body {
+  background: #f1f1f1;
+  font-family: "Roboto Slab";
+  margin: 0;
+  line-height: 1.3;
+  color: #2f2b32;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  font-weight: 500;
+  word-spacing: 1px;
+}
+
+.spinner {
+  display: inline-block; /* Or 'inline' depending on the exact behavior you want */
+  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  background-color: #f1f1f1; /* or any color of your choice */
+  border: 2px solid #2f2b32;
+  animation: oscillate 1s infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes oscillate {
+  0%,
+  100% {
+    box-shadow: 5px 5px 0px #2f2b32;
+  }
+  50% {
+    box-shadow: 0px 0px 0px #2f2b32;
+  }
 }
 
 .navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: #fbf3ff;
-  padding-bottom: 5px;
+  background: #f1f1f1;
 }
 
 .navbar h1 {
@@ -28,6 +183,14 @@ h1 {
   margin: 0;
   padding: 0;
 }
+a {
+  color: #a260f8;
+  text-decoration: none;
+}
+
+p {
+  margin-top: 0px;
+}
 
 .nav-links li {
   display: inline;
@@ -35,8 +198,26 @@ h1 {
   font-size: 24px;
 }
 
+.content {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1; /* Allows the content to fill the space */
+  justify-content: space-between; /* Distributes space between children */
+  box-sizing: border-box;
+  padding: 0px;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 40px;
+}
+
+/* Styling the scrollbar thumb (the part you drag) */
+
 .navbar a {
-  color: #2F2B32;
+  color: #2f2b32;
   text-decoration: none;
   transition: color 0.3s ease-in-out;
 }
@@ -45,233 +226,33 @@ h1 {
   color: #a260f8; /* Change color on hover */
 }
 
-h1,
-h2,
-h3,
-h4 {
-  font-family: 'Roboto Slab';        
-  font-weight: 300;
-  text-align: center;
+@media only screen and (max-width: 620px) {
+  #data {
+    height: calc(100svh - 240px);
+    border: 0px solid #f1f1f1;
+  }
 }
 
-.description {
-  color: #2F2B32;
-  font-size: 18px; /* Slightly larger font for emphasis */
-  line-height: 1.4; /* Adjust line height for better readability */
-  margin-left: auto; /* Centering the paragraph */
-  margin-right: auto; /* Centering the paragraph */
-  margin-top: 60px;
-}
-button {
-  height: 50px; /* Set a fixed height */
-  margin-bottom: 10px;
-  width: 26%;
-  background: #fbf3ff; /* Same as body background */
-  color: #2F2B32; /* Matching the anchor tag color */
-  cursor: pointer; /* Make the button show a hand cursor on hover */
-  transition: background 2s ease; /* Smooth transition for hover effect */
+.custom-button {
+  display: inline-block;
+  padding: 10px 20px;
+  margin-top: 20px;
+  background-color: #f1f1f1;
+  color: #2f2b32;
+  text-align: center;
+  text-decoration: none;
   font-size: 18px;
   border-radius: 10px;
-  border: none;
-  font-family: 'Roboto Slab';        
-  box-shadow: 5px 5px 5px -1px #dacfe0, -5px -5px 5px -1px #fff8ff;
-  border-radius: 10px;
-  text-align: center;
-  font-size: 16px;
-}
-button:hover {
-  background: #fbf3ff; /* Slightly lighter shade for hover */
-  color: #2F2B32;
-  box-shadow: inset 5px 5px 5px -1px #dacfe0, inset -5px -5px 5px -1px #fff8ff;
+  transition: background-color 0.3s, color 0.3s;
+  width: 150px; /* Adjust as needed */
+  border: 2px solid #2f2b32;
 }
 
-button:active {
-  box-shadow: inset 5px 5px 5px -1px #dacfe0, inset -5px -5px 5px -1px #fff8ff;
-}
-a {
-  color: #ceb9e3;
-  text-decoration: none;
+.custom-button:hover {
+  background: #f1f1f1; /* Slightly lighter shade for hover */
+  box-shadow: 5px 5px 0px #2f2b32;
 }
 
-a:hover {
-  text-decoration: underline;
-}
-
-footer {
-  color: #fff8ff;
-}
-
-li {
-  color: #2F2B32;
-}
-
-input {
-  -webkit-appearance: none;
-  box-sizing: border-box; /* This line ensures padding and border are inside the width */
-  color: #2F2B32;
-  
-  border: 0px solid #fff8ff00;
-  background: #fbf3ff;
-  padding: 12px;
-  width: 70%;
-  height: 50px;
-  transition: width 0.3s ease-in-out;
-  box-shadow: 5px 5px 5px -1px #dacfe0, -5px -5px 5px -1px #fff8ff;
-  border-radius: 10px;
-  text-align: center;
-  margin-bottom: 10px;
-  margin-right: 2%;
-  font-size: 16px;
-}
-input::placeholder {
-  color: #2F2B32; /* Replace #yourColorCode with the color you want */
-}
-
-input:focus {
-  outline: none;
-  box-shadow: inset 5px 5px 5px -1px #dacfe0, inset -5px -5px 5px -1px #fff8ff;
-}
-
-#suggestionsList {
-  list-style-type: none; /* Removes bullet points */
-  padding: 10px;
-  width: 70%;
-
-  border: 1px solid #ccc; /* Adds a border */
-  display: none; /* Hides the list by default */
-}
-#suggestions {
-  width: 70%;
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: none;
-  border-radius: 10px;
-  background-color: #fbf3ff; /* Change background color when hovered over the div */
-  background: #fbf3ff;
-  transition: width 0.3s ease-in-out;
-  outline: none;
-  box-shadow: 5px 5px 5px -1px #dacfe0, -5px -5px 5px -1px #fff8ff;
-  text-align: center;
-  margin-bottom: 10px;
-}
-#suggestions li {
-  padding: 5px;
-  cursor: pointer;
-  line-height: 1.6;
-}
-#suggestions li:hover {
-  text-align: center;
-  border-radius: 10px;
-}
-/* You might want to style or adjust the width of the elements inside for a better look */
-
-
-.container {
-  width: 70%;
-  max-width: 500px;
-  margin: auto;
-  margin-top: 18vh;
-
-  box-shadow: 10px 10px 10px -1px #dacfe0, -10px -10px 10px -1px #fff8ff;
-  border-radius: 40px;
-  padding: 40px;
-}
-
-.containerhow {
-  width: 70%;
-  max-width: 500px;
-  margin: auto;
-  margin-top: 3vh;
-
-  box-shadow: 10px 10px 10px -1px #dacfe0, -10px -10px 10px -1px #fff8ff;
-  border-radius: 40px;
-  padding: 40px;
-}
-
-.about-section {
-  line-height: 1.5rem;
-}
-
-
-.how-it-works h2 {
-  text-align: center;
-  color: #2F2B32; /* Light color for the heading */
-  margin-bottom: 40px;
-}
-
-.step {
-  margin-bottom: 40px;
-}
-
-.step h3 {
-  margin-bottom: 10px;
-}
-
-.step p {
-  color: #2F2B32; /* Light color for descriptions */
-  line-height: 1.5;
-}
-
-/* Additional styling as needed */
-/* For very small screens, typically phones */
-@media only screen and (max-width: 560px) {
-  :root {
-    --gradient-width: 90%;
-  }
-
-  .container {
-    width: 70%; 
-    border-radius: 30px;
-    padding: 30px;
-    margin-top: 15px;
-  }
-  body {
-    font-size: 18px;
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    font-size: 1.5em; /* Adjust based on your design */
-  }
-  
-  .navbar h1 {
-    font-size: 16px;
-  }
-
-  .nav-links li {
-    margin-left: 10px;
-    font-size: 16px;
-  }
-
-  button {
-    font-family: 'Roboto Slab';        
-    height: 35px; /* Set a fixed height */
-    width: 26%;
-    font-size: 12px;
-    text-align: center;
-  }
-  input {
-    width: 70%;
-    height: 35px;
-    margin-right: 2%;
-    font-size: 12px;
-  }
-
-  .content-wrapper {
-    flex-direction: column; /* Stack flex items vertically */
-  }
-
-  header,
-  #status,
-  #pagename,
-  #suggestions {
-    margin-bottom: 20px; /* Add some vertical spacing between stacked elements */
-  }
-  .description {
-    margin-top: 20px;
-  }
-
+.custom-button:active {
+  box-shadow: 3px 3px 0px #2f2b32;
 }

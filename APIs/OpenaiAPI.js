@@ -72,6 +72,16 @@ class OpenaiAPI {
     });
   }
 
+  async gpt3StreamChatLog(system, chatLog) {
+    return this.exponentialBackoffRequest(async () => {
+      return await this.openai.chat.completions.create({
+        messages: [{ role: "system", content: `${system}` }, ...chatLog],
+        model: "gpt-3.5-turbo-1106",
+        stream: true,
+      });
+    });
+  }
+
   async gpt4Stream(system, prompt) {
     return this.exponentialBackoffRequest(async () => {
       return await this.openai.chat.completions.create({

@@ -6,89 +6,31 @@
       name="viewport"
       content="width=device-width, initial-scale=1, maximum-scale=1"
     />
-    <meta name="description" content="Datupedia - Chat with Wikipedia pages and explore information easily.">
+    <meta
+      name="description"
+      content="Datupedia - Chat with Wikipedia pages and explore information easily."
+    />
 
     <link rel="stylesheet" type="text/css" href="styles.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap" rel="stylesheet">
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
 
     <title>Datupedia</title>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        console.log("DOM fully loaded and parsed.");
-        const inputField = document.getElementById("pagename");
-        const suggestionList = document.getElementById("suggestions");
-
-        inputField.addEventListener("input", async () => {
-          const query = inputField.value;
-          console.log(`Query inputted: ${query}`);
-          if (query) {
-            const response = await fetch(`/suggestions?query=${query}`);
-            console.log("Fetch initiated.");
-
-            if (inputField.value !== query) {
-              console.log("Query changed. Ignoring outdated suggestions.");
-              return;
-            }
-
-            const suggestions = await response.json();
-            console.log(`Received suggestions: ${suggestions}`);
-
-            suggestionList.innerHTML = "";
-            suggestions.forEach((suggestion, index) => {
-              if (index < 5) {
-                const listItem = document.createElement("li");
-                listItem.textContent = suggestion;
-                listItem.addEventListener("click", () => {
-                  window.location.href = `/datu/${encodeURIComponent(
-                    suggestion
-                  )}`;
-                });
-                suggestionList.appendChild(listItem);
-              }
-            });
-            suggestionList.style.display =
-              suggestions.length > 0 ? "block" : "none";
-          } else {
-            console.log("Query empty. Hiding suggestions.");
-            suggestionList.style.display = "none";
-          }
-        });
-      });
-
-      async function getRandom() {
-        window.location.href = `/random`;
-      }
-    </script>
   </head>
   <body>
     <div class="container">
-      <header>
-        <nav class="navbar">
-          <h1><a href="/">Datupedia</a></h1>
-          <ul class="nav-links">
-            <li><a href="/how-it-works">How It Works</a></li>
-            <li><a href="/about">About</a></li>
-          </ul>
-        </nav>
-      </header>
-      <p class="description">
-        Chat with Wikipedia pages: Enter a wikipedia page 
-      </p>
-
-      <div id="status"></div>
-      <div class="inputField">
-        <input
-          type="text"
-          id="pagename"
-          name="pagename"
-          placeholder="Search"
-          required
-          autocomplete="off"
-        />
-        <button onclick="getRandom()">Random</button>
+      <div class="content">
+        <div id="data">
+          <h1>Get grounded with Datupedia</h1>
+          <h2>A factual vector database for chatbots</h2>
+          <div class="button-container">
+            <a href="/chat" class="custom-button">Try it now</a>
+            <a href="/" class="custom-button">API Soon!</a>
+          </div>
+        </div>
       </div>
-
-      <ul id="suggestions"></ul>
     </div>
   </body>
 </html>
