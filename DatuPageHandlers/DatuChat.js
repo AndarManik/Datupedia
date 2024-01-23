@@ -8,6 +8,8 @@ var pca;
 (async () => {
   pca = await createPCA();
 })();
+const db = getDbGlobal();
+
 class DatuChat {
   static async generateInitialMessage(pageName) {
     return await openai.gpt4Stream(
@@ -112,9 +114,31 @@ Knowledge End
     return output;
   }
 
+  static async stringSearch(searchString, articleFilters, k) {
+    const article = await wikipediaAPI.resolveRedirectsOrSearch(
+      articleFilters
+    );
+    const preReduce = await openai.ada(searchString);
+    const embedding = pca(preReduce).slice(0, 250);
+    const searchOperation = this.searchWithEmbedding(db, embedding, article, k);
+    try {
+      // Run all search operations concurrently and wait for all of them to complete
+      const results = await searchOperation;
+
+      // Adding an 'index' field to each element in the uniqueResults list
+      results.forEach((element, index) => {
+        element.index = [chatIndex, index + 1];
+      });
+
+      return results;
+    } catch (error) {
+      console.error("Error in findGlobalNearestTexts:", error);
+      return [];
+    }
+  }
+
   //TODO: modify this so that it accepts the list of strings
   static async findGlobalNearestTexts(convertedChat, chatIndex, k) {
-    const db = getDbGlobal();
     const searchParam = await this.enrichGlobalQuery(convertedChat);
     const preReduce = await openai.adaBatch(searchParam.paragraphs);
     const embeddings = preReduce.map((pre) => pca(pre).slice(0, 250));
