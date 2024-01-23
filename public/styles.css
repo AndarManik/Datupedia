@@ -26,111 +26,7 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
-}
-
-#data h1,
-h2,
-h3,
-h4 {
-  margin: 0px;
-}
-
-.tooltip {
-  box-shadow: 5px 5px 0px #2f2b32;
-  max-width: 400px;
-  max-height: 400px; /* Set the maximum height as needed */
-  position: absolute;
-  padding: 10px;
-  background-color: #f1f1f1;
-  color: #2f2b32;
-  border: 1px solid #2f2b32;
-  border-radius: 10px;
-  opacity: 0; /* Start invisible */
-  transition: opacity 0.3s;
-  z-index: 1000; /* Make sure it's on top of other elements */
-  font-size: 0.85em; /* Smaller font size; adjust as needed */
-  box-sizing: border-box;
-}
-
-.tooltip p {
-  overflow-y: scroll; /* Enable vertical scrolling */
-  max-height: 180px; /* Set the maximum height as needed */
-}
-
-.tooltip p::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Light grey track */
-  border-radius: 10px;
-  margin-top: 3px;
-  margin-bottom: 3px;
-}
-
-/* Styling the scrollbar thumb (the part you drag) */
-.tooltip p::-webkit-scrollbar-thumb {
-  background: #2f2b32; /* Dark grey thumb */
-  border-radius: 10px;
-}
-
-/* Styling the scrollbar thumb on hover */
-.tooltip p::-webkit-scrollbar-thumb:hover {
-  background: #796f81; /* Darker grey on hover */
-}
-
-/* Styling the scrollbar itself (width or height) */
-.tooltip p::-webkit-scrollbar {
-  width: 5px; /* Width of the vertical scrollbar */
-  height: 5px; /* Height of the horizontal scrollbar */
-}
-
-.wikiLink {
-  position: absolute; /* Position the element absolutely within its parent */
-  top: 10px; /* Distance from the top of the parent container */
-  right: 10px; /* Distance from the right of the parent container */
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  border-radius: 5px;
-  border: 2px solid #2f2b32;
-  background-color: #f1f1f1;
-}
-
-.wikiLink:hover {
-  background: #f1f1f1; /* Slightly lighter shade for hover */
-  box-shadow: 3px 3px 0px #2f2b32;
-}
-
-.wikiLink:active {
-  box-shadow: 1px 1px 0px #2f2b32;
-}
-
-.tooltip p {
-  margin: 0px;
-}
-
-.tooltip h2 {
-  margin: 0px;
-  padding: 0px;
-}
-.tooltip h3 {
-  margin: 0px;
-}
-
-/* To smoothly transition the tooltip in and out */
-.show-tooltip {
-  opacity: 1;
-}
-
-span[citation] {
-  display: inline-block; /* Or 'inline' depending on the exact behavior you want */
-  margin: 0; /* Adjust margin as needed */
-  padding: 0; /* Adjust padding as needed */
-  font-size: 0.8em; /* Smaller font size; adjust as needed */
-  color: #a260f8;
-  /* Additional styling here */
-}
-
-span[citation]:hover {
-  cursor: default;
+  text-align: center;
 }
 body {
   background: #f1f1f1;
@@ -166,37 +62,8 @@ body {
   }
 }
 
-.navbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #f1f1f1;
-}
 
-.navbar h1 {
-  margin: 0;
-  font-size: 24px;
-}
 
-.nav-links {
-  list-style-type: none;
-  margin: 0;
-  padding: 0;
-}
-a {
-  color: #a260f8;
-  text-decoration: none;
-}
-
-p {
-  margin-top: 0px;
-}
-
-.nav-links li {
-  display: inline;
-  margin-left: 20px;
-  font-size: 24px;
-}
 
 .content {
   display: flex;
@@ -212,25 +79,17 @@ h2,
 h3,
 h4 {
   line-height: 40px;
+  margin: 10px;
 }
 
 /* Styling the scrollbar thumb (the part you drag) */
-
-.navbar a {
-  color: #2f2b32;
-  text-decoration: none;
-  transition: color 0.3s ease-in-out;
-}
-
-.navbar a:hover {
-  color: #a260f8; /* Change color on hover */
-}
 
 @media only screen and (max-width: 620px) {
   #data {
     height: calc(100svh - 240px);
     border: 0px solid #f1f1f1;
   }
+
 }
 
 .custom-button {

@@ -8,7 +8,6 @@ var pca;
 (async () => {
   pca = await createPCA();
 })();
-const dbGlobal = getDbGlobal();
 
 class DatuChat {
   static async generateInitialMessage(pageName) {
@@ -185,7 +184,7 @@ Knowledge End
 
   static async searchWithEmbedding(embedding, articles, k) {
     try {
-      const cursor = await dbGlobal.collection("embeddings").aggregate([
+      const cursor = await getDbGlobal().collection("embeddings").aggregate([
         {
           $vectorSearch: {
             index: "vector_index",
