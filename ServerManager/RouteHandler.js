@@ -201,6 +201,7 @@ class RouteHandler {
   }
 
   async kStringSearch(req, res) {;
+    console.log(req.query);
     const searchString = req.query.searchString; // A text string
     const articleTitles = req.query.articleTitles; // Array of strings, sent as comma-separated values
     const k = parseInt(req.query.k, 10); // A number

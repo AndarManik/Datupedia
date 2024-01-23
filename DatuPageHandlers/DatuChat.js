@@ -115,10 +115,10 @@ Knowledge End
   }
 
   static async stringSearch(searchString, articleFilters, k) {
-    const article = await wikipediaAPI.resolveRedirectsOrSearch(
-      articleFilters
-    );
-    const preReduce = await openai.ada(searchString);
+    const [article, preReduce] = await Promise.all([
+      wikipediaAPI.resolveRedirectsOrSearch(articleFilters),
+      openai.ada(searchString)
+    ]);
     const embedding = pca(preReduce).slice(0, 250);
     const searchOperation = this.searchWithEmbedding(db, embedding, article, k);
     try {
