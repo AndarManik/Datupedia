@@ -30,6 +30,7 @@
     "ml-distance": "^4.0.1",
     "ml-kmeans": "^6.0.0",
     "mongodb": "^6.0.0",
+    "node-fetch": "^3.3.2",
     "node-html-parser": "^6.1.6",
     "openai": "^4.0.0",
     "uuid": "^9.0.1",
