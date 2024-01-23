@@ -126,7 +126,7 @@ Knowledge End
 
       // Adding an 'index' field to each element in the uniqueResults list
       results.forEach((element, index) => {
-        element.index = [chatIndex, index + 1];
+        element.index = index + 1;
       });
 
       return results;
