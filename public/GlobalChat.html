@@ -397,6 +397,21 @@
         );
       };
 
+      const getWikiURL = (headings) => {
+        const baseUrl = "https://en.wikipedia.org/wiki/";
+        const title = encodeURIComponent(headings[0].replace(/ /g, "_"));
+        let url = baseUrl + title;
+
+        if (headings.length > 1) {
+          const subTitle = encodeURIComponent(
+            headings[headings.length - 1].replace(/ /g, "_")
+          );
+          url += "#" + subTitle;
+        }
+
+        return url;
+      };
+
       const getWikiLink = (headings) => {
         const baseUrl = "https://en.wikipedia.org/wiki/";
         const title = encodeURIComponent(headings[0].replace(/ /g, "_"));
@@ -524,15 +539,33 @@
           }
         }
 
-        // Event to show tooltip on mouseover
         document.body.addEventListener("mouseover", function (event) {
           if (event.target.matches("span[citation]")) {
             var indexes = JSON.parse(event.target.getAttribute("citation"));
+            var citationHTML = citations[indexes[0]][indexes[1] - 1];
             var rect = event.target.getBoundingClientRect();
             var posX = rect.left + window.scrollX; // X position of the element
             var posY = rect.top + window.scrollY; // Y position of the element
 
-            updateTooltip(citations[indexes[0]][indexes[1] - 1], posX, posY);
+            updateTooltip(citationHTML, posX, posY);
+
+            // Parse the URL from the citation HTML
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(citationHTML, "text/html");
+            var wikiLink = doc
+              .querySelector(".wikiLink")
+              .getAttribute("onclick");
+
+            // Extract URL from onclick attribute
+            var urlMatch = wikiLink.match(/window.open\('([^']+)'/);
+            var url = urlMatch ? urlMatch[1] : null;
+
+            // Add click event listener to navigate to the URL
+            if (url) {
+              event.target.addEventListener("click", function () {
+                window.open(url, "_blank");
+              });
+            }
           }
         });
 
