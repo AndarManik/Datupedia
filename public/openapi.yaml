@@ -1,0 +1,74 @@
+openapi: 3.0.1
+info:
+  title: DatuChat API
+  description: API for performing vector similarity searches over Wikipedia articles.
+  version: '1.0.0'
+servers:
+  - url: https://datupedia.com/
+paths:
+  /api/stringsearch:
+    post:
+      operationId: stringSearchFiltered
+      summary: Perform a vector similarity search over filtered Wikipedia articles.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StringSearchRequest'
+      responses:
+        "200":
+          description: Search results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StringSearchResponse'
+
+components:
+  schemas:
+    StringSearchRequest:
+      type: object
+      required:
+        - searchString
+        - articleFilters
+        - k
+      properties:
+        searchString:
+          type: string
+          description: A text string to search for.
+        articleTitles:
+          type: array
+          items:
+            type: string
+          description: Array of article titles to filter the search.
+        k:
+          type: integer
+          description: Number of top documents to return.
+
+    StringSearchResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/Document'
+
+    Document:
+      type: object
+      properties:
+        headings:
+          type: array
+          items:
+            type: string
+          description: Headings in the document.
+        links:
+          type: array
+          items:
+            type: string
+          description: Links contained in the document.
+        paragraph:
+          type: string
+          description: Paragraph text from the document.
+        index:
+          type: integer
+          description: Index value of document.  

@@ -27,7 +27,9 @@ class RouteHandler {
     this.app.get("/random", this.handleRandom.bind(this));
     this.app.get("/sitemap.xml", this.handleSiteMap.bind(this));
     this.app.get("/chat", this.handleChat.bind(this));
-    this.app.post("/api/stringsearch", this.kStringSearch.bind(this));
+    this.app.post("/api/stringsearch", this.textBasedFilteredSearch.bind(this));
+    this.app.post("/api/stringsearchglobal", this.textBasedGlobalSearch.bind(this));
+    this.app.get("/openapi.yaml", this.handleOpenApi.bind(this));
   }
 
   handleRoot(req, res) {
@@ -200,12 +202,29 @@ class RouteHandler {
     }
   }
 
-  async kStringSearch(req, res) {;
-    console.log(req.body);
+  async textBasedFilteredSearch(req, res) {;
     const searchString = req.body.searchString; // A text string
-    const articleTitles = req.body.articleTitles; // Array of strings, sent as comma-separated values
+    const articleFilters = req.body.articleFilters; // Array of strings, sent as comma-separated values
     const k = parseInt(req.body.k, 10); // A number
-    res.json(await DatuChat.stringSearch(searchString, articleTitles,k));
+    res.json(await DatuChat.textBasedFilteredSearch(searchString, articleFilters,k));
+  }
+
+  async textBasedGlobalSearch(req, res) {;
+    const searchString = req.body.searchString; // A text string
+    const k = parseInt(req.body.k, 10); // A number
+    res.json(await DatuChat.textBasedSearch(searchString,k));
+  }
+
+  handleOpenApi(req, res) {
+    const filePath = path.join(__dirname, "../public/openapi.yaml"); // Update the path to where your openapi.yaml file is located
+    fs.readFile(filePath, "utf8", (err, data) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Internal Server Error");
+        return;
+      }
+      res.type('yaml').send(data);
+    });
   }
 }
 

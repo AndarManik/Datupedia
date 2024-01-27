@@ -113,23 +113,45 @@ Knowledge End
     return output;
   }
 
-  static async stringSearch(searchString, articleFilters, k) {
-    const [article, preReduce] = await Promise.all([
+  static async textBasedFilteredSearch(searchString, articleFilters, k) {
+    const [filters, preReduce] = await Promise.all([
       wikipediaAPI.resolveRedirectsOrSearch(articleFilters),
       openai.ada(searchString)
     ]);
     const embedding = pca(preReduce).slice(0, 250);
-    const searchOperation = this.searchWithEmbedding(embedding, article, k);
+    const searchOperation = this.searchWithEmbedding(embedding, filters, k);
     try {
-      // Run all search operations concurrently and wait for all of them to complete
       const results = await searchOperation;
 
-      // Adding an 'index' field to each element in the uniqueResults list
-      results.forEach((element, index) => {
+      results.forEach((element, index) => {//this does NOT change a value, it creates one
         element.index = index + 1;
       });
 
-      return results;
+      return results.map((data) => {//removes the unique identifier from the object
+       const {_id, ...rest} = data;
+       return rest
+      });
+    } catch (error) {
+      console.error("Error in findGlobalNearestTexts:", error);
+      return [];
+    }
+  }
+
+  static async textBasedSearch(searchString, k) {
+    const  preReduce = await openai.ada(searchString);
+    const embedding = pca(preReduce).slice(0, 250);
+    const searchOperation = this.searchWithEmbeddingGlobal(embedding, k);
+    try {
+      const results = await searchOperation;
+
+      results.forEach((element, index) => {//this does NOT change a value, it creates one
+        element.index = index + 1;
+      });
+
+      return results.map((data) => {//removes the unique identifier from the object
+       const {_id, ...rest} = data;
+       return rest
+      });
     } catch (error) {
       console.error("Error in findGlobalNearestTexts:", error);
       return [];
@@ -195,7 +217,35 @@ Knowledge End
                 $in: articles,
               },
             },
-            numCandidates: 100,
+            numCandidates: 10 * k,
+            limit: k,
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            headings: 1,
+            links: 1,
+            paragraph: 1,
+          },
+        },
+      ]);
+      return await cursor.toArray();
+    } catch (error) {
+      console.error("Error in searchWithEmbedding:", error);
+      throw error; // Rethrow to be caught in the calling function
+    }
+  }
+
+  static async searchWithEmbeddingGlobal(embedding, k) {
+    try {
+      const cursor = await getDbGlobal().collection("embeddings").aggregate([
+        {
+          $vectorSearch: {
+            index: "vector_index",
+            path: "embedding",
+            queryVector: embedding,
+            numCandidates: 10 * k,
             limit: k,
           },
         },
