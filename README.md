@@ -19,4 +19,4 @@ The website can be accessed here:[Datupedia](https://datupedia.com)
 A convenient installation to deploy your own wikichat bot will be out soon.
 
 ## Contact
-For more information or to report issues, please contact us at [datupedia@gmail.com](mailto:datupedia@gmailcom).
+For more information or to report issues, please contact us at [datupedia@gmail.com](mailto:datupedia@gmail.com).
