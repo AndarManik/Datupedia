@@ -51,7 +51,12 @@ class DatuChat {
     const nearestTextforGPT = this.parseforGPT(nearestText);
     console.log(nearestTextforGPT);
     const systemPrompt = `
-    "What you know": '${nearestTextforGPT}'
+    Task:
+    You are the chat assistant "Datupedia", you assist the user by responding factually. 
+    You will be provided information relevant to the users query as "What you know". 
+    "What you know" was obtained from quering a vector database containing all of wikipedia.
+    This is "What you know": '${nearestTextforGPT}'
+
     Response Guidlines: 
     Construct an accurate and neutral response to the user's query by utilizing only "what you know". 
     Utilize as much of "what you know" by being detailed and thorough, while being interesting and exciting.\
@@ -116,20 +121,22 @@ Knowledge End
   static async textBasedFilteredSearch(searchString, articleFilters, k) {
     const [filters, preReduce] = await Promise.all([
       wikipediaAPI.resolveRedirectsOrSearch(articleFilters),
-      openai.ada(searchString)
+      openai.ada(searchString),
     ]);
     const embedding = pca(preReduce).slice(0, 250);
     const searchOperation = this.searchWithEmbedding(embedding, filters, k);
     try {
       const results = await searchOperation;
 
-      results.forEach((element, index) => {//this does NOT change a value, it creates one
+      results.forEach((element, index) => {
+        //this does NOT change a value, it creates one
         element.index = index + 1;
       });
 
-      return results.map((data) => {//removes the unique identifier from the object
-       const {_id, ...rest} = data;
-       return rest
+      return results.map((data) => {
+        //removes the unique identifier from the object
+        const { _id, ...rest } = data;
+        return rest;
       });
     } catch (error) {
       console.error("Error in findGlobalNearestTexts:", error);
@@ -138,19 +145,21 @@ Knowledge End
   }
 
   static async textBasedSearch(searchString, k) {
-    const  preReduce = await openai.ada(searchString);
+    const preReduce = await openai.ada(searchString);
     const embedding = pca(preReduce).slice(0, 250);
     const searchOperation = this.searchWithEmbeddingGlobal(embedding, k);
     try {
       const results = await searchOperation;
 
-      results.forEach((element, index) => {//this does NOT change a value, it creates one
+      results.forEach((element, index) => {
+        //this does NOT change a value, it creates one
         element.index = index + 1;
       });
 
-      return results.map((data) => {//removes the unique identifier from the object
-       const {_id, ...rest} = data;
-       return rest
+      return results.map((data) => {
+        //removes the unique identifier from the object
+        const { _id, ...rest } = data;
+        return rest;
       });
     } catch (error) {
       console.error("Error in findGlobalNearestTexts:", error);
@@ -206,30 +215,32 @@ Knowledge End
 
   static async searchWithEmbedding(embedding, articles, k) {
     try {
-      const cursor = await getDbGlobal().collection("embeddings").aggregate([
-        {
-          $vectorSearch: {
-            index: "vector_index",
-            path: "embedding",
-            queryVector: embedding,
-            filter: {
-              links: {
-                $in: articles,
+      const cursor = await getDbGlobal()
+        .collection("embeddings")
+        .aggregate([
+          {
+            $vectorSearch: {
+              index: "vector_index",
+              path: "embedding",
+              queryVector: embedding,
+              filter: {
+                links: {
+                  $in: articles,
+                },
               },
+              numCandidates: 10 * k,
+              limit: k,
             },
-            numCandidates: 10 * k,
-            limit: k,
           },
-        },
-        {
-          $project: {
-            _id: 1,
-            headings: 1,
-            links: 1,
-            paragraph: 1,
+          {
+            $project: {
+              _id: 1,
+              headings: 1,
+              links: 1,
+              paragraph: 1,
+            },
           },
-        },
-      ]);
+        ]);
       return await cursor.toArray();
     } catch (error) {
       console.error("Error in searchWithEmbedding:", error);
@@ -239,25 +250,27 @@ Knowledge End
 
   static async searchWithEmbeddingGlobal(embedding, k) {
     try {
-      const cursor = await getDbGlobal().collection("embeddings").aggregate([
-        {
-          $vectorSearch: {
-            index: "vector_index",
-            path: "embedding",
-            queryVector: embedding,
-            numCandidates: 10 * k,
-            limit: k,
+      const cursor = await getDbGlobal()
+        .collection("embeddings")
+        .aggregate([
+          {
+            $vectorSearch: {
+              index: "vector_index",
+              path: "embedding",
+              queryVector: embedding,
+              numCandidates: 10 * k,
+              limit: k,
+            },
           },
-        },
-        {
-          $project: {
-            _id: 1,
-            headings: 1,
-            links: 1,
-            paragraph: 1,
+          {
+            $project: {
+              _id: 1,
+              headings: 1,
+              links: 1,
+              paragraph: 1,
+            },
           },
-        },
-      ]);
+        ]);
       return await cursor.toArray();
     } catch (error) {
       console.error("Error in searchWithEmbedding:", error);
@@ -339,6 +352,28 @@ Knowledge End
     } catch (error) {
       console.error("Error in findNearestTexts:", error);
       return [];
+    }
+  }
+
+  static async getRandom(n) {
+    try {
+      const cursor = await getDbGlobal()
+        .collection("embeddings")
+        .aggregate([
+          { $sample: { size: n } }, // Randomly sample n documents
+          {
+            $project: {
+              _id: 1,
+              headings: 1,
+              links: 1,
+              paragraph: 1,
+            },
+          },
+        ]);
+      return await cursor.toArray();
+    } catch (error) {
+      console.error("Error in getRandom:", error);
+      throw error; // Rethrow to be caught in the calling function
     }
   }
 }

@@ -9,6 +9,7 @@
       href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&display=swap"
       rel="stylesheet"
     />
+    <link rel="icon" type="image/png" href="/logo.png" />
 
     <style>
       .container {
@@ -165,11 +166,25 @@
         }
       }
 
+      .navIcon {
+        margin-top: 0.45rem;
+        width: 1.25rem;
+        height: 1.25rem;
+        border-radius: 0.45rem;
+        border: 2px solid #2f2b32;
+        margin-right: 0.35rem;
+      }
       .navbar {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
         background: #f1f1f1;
+      }
+
+      .navbar:hover a {
+        color: #a260f8; /* Change color on hover */
+      }
+
+      .navbar:hover .navIcon {
+        box-shadow: 0.2rem 0.2rem 0 #2f2b32;
       }
 
       .navbar h1 {
@@ -253,11 +268,6 @@
       .navbar a {
         color: #2f2b32;
         text-decoration: none;
-        transition: color 0.3s ease-in-out;
-      }
-
-      .navbar a:hover {
-        color: #a260f8; /* Change color on hover */
       }
 
       h1,

@@ -35,7 +35,7 @@ class OpenaiAPI {
           { role: "system", content: `${system}` },
           { role: "user", content: `${prompt}` },
         ],
-        model: "gpt-4-1106-preview",
+        model: "gpt-4-turbo-preview",
       });
       return completion.choices[0].message.content;
     });
@@ -45,7 +45,7 @@ class OpenaiAPI {
     return this.exponentialBackoffRequest(async () => {
       const completion = await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],
-        model: "gpt-4-1106-preview",
+        model: "gpt-4-turbo-preview",
       });
       return completion.choices[0].message.content;
     });
@@ -89,7 +89,7 @@ class OpenaiAPI {
           { role: "system", content: `${system}` },
           { role: "user", content: `${prompt}` },
         ],
-        model: "gpt-4-1106-preview",
+        model: "gpt-4-turbo-preview",
         stream: true,
       });
     });
@@ -99,7 +99,7 @@ class OpenaiAPI {
     return this.exponentialBackoffRequest(async () => {
       return await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],
-        model: "gpt-4-1106-preview",
+        model: "gpt-4-turbo-preview",
         stream: true,
       });
     });
