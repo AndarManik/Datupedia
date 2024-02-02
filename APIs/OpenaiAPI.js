@@ -51,6 +51,21 @@ class OpenaiAPI {
     });
   }
 
+  async gpt3JSON(system, prompt) {
+    return this.exponentialBackoffRequest(async () => {
+      const completion = await this.openai.chat.completions.create({
+        messages: [
+          { role: "system", content: `${system}` },
+          { role: "user", content: `${prompt}` },
+        ],
+        response_format: { type: "json_object" },
+
+        model: "gpt-3.5-turbo-1106",
+      });
+      return completion.choices[0].message.content;
+    });
+  }
+
   async gpt3ChatLog(system, chatLog) {
     return this.exponentialBackoffRequest(async () => {
       const completion = await this.openai.chat.completions.create({

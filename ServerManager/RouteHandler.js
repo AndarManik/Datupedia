@@ -20,6 +20,7 @@ class RouteHandler {
     this.app.post("/api/stringsearch", this.textBasedFilteredSearch.bind(this));
     this.app.post("/api/stringsearchglobal", this.textBasedGlobalSearch.bind(this));
     this.app.post("/api/getRandom", this.getRandom.bind(this));
+    this.app.post("/api/enrichSimpleQuery", this.enrichSimpleQuery.bind(this));
 }
 
   handleRoot(req, res) {
@@ -39,7 +40,7 @@ class RouteHandler {
 
   async handleChat(req, res) {
     try {
-      const filePath = path.join(__dirname, "../public/Chat.html");
+      const filePath = path.join(__dirname, "../public/DatuChat.html");
       const fileContent = fs.readFileSync(filePath, "utf-8");
       let renderedHtml = fileContent.replace(/{{userID}}/g, uuidv4());
       renderedHtml = renderedHtml.replace(/{{wss}}/g, process.env.WSS);
@@ -63,6 +64,11 @@ class RouteHandler {
     const searchString = req.body.searchString; // A text string
     const k = parseInt(req.body.k, 10); // A number
     res.json(await DatuChat.textBasedSearch(searchString, k));
+  }
+
+  async enrichSimpleQuery(req, res) {
+    const simpleQuery = req.body.simpleQuery; // A text string
+    res.json(await DatuChat.enrichQuery(simpleQuery));
   }
 
   handleOpenApi(req, res) {

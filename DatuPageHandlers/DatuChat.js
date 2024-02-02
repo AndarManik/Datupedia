@@ -89,7 +89,7 @@ Knowledge End
   There needs to be a way for the model to understand the context of the chat to better develop article titles, stuff like "general wikipedia pages will be slow to load"
   also the model should be stricter wrt knowledge in the 
   */
-  static async enrichGlobalQuery(convertedChat) {
+  static async enrichChatQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
       First, determine a list of 5-10 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
       Second, answer the user's query with a list of 3-7 short and precise paragraphs, approximately 50-75 words in length each. This response should also be in JSON format, where the key is 'paragraphs' and the value is a list of paragraphs. 
@@ -104,6 +104,28 @@ Knowledge End
       { articles: ["title","title"], paragraphs: ["text","text"] }
       `;
     const data = await openai.gpt3ChatLogJSON(systemPrompt, convertedChat);
+    const output = JSON.parse(data);
+    output.articles = [...new Set(output.articles)];
+    output.articles = output.articles.map((title) => title.toLowerCase());
+    console.log(output);
+    return output;
+  }
+
+  static async enrichQuery(convertedChat) {
+    const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
+      First, determine a list of 5-10 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
+      Second, answer the user's query with a list of 3-7 short and precise paragraphs, approximately 50-75 words in length each. This response should also be in JSON format, where the key is 'paragraphs' and the value is a list of paragraphs. 
+      The final output should be a single JSON object containing both keys: 'articles' and 'paragraphs'.
+      Note, the number of article titles does not have to match the number of paragraphs.
+      
+      The purpose of this JSON output is to query a vector database. The paragraphs will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
+      First, the paragraphs should be different as to gather a diverse set of information, this is because if two paragraphs were similar the outputs from the search would be similar and thus a waste of search.
+      Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics" or "Species", are references heavily and thus would require a larger search space.
+      These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
+      Example Format:
+      { articles: ["title","title"], paragraphs: ["text","text"] }
+      `;
+    const data = await openai.gpt3JSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
     output.articles = [...new Set(output.articles)];
     output.articles = output.articles.map((title) => title.toLowerCase());
@@ -162,7 +184,7 @@ Knowledge End
 
   //TODO: modify this so that it accepts the list of strings
   static async findGlobalNearestTexts(convertedChat, chatIndex, k) {
-    const searchParam = await this.enrichGlobalQuery(convertedChat);
+    const searchParam = await this.enrichChatQuery(convertedChat);
     const preReduce = await openai.adaBatch(searchParam.paragraphs);
     const embeddings = preReduce.map((pre) => pca(pre).slice(0, 250));
     const articles = await wikipediaAPI.resolveRedirectsOrSearch(
@@ -278,7 +300,7 @@ Knowledge End
   static async findNearestTexts(pageName, convertedChat, k) {
     const db = getDb();
     const embedding = await openai.ada(
-      await this.enrichQuery(pageName, convertedChat)
+      await this.enrichChatQuery(pageName, convertedChat)
     );
     try {
       const cursor = await db.collection("datuPages").aggregate([
