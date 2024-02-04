@@ -195,8 +195,19 @@ class WikipediaAPI {
   }
 
   async resolveRedirectsOrSearch(titles) {
-    const resolvedTitles = [];
+    const data = await this._fetchQueryData(titles);
+    const { redirectMap, normalizeMap } =
+      this._processRedirectsAndNormalizations(data);
 
+    const searchPromises = titles.map((title) =>
+      this._resolveTitle(title, redirectMap, normalizeMap, data.query.pages)
+    );
+
+    const results = await Promise.all(searchPromises);
+    return this._extractResolvedTitles(results);
+  }
+
+  async _fetchQueryData(titles) {
     const joinedTitles = titles.join("|");
     const params = {
       action: "query",
@@ -204,8 +215,10 @@ class WikipediaAPI {
       redirects: "",
       format: "json",
     };
-    const data = await this._apiCall(params);
+    return await this._apiCall(params);
+  }
 
+  _processRedirectsAndNormalizations(data) {
     const redirects = data.query.redirects || [];
     const normalized = data.query.normalized || [];
     const redirectMap = Object.fromEntries(
@@ -215,20 +228,30 @@ class WikipediaAPI {
       normalized.map((n) => [n.from, n.to])
     );
 
-    for (const title of titles) {
-      let resolvedTitle = normalizeMap[title] || title;
-      resolvedTitle = redirectMap[resolvedTitle] || resolvedTitle;
+    return { redirectMap, normalizeMap };
+  }
 
-      if (!(resolvedTitle in data.query.pages)) {
-        const searchResults = await this.searchWikipedia(title);
-        resolvedTitle =
+  async _resolveTitle(title, redirectMap, normalizeMap, pages) {
+    let resolvedTitle = normalizeMap[title] || title;
+    resolvedTitle = redirectMap[resolvedTitle] || resolvedTitle;
+
+    if (!(resolvedTitle in pages)) {
+      return this.searchWikipedia(title).then((searchResults) => ({
+        title,
+        resolvedTitle:
           searchResults.length > 0
             ? searchResults[0].title.toLowerCase()
-            : null;
-      }
-
-      resolvedTitles.push(resolvedTitle);
+            : null,
+      }));
+    } else {
+      return Promise.resolve({ title, resolvedTitle });
     }
+  }
+
+  _extractResolvedTitles(results) {
+    const resolvedTitles = results
+      .filter(({ resolvedTitle }) => resolvedTitle !== null)
+      .map(({ resolvedTitle }) => resolvedTitle);
 
     return [...new Set(resolvedTitles)];
   }

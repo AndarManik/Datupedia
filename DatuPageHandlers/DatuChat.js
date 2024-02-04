@@ -53,8 +53,9 @@ class DatuChat {
     Response Guidlines: 
     Construct an accurate and neutral response to the user's query by utilizing only "what you know". 
     Utilize as much of "what you know" by being detailed and thorough, while being interesting and exciting.\
-    The way "What you know" was obtained through querying a vector database contain all of wikipedia.
+    "What you know" was obtained through querying a vector database containing all of wikipedia.
     Use html to format your response using tags such as <h>, <p>, <b>, and so on. 
+    If you reference a link from "What you know" surround it with <b> tags.
     Use citations at the end of sentences by referencing the index in "what you know".
     This is done by inserting a span tag with an attribute "citation"=Knowledge Index, the text of the span should be the second value in the array in brackets.
     Here is an example for Knowledge Index = [6,12]
@@ -84,24 +85,19 @@ Knowledge End
     return text.join("");
   }
 
-  /*
-  These are some notes on how to improve the prompt
-  There needs to be a way for the model to understand the context of the chat to better develop article titles, stuff like "general wikipedia pages will be slow to load"
-  also the model should be stricter wrt knowledge in the 
-  */
   static async enrichChatQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
-      First, determine a list of 5-10 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
-      Second, answer the user's query with a list of 3-7 short and precise paragraphs, approximately 50-75 words in length each. This response should also be in JSON format, where the key is 'paragraphs' and the value is a list of paragraphs. 
-      The final output should be a single JSON object containing both keys: 'articles' and 'paragraphs'.
-      Note, the number of article titles does not have to match the number of paragraphs.
+      First, determine a list of 3-5 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
+      Second, answer the user's query with a list of 1-3 comprehensive sentences, approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
+      The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
+      Note, the number of article titles does not have to match the number of texts.
       
-      The purpose of this JSON output is to query a vector database. The paragraphs will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
-      First, the paragraphs should be different as to gather a diverse set of information, this is because if two paragraphs were similar the outputs from the search would be similar and thus a waste of search.
+      The purpose of this JSON output is to query a vector database. The texts will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
+      First, the texts should be different as to gather a diverse set of information, this is because if two texts were similar the outputs from the search would be similar and thus a waste of search.
       Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics", are references heavily and thus would require a larger search space.
       These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
       Example Format:
-      { articles: ["title","title"], paragraphs: ["text","text"] }
+      { articles: ["article","article"], texts: ["text","text"] }
       `;
     const data = await openai.gpt3ChatLogJSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
@@ -114,16 +110,16 @@ Knowledge End
   static async enrichQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
       First, determine a list of 5-10 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
-      Second, answer the user's query with a list of 3-7 short and precise paragraphs, approximately 50-75 words in length each. This response should also be in JSON format, where the key is 'paragraphs' and the value is a list of paragraphs. 
-      The final output should be a single JSON object containing both keys: 'articles' and 'paragraphs'.
-      Note, the number of article titles does not have to match the number of paragraphs.
+      Second, answer the user's query with a list of 3-7 short and precise texts, approximately 50-75 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
+      The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
+      Note, the number of article titles does not have to match the number of texts.
       
-      The purpose of this JSON output is to query a vector database. The paragraphs will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
-      First, the paragraphs should be different as to gather a diverse set of information, this is because if two paragraphs were similar the outputs from the search would be similar and thus a waste of search.
+      The purpose of this JSON output is to query a vector database. The texts will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
+      First, the texts should be different as to gather a diverse set of information, this is because if two texts were similar the outputs from the search would be similar and thus a waste of search.
       Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics" or "Species", are references heavily and thus would require a larger search space.
       These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
       Example Format:
-      { articles: ["title","title"], paragraphs: ["text","text"] }
+      { articles: ["title","title"], texts: ["text","text"] }
       `;
     const data = await openai.gpt3JSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
@@ -182,16 +178,23 @@ Knowledge End
     }
   }
 
-  //TODO: modify this so that it accepts the list of strings
   static async findGlobalNearestTexts(convertedChat, chatIndex, k) {
     const searchParam = await this.enrichChatQuery(convertedChat);
-    const preReduce = await openai.adaBatch(searchParam.paragraphs);
-    const embeddings = preReduce.map((pre) => pca(pre).slice(0, 250));
-    const articles = await wikipediaAPI.resolveRedirectsOrSearch(
+    console.time("Time for section");
+    const adaBatchPromise = openai
+      .adaBatch(searchParam.texts)
+      .then((preReduce) =>
+        preReduce.map((pre) => pca(pre).slice(0, 250))
+      );
+    const wikipediaPromise = wikipediaAPI.resolveRedirectsOrSearch(
       searchParam.articles
     );
+    const [embeddings, articles] = await Promise.all([
+      adaBatchPromise,
+      wikipediaPromise,
+    ]);
+    console.timeEnd("Time for section");
 
-    // Map each embedding to a search operation
     const searchOperations = embeddings.map((embedding) => {
       return this.searchWithEmbedding(embedding, articles, k);
     });

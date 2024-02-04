@@ -60,7 +60,7 @@ class OpenaiAPI {
         ],
         response_format: { type: "json_object" },
 
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-3.5-turbo-0125",
       });
       return completion.choices[0].message.content;
     });
@@ -70,7 +70,7 @@ class OpenaiAPI {
     return this.exponentialBackoffRequest(async () => {
       const completion = await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-3.5-turbo-0125",
       });
       return completion.choices[0].message.content;
     });
@@ -81,7 +81,7 @@ class OpenaiAPI {
       const completion = await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],
         response_format: { type: "json_object" },
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-3.5-turbo-0125",
       });
       return completion.choices[0].message.content;
     });
@@ -91,7 +91,7 @@ class OpenaiAPI {
     return this.exponentialBackoffRequest(async () => {
       return await this.openai.chat.completions.create({
         messages: [{ role: "system", content: `${system}` }, ...chatLog],
-        model: "gpt-3.5-turbo-1106",
+        model: "gpt-3.5-turbo-0125",
         stream: true,
       });
     });

@@ -17,15 +17,16 @@
       const userId = "{{userID}}"; // This gets populated before it is sent from the server, might not be the best solution later, but is ok now.
       const ws = new WebSocket("{{wss}}");
 
-      var isWriting = true;
-      var isUserScrolling = false;
+      var isWriting = true; //This stops the user from sending messages while the bot is sending a message
+      var isUserScrolling = false; //This stops the autoscrolling
+      var startY; // Starting Y position of touch
 
       var citations = [
         [
           `These citation reveal the facts from Wikipedia which are used in the response. Datupedia will include these citations throughout this chat to ensure everything is fact checked.`,
           `Do note that I'm still being made so I might display text formated incorrectly.`,
         ],
-      ]; // Your list of citations
+      ]; // list of citations
 
       ws.addEventListener("open", () => {
         const statusDiv = document.getElementById("status");
@@ -35,6 +36,11 @@
             userId,
           })
         );
+      });
+
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        handleServerResponse(data);
       });
       // Function to handle the server response
       const handleServerResponse = (data) => {
@@ -66,6 +72,7 @@
       };
 
       const formatCitation = (data) => {
+        //this is dirty code for generating the citation tooltip hovers
         citations.push(
           data.citations.map((citation) => {
             return (
@@ -81,22 +88,8 @@
         );
       };
 
-      const getWikiURL = (headings) => {
-        const baseUrl = "https://en.wikipedia.org/wiki/";
-        const title = encodeURIComponent(headings[0].replace(/ /g, "_"));
-        let url = baseUrl + title;
-
-        if (headings.length > 1) {
-          const subTitle = encodeURIComponent(
-            headings[headings.length - 1].replace(/ /g, "_")
-          );
-          url += "#" + subTitle;
-        }
-
-        return url;
-      };
-
       const getWikiLink = (headings) => {
+        //more dirty code for generating the thing you click to go to wikipedia, not the citation bracket thing
         const baseUrl = "https://en.wikipedia.org/wiki/";
         const title = encodeURIComponent(headings[0].replace(/ /g, "_"));
         let url = baseUrl + title;
@@ -111,14 +104,8 @@
         return `<div class="wikiLink" onclick="window.open('${url}', '_blank')"></div>`;
       };
 
-      ws.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        handleServerResponse(data);
-      });
-
       window.addEventListener("unload", () => {
         ws.send(JSON.stringify({ type: "disconnect", userId }));
-
         setTimeout(() => {
           ws.close();
         }, 100);
@@ -160,6 +147,10 @@
         spinner.classList.add("spinner");
         botDiv.appendChild(spinner);
 
+        const searchingText = document.createElement("p");
+        searchingText.innerText = "Seaching"
+        botDiv.appendChild(searchingText);
+
         scrollToBottom();
         ws.send(
           JSON.stringify({ type: "New Global Message", message: query, userId })
@@ -192,6 +183,29 @@
             isUserScrolling = false;
           }
         });
+
+        scrollableDiv.addEventListener(
+          "touchstart",
+          function (event) {
+            startY = event.touches[0].clientY;
+          },
+          false
+        );
+
+        // Touchmove event to determine if the user is scrolling
+        scrollableDiv.addEventListener(
+          "touchmove",
+          function (event) {
+            var moveY = event.touches[0].clientY;
+            var diffY = startY - moveY;
+
+            // If diffY is positive, user is scrolling up. If negative, scrolling down.
+            if (diffY < 0) {
+              isUserScrolling = true; // User is actively scrolling
+            } 
+          },
+          false
+        );
 
         // Create a tooltip element
         var tooltip = document.createElement("div");
