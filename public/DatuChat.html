@@ -143,12 +143,10 @@
         botDiv.classList.add("bot");
         dataField.appendChild(botDiv);
 
-        const spinner = document.createElement("div");
-        spinner.classList.add("spinner");
-        botDiv.appendChild(spinner);
-
         const searchingText = document.createElement("p");
+        searchingText.classList.add("spinner");
         searchingText.innerText = "Seaching"
+        
         botDiv.appendChild(searchingText);
 
         scrollToBottom();

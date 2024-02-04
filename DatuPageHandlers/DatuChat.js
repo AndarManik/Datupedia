@@ -11,12 +11,11 @@ var pca;
 
 class DatuChat {
   static async generateGlobalMessage(chatLog) {
-    console.log(chatLog);
     let attempts = 0;
 
     while (attempts < 5) {
       try {
-        return await this.ragGlobalResponse(chatLog.slice(-8), 3);
+        return await this.ragGlobalResponse(chatLog.slice(-8), 5);
       } catch (error) {
         console.error("Attempt failed:", attempts, error);
         attempts++;
@@ -35,12 +34,7 @@ class DatuChat {
       const content = message[role];
       return { role, content };
     });
-    console.log(`ragGlobalResponse ${k}`);
-    const nearestText = await this.findGlobalNearestTexts(
-      convertedChat,
-      chatIndex,
-      k
-    );
+    const nearestText = await this.findNearestTexts(convertedChat, chatIndex, k);
     const nearestTextforGPT = this.parseforGPT(nearestText);
     console.log(nearestTextforGPT);
     const systemPrompt = `
@@ -75,7 +69,7 @@ class DatuChat {
     nearestText.forEach((nearest) => {
       const stringToAdd = `
 Knowledge Index = [${nearest.index}]
-Titles = ${nearest.headings}
+Titles = [${nearest.headings}]
 Text = "${nearest.paragraph}"
 Links = [${nearest.links}]
 Knowledge End
@@ -103,7 +97,6 @@ Knowledge End
     const output = JSON.parse(data);
     output.articles = [...new Set(output.articles)];
     output.articles = output.articles.map((title) => title.toLowerCase());
-    console.log(output);
     return output;
   }
 
@@ -178,9 +171,9 @@ Knowledge End
     }
   }
 
-  static async findGlobalNearestTexts(convertedChat, chatIndex, k) {
+  static async findNearestTexts(convertedChat, chatIndex, k) {
     const searchParam = await this.enrichChatQuery(convertedChat);
-    console.time("Time for section");
+    console.log(searchParam);
     const adaBatchPromise = openai
       .adaBatch(searchParam.texts)
       .then((preReduce) =>
@@ -193,7 +186,10 @@ Knowledge End
       adaBatchPromise,
       wikipediaPromise,
     ]);
-    console.timeEnd("Time for section");
+
+    console.log(embeddings);
+    console.log(articles);
+
 
     const searchOperations = embeddings.map((embedding) => {
       return this.searchWithEmbedding(embedding, articles, k);
@@ -211,7 +207,7 @@ Knowledge End
       uniqueResults.forEach((element, index) => {
         element.index = [chatIndex, index + 1];
       });
-
+      console.log(uniqueResults);
       return uniqueResults;
     } catch (error) {
       console.error("Error in findGlobalNearestTexts:", error);
@@ -300,50 +296,6 @@ Knowledge End
     return await this.ragResponse(pageName, chatLog.slice(-8), 5);
   }
 
-  static async findNearestTexts(pageName, convertedChat, k) {
-    const db = getDb();
-    const embedding = await openai.ada(
-      await this.enrichChatQuery(pageName, convertedChat)
-    );
-    try {
-      const cursor = await db.collection("datuPages").aggregate([
-        {
-          $vectorSearch: {
-            index: "DatuSearch",
-            path: "embedding",
-            queryVector: embedding,
-            filter: {
-              pageName: {
-                $eq: pageName,
-              },
-            },
-            numCandidates: 100,
-            limit: k,
-          },
-        },
-        {
-          $project: {
-            _id: 0,
-            title: "$title",
-            paragraph: "$paragraph",
-          },
-        },
-      ]);
-      const results = await cursor.toArray();
-      results.forEach((result) => {
-        if (result.title.startsWith(pageName)) {
-          result.title = `None`;
-        } else {
-          result.title = `/datu/${encodeURIComponent(result.title)}`;
-        }
-      });
-      console.log(results);
-      return results;
-    } catch (error) {
-      console.error("Error in findNearestTexts:", error);
-      return [];
-    }
-  }
 
   static async getRandom(n) {
     try {

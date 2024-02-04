@@ -168,8 +168,7 @@ span[citation]:hover {
 .spinner {
   display: inline-block; /* Or 'inline' depending on the exact behavior you want */
   border-radius: 10px;
-  width: 30px;
-  height: 30px;
+  padding: 10px;
   background-color: #f1f1f1; /* or any color of your choice */
   border: 2px solid #2f2b32;
   animation: oscillate 1s infinite;
