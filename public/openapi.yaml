@@ -4,7 +4,7 @@ info:
   description: API for performing vector similarity searches over Wikipedia articles.
   version: '1.0.0'
 servers:
-  - url: https://datupedia.com/
+  - url: https://datupedia.com
 paths:
   /api/stringsearch:
     post:
@@ -33,14 +33,14 @@ components:
         - articleFilters
         - k
       properties:
-        searchString:
-          type: string
-          description: A string which answers the user's query with a comprehensive sentence approximately 50-100 words in length.
         articleTitles:
           type: array
           items:
             type: string
           description: A list of 5-10 relevant Wikipedia article titles that will supplement information related to the query.
+        searchString:
+          type: string
+          description: A string which answers the user's query with a comprehensive sentence approximately 50-100 words in length.
         k:
           type: integer
           description: Number of top documents to return.
