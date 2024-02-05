@@ -4,9 +4,9 @@ info:
   description: API for performing vector similarity searches over Wikipedia articles.
   version: '1.0.0'
 servers:
-  - url: https://datupedia.com/
+  - url: https://datupedia.com
 paths:
-  api/stringsearch:
+  /api/stringsearch:
     post:
       operationId: stringSearchFiltered
       summary: A function which provides relevant paragraphs from wikipedia.
