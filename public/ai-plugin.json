@@ -3,7 +3,7 @@
     "name_for_human": "Datupedia",
     "name_for_model": "Datupedia",
     "description_for_human": "Get wikipedia facts through Datupedia, a fact search engine.",
-    "description_for_model": "Help the user get facts.",
+    "description_for_model": "Help the user get facts by searching wikipedia documents",
     "auth": {
         "type": "none"
     },
@@ -13,5 +13,5 @@
     },
     "logo_url": "https://datupedia.com/logo.png",
     "contact_email": "categoricalinformatics@gmail.com",
-    "legal_info_url": "http://datupedia.com/legal"
+    "legal_info_url": "http://datupedia.com/"
 }

@@ -55,10 +55,15 @@ class RouteHandler {
     const searchString = req.body.searchString; // A text string
     const articleFilters = req.body.articleFilters; // Array of strings, sent as comma-separated values
     const k = parseInt(req.body.k, 10); // A number
-    res.json(
-      await DatuChat.textBasedFilteredSearch(searchString, articleFilters, k)
-    );
-  }
+    try {
+        const searchResults = await DatuChat.textBasedFilteredSearch(searchString, articleFilters, k);
+        res.status(200).json(searchResults);
+    } catch (error) {
+        console.error("Error during text-based filtered search:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+}
+
 
   async textBasedGlobalSearch(req, res) {
     const searchString = req.body.searchString; // A text string

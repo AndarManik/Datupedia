@@ -81,7 +81,7 @@ Knowledge End
 
   static async enrichChatQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
-      First, determine a list of 3-5 relevant Wikipedia article titles that supplement the information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
+      First, determine a list of 3-5 relevant Wikipedia article titles that will supplement information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
       Second, answer the user's query with a list of 1-3 comprehensive sentences, approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
       The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
       Note, the number of article titles does not have to match the number of texts.

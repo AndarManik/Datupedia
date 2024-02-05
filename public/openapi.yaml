@@ -9,7 +9,7 @@ paths:
   /api/stringsearch:
     post:
       operationId: stringSearchFiltered
-      summary: Perform a vector similarity search over filtered Wikipedia articles.
+      summary: A function which provides relevant paragraphs from wikipedia.
       requestBody:
         required: true
         content:
@@ -35,12 +35,12 @@ components:
       properties:
         searchString:
           type: string
-          description: A text string to search for.
+          description: A string which answers the user's query with a comprehensive sentence approximately 50-100 words in length.
         articleTitles:
           type: array
           items:
             type: string
-          description: Array of article titles to filter the search.
+          description: A list of 5-10 relevant Wikipedia article titles that will supplement information related to the query.
         k:
           type: integer
           description: Number of top documents to return.
