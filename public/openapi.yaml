@@ -43,7 +43,7 @@ components:
           description: A list of 5-10 relevant Wikipedia article titles that will supplement information related to the query.
         k:
           type: integer
-          description: Number of top documents to return.
+          description: Number of paragraphs to return, between 3-10
 
     StringSearchResponse:
       type: object
