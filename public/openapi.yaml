@@ -43,32 +43,29 @@ components:
           description: A list of 5-10 relevant Wikipedia article titles that will supplement information related to the query.
         k:
           type: integer
-          description: Number of paragraphs to return, between 3-10
+          description: Number of paragraphs to return, between 5-10
 
     StringSearchResponse:
       type: object
       properties:
-        documents:
+        paragraphs:
           type: array
           items:
-            $ref: '#/components/schemas/Document'
+            $ref: '#/components/schemas/Paragraph'
 
-    Document:
+    Paragraph:
       type: object
       properties:
         headings:
           type: array
           items:
             type: string
-          description: Headings in the document.
+          description: Headings for the paragraph.
         links:
           type: array
           items:
             type: string
-          description: Links contained in the document.
+          description: Links contained in the paragraph.
         paragraph:
           type: string
-          description: Paragraph text from the document.
-        index:
-          type: integer
-          description: Index value of document.  
+          description: Paragraph text from the paragraph.

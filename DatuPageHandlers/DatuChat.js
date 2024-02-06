@@ -132,11 +132,6 @@ Knowledge End
     try {
       const results = await searchOperation;
 
-      results.forEach((element, index) => {
-        //this does NOT change a value, it creates one
-        element.index = index + 1;
-      });
-
       return results.map((data) => {
         //removes the unique identifier from the object
         const { _id, ...rest } = data;
