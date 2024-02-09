@@ -2,7 +2,7 @@ const OpenaiApi = require("../APIs/OpenaiAPI");
 const openai = new OpenaiApi();
 const WikipediaAPI = require("../APIs/WikipediaAPI");
 const wikipediaAPI = new WikipediaAPI();
-const { getDb, getDbGlobal } = require("../APIs/MongoAPI");
+const { getDb } = require("../APIs/MongoAPI");
 const createPCA = require("../DatuPageHandlers/PCA");
 var pca;
 (async () => {
@@ -222,7 +222,7 @@ texts: ["text","text"]
 
   static async searchWithEmbedding(embedding, articles, k) {
     try {
-      const cursor = await getDbGlobal()
+      const cursor = await getDb()
         .collection("embeddings")
         .aggregate([
           {
@@ -257,7 +257,7 @@ texts: ["text","text"]
 
   static async searchWithEmbeddingGlobal(embedding, k) {
     try {
-      const cursor = await getDbGlobal()
+      const cursor = await getDb()
         .collection("embeddings")
         .aggregate([
           {
@@ -292,7 +292,7 @@ texts: ["text","text"]
 
   static async getRandom(n) {
     try {
-      const cursor = await getDbGlobal()
+      const cursor = await getDb()
         .collection("embeddings")
         .aggregate([
           { $sample: { size: n } }, // Randomly sample n documents

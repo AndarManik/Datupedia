@@ -9,23 +9,12 @@ const client = new MongoClient(process.env.MONGO_API_KEY, {
   }
 });
 
-const clientGlobal = new MongoClient(process.env.MONGO_API_KEY_GLOBAL, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: false,
-    deprecationErrors: true,
-  }
-});
-
 let db;
-let dbGlobal;
 
 async function connectToDb() {
   try {
     await client.connect();
-    await clientGlobal.connect();
-    db = client.db("datupedia");
-    dbGlobal = clientGlobal.db("wikipedia");
+    db = client.db("wikipedia");
     console.log("Successfully connected to MongoDB!");
   } catch (err) {
     console.error("Failed to connect to MongoDB", err);
@@ -36,39 +25,4 @@ function getDb() {
   return db;
 }
 
-function getDbGlobal() {
-  return dbGlobal;
-}
-
-async function getInlinkData(pageName) {
-  try {
-    const cursor = db
-      .collection("datuPages")
-      .find({ pageName: pageName });
-
-    return await cursor.toArray();
-  } catch (error) {
-    console.log(
-      `Error loading data from DB for page ${pageName}: ${error}`
-    );
-    return false;
-  }
-}
-
-async function getInlinkDataLimit(pageName, numDocuments) {
-  try {
-    const cursor = db
-      .collection("datuPages")
-      .find({ pageName: pageName })
-      .limit(numDocuments); // Apply the limit here
-
-    return await cursor.toArray();
-  } catch (error) {
-    console.log(
-      `Error loading data from DB for page ${pageName}: ${error}`
-    );
-    return false;
-  }
-}
-
-module.exports = { connectToDb, getDb, getDbGlobal, getInlinkData, getInlinkDataLimit };
+module.exports = { connectToDb, getDb};
