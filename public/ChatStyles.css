@@ -11,12 +11,15 @@ b {
   color: #2f2b32;
 }
 
+#data b:hover {
+  color: #a260f8;
+}
+
 
 body {
   background: #f1f1f1;
   font-family: "Roboto Slab";
   margin: 0;
-  line-height: 1.5;
   color: #2f2b32;
   display: flex;
   flex-direction: column;
@@ -64,7 +67,7 @@ body {
   border: 2px solid #2f2b32;
   border-radius: 10px;
   font-size: 16px;
-  line-height: 20px;
+  line-height: 1.5;
 }
 
 .tooltip {
@@ -151,16 +154,15 @@ body {
   opacity: 1;
 }
 
-span[citation] {
-  display: inline-block; /* Or 'inline' depending on the exact behavior you want */
+sup[citation] {
   margin: 0; /* Adjust margin as needed */
   padding: 0; /* Adjust padding as needed */
-  font-size: 0.8em; /* Smaller font size; adjust as needed */
+  font-size: 0.7em; /* Smaller font size; adjust as needed */
   color: #a260f8;
   /* Additional styling here */
 }
 
-span[citation]:hover {
+sup[citation]:hover {
   cursor: default;
 }
 

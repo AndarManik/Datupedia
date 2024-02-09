@@ -63,7 +63,7 @@ class WebSocketHandler {
     this.users.set(userId, user);
 
     const message = {
-      assistant: `<p>I'm Datupedia, your go-to chatbot for reasoning with facts. I have access to Wikipedia to ensure that my responses are factual and well-informed. Feel free to ask me anything!<span citation="[0,1]">[1]</span><span citation="[0,2]">[2]</span></p>`,
+      assistant: `<p>I'm Datupedia, your go-to chatbot for reasoning with facts. I have access to Wikipedia to ensure that my responses are factual and well-informed. Feel free to ask me anything!<sup citation="[0,1]">[1]</sup><sup citation="[0,2]">[2]</sup></p>`,
     };
     user.chatLog.push(message);
 

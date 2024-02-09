@@ -236,7 +236,7 @@
         }
 
         document.body.addEventListener("mouseover", function (event) {
-          if (event.target.matches("span[citation]")) {
+          if (event.target.matches("sup[citation]")) {
             var indexes = JSON.parse(event.target.getAttribute("citation"));
             var citationHTML = citations[indexes[0]][indexes[1] - 1];
             var rect = event.target.getBoundingClientRect();
@@ -267,7 +267,7 @@
 
         // Event to hide tooltip on mouseout
         document.body.addEventListener("mouseout", function (event) {
-          if (event.target.matches("span[citation]")) {
+          if (event.target.matches("sup[citation]")) {
             isMouseOver = false;
             setTimeout(hideTooltip, 150); // Delayed hide
           }

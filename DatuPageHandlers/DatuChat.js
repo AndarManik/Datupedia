@@ -37,26 +37,24 @@ class DatuChat {
     const nearestText = await this.findNearestTexts(convertedChat, chatIndex, k);
     const nearestTextforGPT = this.parseforGPT(nearestText);
     console.log(nearestTextforGPT);
-    const systemPrompt = `
-    Task:
-    You are the chat assistant "Datupedia", you assist the user by responding factually. 
-    You will be provided information relevant to the users query as "What you know". 
-    "What you know" was obtained from quering a vector database containing all of wikipedia.
-    This is "What you know": '${nearestTextforGPT}'
+    const systemPrompt = `Task:
+- You are "Datupedia", a chat assistant here to help users with factual answers.
+- You'll get knowledge to help answer users' questions, called "What you know".
+- "What you know" is the most relevant paragraphs from Wikipedia.
 
-    Response Guidlines: 
-    Construct an accurate and neutral response to the user's query by utilizing only "what you know". 
-    Utilize as much of "what you know" by being detailed and thorough, while being interesting and exciting.\
-    "What you know" was obtained through querying a vector database containing all of wikipedia.
-    Use html to format your response using tags such as <h>, <p>, <b>, and so on. 
-    If you reference a link from "What you know" surround it with <b> tags.
-    Use citations at the end of sentences by referencing the index in "what you know".
-    This is done by inserting a span tag with an attribute "citation"=Knowledge Index, the text of the span should be the second value in the array in brackets.
-    Here is an example for Knowledge Index = [6,12]
-    <p>This text is in a p tag and will end with a citation, this citation must be before the p tag ends.<span citation="[6,12]">[12]</span></p>
-    If multiple citations are needed for at the end of a sentence, use seperate spans, for example:
-    DO THIS: <span citation="[2,1]">[1]</span><span citation="[2,4]">[4]</span><span citation="[2,11]">[11]</span>
-    `;
+Response Guidelines:
+- Your job is to give accurate and fair answers using only "What you know".
+- Try to use as much knowledge from "What you know" as you can to give detailed answers.
+- Format your answers with HTML. You can use heading tags <h1> to <h6>, paragraphs <p>, bold <b>, and citations <sup>.
+- Highlight key words or phrases using <b>.
+- When you finish a sentence with knowledge from "What you know", show where it came from. Do this by adding a <sup> tag with "citation" set to where you got it. Inside the <sup>, put the reference number in brackets.
+- Here's how to do it for knowledge index [6,12]:
+  '<p>This is an example sentence that ends with a citation.<sup citation="[6,12]">[12]</sup></p>'
+- If you need to cite more than one source at the end of a sentence, use a <sup> tag for each one. Like this:
+  '<sup citation="[2,1]">[1]</sup><sup citation="[2,4]">[4]</sup><sup citation="[2,11]">[11]</sup>'
+
+This is "What you know": 
+'${nearestTextforGPT}'`;
     const messageStream = await openai.gpt4StreamChatLog(
       systemPrompt,
       convertedChat
@@ -71,7 +69,7 @@ class DatuChat {
 Knowledge Index = [${nearest.index}]
 Titles = [${nearest.headings}]
 Text = "${nearest.paragraph}"
-Links = [${nearest.links}]
+Key Words = [${nearest.links}]
 Knowledge End
         `;
       text.push(stringToAdd);
@@ -81,18 +79,19 @@ Knowledge End
 
   static async enrichChatQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
-      First, determine a list of 3-5 relevant Wikipedia article titles that will supplement information related to the query. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
-      Second, answer the user's query with a list of 1-3 comprehensive sentences, approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
-      The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
-      Note, the number of article titles does not have to match the number of texts.
-      
-      The purpose of this JSON output is to query a vector database. The texts will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
-      First, the texts should be different as to gather a diverse set of information, this is because if two texts were similar the outputs from the search would be similar and thus a waste of search.
-      Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics", are references heavily and thus would require a larger search space.
-      These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
-      Example Format:
-      { articles: ["article","article"], texts: ["text","text"] }
-      `;
+- First, determine a list of 5-10 Wikipedia article titles. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
+- Second, determine a list of 3-5 comprehensive sentences that contain information on the users query. approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
+- The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
+- Note, the number of article titles does not have to match the number of texts.
+
+The purpose of this JSON is to perform similarity search on the text of wikipedia. The texts will be embedded and used as search vectors. The article titles will be used to filter the search. Here are 2 facts to keep in mind:
+- First, the texts should be different as to gather a diverse set of information, this is because if two texts are similar the outputs from the search will be similar and thus a waste of search.
+- Second, the article titles should be precise as to target pages that have fewer entries, this is because general topics, such as "Physics", are references heavily and thus require a larger search and slower search.
+Example Format:
+{ 
+articles: ["article","article"], 
+texts: ["text","text"] 
+}`;
     const data = await openai.gpt3ChatLogJSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
     output.articles = [...new Set(output.articles)];
@@ -109,8 +108,7 @@ Knowledge End
       
       The purpose of this JSON output is to query a vector database. The texts will be embedded and used as search vectors, and the article titles will be used to filter the search. Because of the JSON's purpose a few facts should be kept in mind:
       First, the texts should be different as to gather a diverse set of information, this is because if two texts were similar the outputs from the search would be similar and thus a waste of search.
-      Second, the article titles should be precise as to target pages that would have fewer entries, this is because general topics, such as "Physics" or "Species", are references heavily and thus would require a larger search space.
-      These facts should be kept in mind and used reasonably, if a case requires one of these facts to be broken its ok.
+      Second, the article titles should be specific rather than general, this is because general topics such as "Physics" or "Species" are references heavily and thus would require a larger search space.
       Example Format:
       { articles: ["title","title"], texts: ["text","text"] }
       `;
