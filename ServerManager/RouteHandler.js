@@ -23,6 +23,7 @@ class RouteHandler {
     );
     this.app.post("/api/getRandom", this.getRandom.bind(this));
     this.app.post("/api/enrichSimpleQuery", this.enrichSimpleQuery.bind(this));
+    this.app.post("/api/getAllFiltered", this.getAllFiltered.bind(this));
   }
 
   handleRoot(req, res) {
@@ -53,39 +54,10 @@ class RouteHandler {
     }
   }
 
-  async textBasedFilteredSearch(req, res) {
-    const searchString = req.body.searchString; // A text string
-    const articleFilters = req.body.articleFilters; // Array of strings, sent as comma-separated values
-    const k = parseInt(req.body.k, 10); // A number
-  
-    // Check for missing arguments
-    if (!searchString) {
-      return res.status(400).json({ error: "Missing argument: searchString" });
-    }
-    if (!articleFilters) {
-      return res.status(400).json({ error: "Missing argument: articleFilters" });
-    }
-    if (isNaN(k)) { // Using isNaN to check if k is not a number after parsing
-      return res.status(400).json({ error: "Missing or invalid argument: k" });
-    }
-  
-    try {
-      const searchResults = await DatuChat.textBasedFilteredSearch(
-        searchString,
-        articleFilters,
-        k
-      );
-      res.status(200).json(searchResults);
-    } catch (error) {
-      console.error("Error during text-based filtered search:", error);
-      if (error.statusCode === 500) {
-        res.status(500).json({ error: "Server error with valid input" });
-      } else {
-        res.status(error.statusCode || 500).json({ error: error.message || "Internal server error" });
-      }
-    }
+  async getAllFiltered(req, res) {
+    const filters = req.body.filters;
+    res.json(await DatuChat.getAllFiltered(filters));
   }
-  
 
   async textBasedGlobalSearch(req, res) {
     const searchString = req.body.searchString; // A text string
@@ -97,6 +69,13 @@ class RouteHandler {
     const simpleQuery = req.body.simpleQuery; // A text string
     res.json(await DatuChat.enrichQuery(simpleQuery));
   }
+
+  async getRandom(req, res) {
+    const n = parseInt(req.body.n, 10); // A number
+    res.json(await DatuChat.getRandom(n));
+  }
+
+  //Routes for OpenAI plugin
 
   handleOpenApi(req, res) {
     const filePath = path.join(__dirname, "../public/openapi.yaml"); // Update the path to where your openapi.yaml file is located
@@ -121,10 +100,42 @@ class RouteHandler {
       res.type("yaml").send(data);
     });
   }
+  async textBasedFilteredSearch(req, res) {
+    const searchString = req.body.searchString; // A text string
+    const articleFilters = req.body.articleFilters; // Array of strings, sent as comma-separated values
+    const k = parseInt(req.body.k, 10); // A number
 
-  async getRandom(req, res) {
-    const n = parseInt(req.body.n, 10); // A number
-    res.json(await DatuChat.getRandom(n));
+    // Check for missing arguments
+    if (!searchString) {
+      return res.status(400).json({ error: "Missing argument: searchString" });
+    }
+    if (!articleFilters) {
+      return res
+        .status(400)
+        .json({ error: "Missing argument: articleFilters" });
+    }
+    if (isNaN(k)) {
+      // Using isNaN to check if k is not a number after parsing
+      return res.status(400).json({ error: "Missing or invalid argument: k" });
+    }
+
+    try {
+      const searchResults = await DatuChat.textBasedFilteredSearch(
+        searchString,
+        articleFilters,
+        k
+      );
+      res.status(200).json(searchResults);
+    } catch (error) {
+      console.error("Error during text-based filtered search:", error);
+      if (error.statusCode === 500) {
+        res.status(500).json({ error: "Server error with valid input" });
+      } else {
+        res
+          .status(error.statusCode || 500)
+          .json({ error: error.message || "Internal server error" });
+      }
+    }
   }
 }
 

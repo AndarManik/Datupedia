@@ -17,11 +17,11 @@ class OpenaiAPI {
         const result = await apiCall();
         return result;
       } catch (error) {
-        this.retryCount++;
+        console.log(error);
+        retryCount++;
         await this.sleep(this.waitTime * Math.pow(2, this.retryCount));
       }
     }
-    console.log("call failed");
   }
 
   sleep(ms) {

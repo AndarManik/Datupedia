@@ -34,7 +34,11 @@ class DatuChat {
       const content = message[role];
       return { role, content };
     });
-    const nearestText = await this.findNearestTexts(convertedChat, chatIndex, k);
+    const nearestText = await this.findNearestTexts(
+      convertedChat,
+      chatIndex,
+      k
+    );
     const nearestTextforGPT = this.parseforGPT(nearestText);
     console.log(nearestTextforGPT);
     const systemPrompt = `Task:
@@ -169,9 +173,7 @@ texts: ["text","text"]
     console.log(searchParam);
     const adaBatchPromise = openai
       .adaBatch(searchParam.texts)
-      .then((preReduce) =>
-        preReduce.map((pre) => pca(pre).slice(0, 250))
-      );
+      .then((preReduce) => preReduce.map((pre) => pca(pre).slice(0, 250)));
     const wikipediaPromise = wikipediaAPI.resolveRedirectsOrSearch(
       searchParam.articles
     );
@@ -182,7 +184,6 @@ texts: ["text","text"]
 
     console.log(embeddings);
     console.log(articles);
-
 
     const searchOperations = embeddings.map((embedding) => {
       return this.searchWithEmbedding(embedding, articles, k);
@@ -289,7 +290,6 @@ texts: ["text","text"]
     return await this.ragResponse(pageName, chatLog.slice(-8), 5);
   }
 
-
   static async getRandom(n) {
     try {
       const cursor = await getDb()
@@ -310,6 +310,34 @@ texts: ["text","text"]
       console.error("Error in getRandom:", error);
       throw error; // Rethrow to be caught in the calling function
     }
+  }
+
+  static async getAllFiltered(filters) {
+    const filtersResolved = await wikipediaAPI.resolveRedirectsOrSearch(filters);
+    // Construct the query to match documents where the links field contains
+    // any of the links provided in the filters array.
+    const matchStage =
+    filtersResolved && filtersResolved.length > 0 ? { links: { $in: filtersResolved } } : {};
+
+    // Use the aggregation framework to filter documents based on links
+    // and then project only the necessary fields.
+    const cursor = await getDb()
+      .collection("embeddings")
+      .aggregate([
+        { $match: matchStage }, // Apply the filter condition based on links
+        {
+          $project: {
+            _id: 1,
+            headings: 1,
+            links: 1,
+            paragraph: 1,
+          },
+        },
+      ]);
+
+    // Assuming you want to return the documents as an array
+    const results = await cursor.toArray();
+    return results;
   }
 }
 
