@@ -15,7 +15,7 @@ class DatuChat {
 
     while (attempts < 5) {
       try {
-        return await this.ragGlobalResponse(chatLog.slice(-8), 5);
+        return await this.ragGlobalResponse(chatLog.slice(-8), 7);
       } catch (error) {
         console.error("Attempt failed:", attempts, error);
         attempts++;
@@ -34,13 +34,13 @@ class DatuChat {
       const content = message[role];
       return { role, content };
     });
-    const nearestText = await this.findNearestTexts(
+    const {nearestText, nearestTextforGPT} = await this.findNearestTexts(
       convertedChat,
       chatIndex,
-      k
+      k * 2
     );
-    const nearestTextforGPT = this.parseforGPT(nearestText);
-    console.log(nearestTextforGPT);
+    console.log("after findNearestText")
+    console.log(nearestText, nearestTextforGPT);
     const systemPrompt = `Task:
 - You are "Datupedia", a chat assistant here to help users with factual answers.
 - You'll get knowledge to help answer users' questions, called "What you know".
@@ -66,35 +66,61 @@ This is "What you know":
     return { messageStream, nearestText };
   }
 
-  static parseforGPT(nearestText) {
-    const text = [];
+  static parseforGPT(nearestText, articles, k) {
+    const articleTexts = [];
+    const backLinkTexts = [];
+
     nearestText.forEach((nearest) => {
-      const stringToAdd = `
-Knowledge Index = [${nearest.index}]
-Titles = [${nearest.headings}]
-Text = "${nearest.paragraph}"
-Key Words = [${nearest.links}]
-Knowledge End
-        `;
-      text.push(stringToAdd);
+      if(articles.includes(nearest.headings[0])) {
+        articleTexts.push(nearest);
+      }
+      else {
+        backLinkTexts.push(nearest);
+      }
     });
-    return text.join("");
+
+    const numberOfBackLinkTexts = Math.min(Math.floor(k/2), backLinkTexts.length);
+    const numberOfArticleTexts = k - numberOfBackLinkTexts;
+
+    const text = [];
+
+    articleTexts.forEach((nearest, index) => {
+      if(index >= numberOfArticleTexts) return;
+      const stringToAdd = `Knowledge Index: [${nearest.index}]
+Titles: [${nearest.headings}]
+Text: "${nearest.paragraph}"
+Links: [${nearest.links}]
+---`;
+      text.push(stringToAdd);
+    })
+
+    backLinkTexts.forEach((nearest, index) => {
+      if(index >= numberOfBackLinkTexts) return;
+      const stringToAdd = `Knowledge Index: [${nearest.index}]
+Titles: [${nearest.headings}]
+Text: "${nearest.paragraph}"
+Links: [${nearest.links}]
+---`;
+      text.push(stringToAdd);
+    })
+
+    console.log(text.join("\n"));
+    console.log(numberOfArticleTexts, numberOfBackLinkTexts);
+    return text.join("\n");
   }
 
   static async enrichChatQuery(convertedChat) {
     const systemPrompt = `Based on the user's query, provide a JSON response that includes two components:
-- First, determine a list of 5-10 Wikipedia article titles. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
-- Second, determine a list of 3-5 comprehensive sentences that contain information on the users query. approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
-- The final output should be a single JSON object containing both keys: 'articles' and 'texts'.
-- Note, the number of article titles does not have to match the number of texts.
+First, determine a list of 5-10 Wikipedia article titles. The output for this component should be in JSON format with the key 'articles' and the value being a list of the article titles. 
+Second, determine a list of 3-5 comprehensive sentences that contain information on the users query. approximately 50-100 words in length each. This response should also be in JSON format, where the key is 'texts' and the value is a list of texts. 
+The number of article titles does not have to match the number of texts.
 
-The purpose of this JSON is to perform similarity search on the text of wikipedia. The texts will be embedded and used as search vectors. The article titles will be used to filter the search. Here are 2 facts to keep in mind:
-- First, the texts should be different as to gather a diverse set of information, this is because if two texts are similar the outputs from the search will be similar and thus a waste of search.
-- Second, the article titles should be precise as to target pages that have fewer entries, this is because general topics, such as "Physics", are references heavily and thus require a larger search and slower search.
+The texts should be different as to gather a diverse set of information, this is because if two texts are similar the outputs from the search will be similar and thus a waste of search.
+The article titles should be precise as to target pages that have fewer entries, this is because general topics, such as "Physics", are references heavily and thus require a larger search and slower search.
 Example Format:
 { 
-articles: ["article","article"], 
-texts: ["text","text"] 
+articles: ["article1","article2"], 
+texts: ["text1","text2"] 
 }`;
     const data = await openai.gpt3ChatLogJSON(systemPrompt, convertedChat);
     const output = JSON.parse(data);
@@ -202,7 +228,7 @@ texts: ["text","text"]
         element.index = [chatIndex, index + 1];
       });
       console.log(uniqueResults);
-      return uniqueResults;
+      return {nearestText: uniqueResults, nearestTextforGPT: this.parseforGPT(uniqueResults, articles, k)};
     } catch (error) {
       console.error("Error in findGlobalNearestTexts:", error);
       return [];
