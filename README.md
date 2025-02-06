@@ -1,3 +1,5 @@
+Service is discontinued, Demos available upon request.
+
 # Datupedia
 
 ## Introduction
